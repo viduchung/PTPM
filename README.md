@@ -54,10 +54,12 @@ Dự án gồm 4 thành viên với vai trò và file nhiệm vụ chi tiết ri
 ```text
 pitchos/
 ├── README.md                      # [TỔNG QUAN] Bảng điều phối toàn dự án
-├── NHIEM_VU_HUNG.md               # [HÙNG] File nhiệm vụ cá nhân chi tiết
-├── NHIEM_VU_LINH.md               # [LINH] File nhiệm vụ cá nhân chi tiết
-├── NHIEM_VU_HOANG.md              # [HOÀNG] File nhiệm vụ cá nhân chi tiết
-├── NHIEM_VU_NHAT.md               # [NHẬT] File nhiệm vụ cá nhân chi tiết
+├── 🛠️ CONG_NGHE_SU_DUNG.md        # [TECH STACK] Toàn bộ công nghệ Backend, Frontend, CSDL
+├── 🔑 .env                        # [MÔI TRƯỜNG] File cấu hình master dùng chung
+├── 👤 NHIEM_VU_HUNG.md            # [HÙNG] File nhiệm vụ cá nhân chi tiết
+├── 👤 NHIEM_VU_LINH.md            # [LINH] File nhiệm vụ cá nhân chi tiết
+├── 👤 NHIEM_VU_HOANG.md           # [HOÀNG] File nhiệm vụ cá nhân chi tiết
+├── 👤 NHIEM_VU_NHAT.md            # [NHẬT] File nhiệm vụ cá nhân chi tiết
 │
 ├── pitchos-database/              # Thư mục CSDL phân tán (HÙNG)
 │   ├── auth-user-service.sql      # CSDL User & Auth (Role: admin, chusan, user)
