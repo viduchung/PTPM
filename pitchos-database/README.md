@@ -1,13 +1,13 @@
 # Nhiệm vụ: Hùng — Quản trị CSDL Phân tán & Tầng Repository
 
 - **Vai trò:** Database Administrator & Backend Data Engineer
-- **Tổng điểm phụ trách:** **2,5 Điểm** (0,5đ Lý thuyết + 2,0đ Thực nghiệm)
+- **Tổng điểm phụ trách:** **2,25 / 10,0 Điểm** (0,75đ Lý thuyết + 1,5đ Thực nghiệm)
 - **Báo cáo phụ trách:** **Chương 3** (Quản lý dữ liệu, lược đồ ERD từng dịch vụ, kiến trúc Entity/Repository)
-- **Thứ tự thực hiện:** **GIAI ĐOẠN 1 (LÀM ĐẦU TIÊN)** — Vì các dịch vụ Spring Boot cần CSDL hợp lệ để kết nối khi khởi động.
+- **Thứ tự thực hiện:** **GIAI ĐOẠN 1 (LÀM ĐẦU TIÊN CẢ NHÓM)** — Vì các dịch vụ Spring Boot cần CSDL hợp lệ để kết nối khi khởi động.
 
 ---
 
-## 📚 1. Yêu cầu Lý thuyết (0,5 Điểm - Câu 1 Ý 2b)
+## 📚 1. Yêu cầu Lý thuyết (0,75 Điểm — Câu 1 Ý 2b)
 
 - [ ] **Giải thích nguyên tắc Database-per-service:**
   - Mỗi microservice chỉ sở hữu và quản trị cơ sở dữ liệu riêng thuộc phạm vi của mình.
@@ -20,20 +20,20 @@
 
 ---
 
-## 🛠️ 2. Yêu cầu Thực nghiệm (2,0 Điểm - Câu 2 Ý 3 & hỗ trợ Ý 4)
+## 🛠️ 2. Yêu cầu Thực nghiệm (1,5 Điểm — Câu 2 Ý 3)
 
 ### 2.1. Khởi tạo 3 CSDL MySQL độc lập
 Tạo 3 schema riêng biệt trên MySQL (mặc định port 3306):
-1. `pitchos_user_db` (Dành cho Auth & User Service)
-2. `pitchos_pitch_db` (Dành cho Pitch Service)
-3. `pitchos_booking_db` (Dành cho Booking Service)
+1. `pitchos_user_db` (Dành cho Hoàng - Auth & User Service)
+2. `pitchos_pitch_db` (Dành cho Linh - Pitch Service)
+3. `pitchos_booking_db` (Dành cho Nhật - Booking Service)
 
 ### 2.2. Viết 3 Script Khởi tạo CSDL tương ứng 3 Microservice
 Trong thư mục `pitchos-database/` có đúng 3 file SQL độc lập:
-1. `auth-user-service.sql` (Cấp cho Linh - Auth Service, DB: `pitchos_user_db`)
+1. `auth-user-service.sql` (Cấp cho Hoàng - Auth Service, DB: `pitchos_user_db`)
    - Bảng `users`: `id`, `username`, `email` (Gmail), `password` (BCrypt), `full_name`, `phone`, `role` (`admin`, `chusan`, `user`).
    - Nạp sẵn 3 tài khoản mẫu cho 3 role: `admin`, `chusan`, `user` với mật khẩu mặc định là `123456`.
-2. `pitch-service.sql` (Cấp cho Hoàng - Pitch Service, DB: `pitchos_pitch_db`)
+2. `pitch-service.sql` (Cấp cho Linh - Pitch Service, DB: `pitchos_pitch_db`)
    - Bảng `pitches`: `id`, `name` (tên sân), `pitch_type` (loại sân: `san_5`, `san_7`, `san_10`), `price_per_hour` (giá), `address` (địa chỉ), `thumbnail_url` (link ảnh đại diện), `google_map_url` (link Google Maps), `status` (`hoat_dong`, `bao_tri`).
    - Nạp sẵn 4 sân bóng mẫu đa dạng cấu hình.
 3. `booking-service.sql` (Cấp cho Nhật - Booking Service, DB: `pitchos_booking_db`)
@@ -54,7 +54,7 @@ Trong thư mục `pitchos-database/` có đúng 3 file SQL độc lập:
     ```
 
 ### 2.4. Bàn giao Cấu hình cho nhóm
-- Gửi chuỗi kết nối `application.properties` (JDBC URL, username, password) cho Linh, Hoàng và Nhật.
+- Gửi chuỗi kết nối trong file master `.env` và `application.properties` (JDBC URL, username, password) cho Hoàng, Linh và Nhật.
 
 ---
 

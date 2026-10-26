@@ -37,9 +37,9 @@ Hệ thống Backend được xây dựng bằng **Java** và nền tảng **Spr
 * **Hệ quản trị CSDL:** **MySQL 8.0**
 * **Driver kết nối:** `mysql-connector-j`
 * **Kiến trúc CSDL phân tán:** 3 CSDL độc lập hoạt động trên cùng máy chủ hoặc độc lập:
-  1. `pitchos_user_db` (Auth & User Service - Port 8081)
-  2. `pitchos_pitch_db` (Pitch Service - Port 8082)
-  3. `pitchos_booking_db` (Booking Service - Port 8083)
+  1. `pitchos_user_db` (Auth & User Service - Port 8081 - Hoàng)
+  2. `pitchos_pitch_db` (Pitch Service - Port 8082 - Linh)
+  3. `pitchos_booking_db` (Booking Service - Port 8083 - Nhật)
 * **Công cụ trực quan hóa & kiểm chứng:**
   - **DBeaver Community / MySQL Workbench / Navicat**
   - Hỗ trợ chạy các câu lệnh `SELECT` kiểm chứng đơn lưu đĩa cứng khi demo.
@@ -63,8 +63,8 @@ Phục vụ giao diện người dùng đặt sân và chủ sân quản lý:
 
 ## 🚀 5. DEVOPS, CÔNG CỤ & MÔI TRƯỜNG PHÁT TRIỂN
 
-* **Quản lý biến môi trường:** File master [`.env`](file:///c:/Users/viduc/Downloads/loll/.env) tập trung và các file `application.properties` tự động nạp.
-* **Container hóa:** **Docker & Docker Compose** (File [`docker-compose.yml`](file:///c:/Users/viduc/Downloads/loll/docker-compose.yml) bật MySQL và tự nạp dữ liệu với 1 lệnh `docker compose up -d`).
+* **Quản lý biến môi trường:** File master [`.env`](file:///c:/Users/viduc/Downloads/PTPM/.env) tập trung và các file `application.properties` tự động nạp.
+* **Container hóa:** **Docker & Docker Compose** (File [`docker-compose.yml`](file:///c:/Users/viduc/Downloads/PTPM/docker-compose.yml) bật MySQL và tự nạp dữ liệu với 1 lệnh `docker compose up -d`).
 * **Công cụ kiểm thử API (Testing):**
   - **Postman:** Tạo bộ sưu tập (Collection) kiểm thử kịch bản thành công và lỗi (400, 401, 403, 503).
   - **Swagger UI:** Giao diện trực quan tích hợp sẵn trên từng dịch vụ (`http://localhost:8082/swagger-ui.html`).
@@ -74,8 +74,8 @@ Phục vụ giao diện người dùng đặt sân và chủ sân quản lý:
 
 ## 📊 6. MA TRẬN ÁNH XẠ CÔNG NGHỆ VÀO NỘI DUNG BÁO CÁO
 
-* **Chương 1 (Hoàng):** Trình bày kiến trúc SOA, Spring Web, RESTful API, Jakarta Validation và Swagger UI.
+* **Chương 1 (Linh):** Trình bày kiến trúc SOA, Spring Web, RESTful API, Jakarta Validation và Swagger UI.
 * **Chương 2 (Nhật):** Trình bày Spring Cloud OpenFeign, HTTP Status Code, CustomErrorDecoder và giải pháp ngăn chặn Cascading Failure (503 Service Unavailable).
 * **Chương 3 (Hùng):** Trình bày MySQL 8.0, Spring Data JPA, Hibernate, thiết kế Schema không dùng Foreign Key vật lý.
-* **Chương 4 (Linh):** Trình bày Spring Security 6, JJWT (HMAC-SHA256), BCryptPasswordEncoder, cơ chế xử lý 401/403.
-* **Chương 5 (Linh & Cả nhóm):** Trình bày bộ Test Cases thực hiện qua Postman / Swagger UI.
+* **Chương 4 (Hoàng):** Trình bày Spring Security 6, JJWT (HMAC-SHA256), BCryptPasswordEncoder, cơ chế xử lý 401/403.
+* **Chương 5 (Hoàng & Cả nhóm):** Trình bày bộ Test Cases thực hiện qua Postman / Swagger UI.

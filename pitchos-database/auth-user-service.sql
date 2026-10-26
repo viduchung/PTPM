@@ -1,5 +1,5 @@
 -- ====================================================================
--- MICROSERVICE 1: AUTH & USER SERVICE (Port 8081) - LINH PHỤ TRÁCH
+-- MICROSERVICE 1: AUTH & USER SERVICE (Port 8081) - HOÀNG PHỤ TRÁCH
 -- ====================================================================
 
 -- 1. Khởi tạo cơ sở dữ liệu riêng

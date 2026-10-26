@@ -1,5 +1,5 @@
 -- ====================================================================
--- MICROSERVICE 2: PITCH SERVICE (Port 8082) - HOÀNG PHỤ TRÁCH
+-- MICROSERVICE 2: PITCH SERVICE (Port 8082) - LINH PHỤ TRÁCH
 -- ====================================================================
 
 -- 1. Khởi tạo cơ sở dữ liệu riêng
