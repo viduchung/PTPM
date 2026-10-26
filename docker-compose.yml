@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  pitchos-mysql:
+    image: mysql:8.0
+    container_name: pitchos-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-123456}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Tự động nạp 3 file SQL của Hùng khi khởi động container lần đầu:
+      - ./pitchos-database/auth-user-service.sql:/docker-entrypoint-initdb.d/01_auth.sql
+      - ./pitchos-database/pitch-service.sql:/docker-entrypoint-initdb.d/02_pitch.sql
+      - ./pitchos-database/booking-service.sql:/docker-entrypoint-initdb.d/03_booking.sql
+    networks:
+      - pitchos-network
+
+networks:
+  pitchos-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
