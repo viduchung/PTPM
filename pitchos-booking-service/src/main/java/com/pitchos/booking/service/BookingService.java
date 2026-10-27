@@ -85,6 +85,12 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn đặt sân id = " + bookingId));
 
+        // Đơn tu_choi đã nhả khung giờ (truy vấn trùng lịch bỏ qua tu_choi), có thể người khác đã đặt vào
+        // → không cho duyệt lại, tránh 2 đơn cùng giữ 1 khung giờ.
+        if (booking.getStatus() == BookingStatus.tu_choi) {
+            throw new BadRequestException("Đơn đã bị từ chối, không thể đổi trạng thái");
+        }
+
         booking.setStatus(status);
         return BookingResponse.from(bookingRepository.save(booking));
     }

@@ -106,7 +106,7 @@ mvn spring-boot:run
 
 | Mã lỗi | Khi nào |
 | :---: | :--- |
-| `400` | Thiếu trường, `endTime` không sau `startTime`, sân đang bảo trì, trùng lịch, `status` sai |
+| `400` | Thiếu trường, `endTime` không sau `startTime`, sân đang bảo trì, trùng lịch, `status` sai, đổi trạng thái đơn đã `tu_choi` |
 | `401` | Không gửi token, token sai chữ ký hoặc hết hạn |
 | `403` | Sai vai trò (token `chusan` gọi `POST`, token `user` gọi `PATCH`) |
 | `404` | `pitchId` không tồn tại trên Pitch Service, hoặc đơn đặt không tồn tại |
