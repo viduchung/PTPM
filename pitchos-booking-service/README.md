@@ -85,6 +85,24 @@
 
 > ⚠️ Khi demo, chọn khung giờ **khác** `2026-10-27 18:00–19:30` (đơn mẫu trong `booking-service.sql`), nếu không sẽ nhận 400 "Khung giờ này đã có người đặt".
 
+**Postman:** import [`postman/PitchOS-Booking.postman_collection.json`](postman/PitchOS-Booking.postman_collection.json), mở thư mục *1. Demo hội đồng (Nhật)*:
+1. Gửi *Bước 1* → `201` (ngày đặt chọn ngẫu nhiên trong năm 2027 nên tập dượt nhiều lần không bị trùng lịch).
+2. Báo Hùng chạy `SELECT` kiểm chứng CSDL.
+3. Tắt Pitch Service (Ctrl + C cửa sổ 8082), gửi *Bước 3* (cùng khung giờ với Bước 1) → `503`; gửi *Bước 3b* → `200` (Booking Service không sập theo).
+
+Token `user`/`chusan`/`admin` đã điền sẵn trong tab *Variables* (ký bằng `JWT_SECRET` chung, hạn 30/06/2027). Khi Auth Service của Hoàng xong, chạy thư mục *0* để thay bằng token thật.
+
+### Tập dượt khi Pitch Service / Auth Service chưa xong
+
+```bash
+# Cửa sổ 1: Pitch Service GIẢ LẬP trên cổng 8082 (dữ liệu giống pitch-service.sql: sân 1 giá 300.000đ, sân 4 bảo trì)
+java pitchos-booking-service/demo/MockPitchService.java
+# Cửa sổ 2: Booking Service
+cd pitchos-booking-service && mvn spring-boot:run
+```
+
+Thư mục *2* của collection (17 request, chạy bằng Collection Runner khi Pitch Service BẬT) và thư mục *3* (khi Pitch Service TẮT) là bộ kiểm thử Bảng 2.2. Trước khi chụp ảnh minh chứng cho báo cáo, chạy lại với Pitch Service thật của Linh.
+
 ---
 
 ## ▶️ 5. Hướng dẫn chạy và đặc tả API
@@ -97,6 +115,7 @@ mvn spring-boot:run
 - Cần MySQL đã chạy `pitchos-database/booking-service.sql`. Giá trị mặc định trong `application.properties` trùng với `.env` tổng.
 - JDBC dùng `serverTimezone=Asia/Ho_Chi_Minh` để giờ đặt sân lưu xuống MySQL đúng như giờ gửi lên (dùng `UTC` sẽ lệch 7 tiếng).
 - Timeout gọi Pitch Service: kết nối 2s, đọc 3s.
+- Chống đặt trùng khi nhiều request **đồng thời**: `BookingService` khóa theo từng sân, các request cùng sân lần lượt "kiểm tra trùng lịch → lưu đơn" (10 request cùng lúc vào 1 khung giờ → đúng 1 đơn `201`, 9 request `400`). Khóa nằm trong bộ nhớ nên chỉ đúng khi chạy 1 instance Booking Service.
 
 | Method | URL | Role | Body | Thành công |
 | :--- | :--- | :---: | :--- | :---: |
@@ -125,6 +144,9 @@ src/main/java/com/pitchos/booking/
 ├── repository/  BookingRepository (Hùng)
 ├── security/    JwtUtil, JwtAuthenticationFilter, SecurityConfig
 └── service/     BookingService
+
+demo/MockPitchService.java                  # Pitch Service giả lập để tập dượt (không thuộc mã nguồn service)
+postman/PitchOS-Booking.postman_collection.json
 ```
 
 **Hợp đồng với nhóm:**

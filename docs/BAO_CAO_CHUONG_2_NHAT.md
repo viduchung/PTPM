@@ -87,11 +87,13 @@ OpenFeign tự sinh phần cài đặt gửi HTTP request và chuyển JSON tr�
 1. Kiểm tra `endTime` sau `startTime` (sai → `400`).
 2. Gọi `pitchClient.getPitchById(pitchId)` (sân không tồn tại → `404`, Pitch Service tắt → `503`).
 3. Sân không ở trạng thái `hoat_dong` → `400`.
-4. `countOverlappingBookings` (câu truy vấn của Hùng, bỏ qua đơn `tu_choi`) > 0 → `400` "Khung giờ này đã có người đặt".
-5. `totalPrice = pricePerHour × số phút / 60`.
-6. Lưu đơn `cho_duyet`, trả `201 Created`.
+4. `totalPrice = pricePerHour × số phút / 60`.
+5. Khóa theo sân, rồi `countOverlappingBookings` (câu truy vấn của Hùng, bỏ qua đơn `tu_choi`) > 0 → `400` "Khung giờ này đã có người đặt".
+6. Lưu đơn `cho_duyet`, nhả khóa, trả `201 Created`.
 
 Gọi Pitch Service **trước** khi kiểm tra trùng lịch để kịch bản demo "tắt Pitch Service rồi gửi lại request vừa đặt" luôn đi tới lời gọi liên dịch vụ và trả `503`.
+
+**Chống đặt trùng khi nhiều khách gửi cùng lúc:** nếu 2 request cùng kiểm tra trùng lịch (đều thấy trống) rồi mới lưu thì cả 2 đều được lưu, tức 1 khung giờ bị đặt 2 lần. Kiểm thử thực tế phiên bản chưa khóa: 5 request đồng thời → 2 request nhận `201`, 2 đơn cùng giữ một khung giờ trong CSDL. Vì vậy bước 5–6 được đặt trong khối `synchronized` theo `pitchId`: các request **cùng sân** phải lần lượt "kiểm tra → lưu", còn các sân khác vẫn chạy song song. Lời gọi Pitch Service nằm **ngoài** khóa nên một request đang chờ Pitch Service không chặn request khác. Hạn chế: khóa nằm trong bộ nhớ của tiến trình, chỉ đúng khi chạy 1 instance Booking Service; khi mở rộng nhiều instance cần khóa ở tầng CSDL (ví dụ `SELECT ... FOR UPDATE` hoặc khóa phân tán).
 
 **Kết quả thực tế** của `POST /api/v1/bookings` (token `user`, sân 1 giá 300.000đ, 18:00–19:30):
 
@@ -210,7 +212,7 @@ Booking Service không bị dừng, không trả `500`, không ghi đơn xuống
 
 ## 2.4. Kết quả kiểm thử Booking Service (đóng góp cho Chương 5)
 
-Kiểm thử bằng request HTTP thật tới Booking Service (8083) chạy với MySQL. Vì Pitch Service (Linh) và Auth Service (Hoàng) chưa hoàn thiện lúc kiểm thử, cổng 8082 dùng một **Pitch Service giả lập** trả dữ liệu như `pitch-service.sql` (sân `1` hoạt động 300.000đ, sân `4` bảo trì) và token được ký bằng `jwt.secret` chung. **Cần chạy lại với Pitch Service và Auth Service thật trước khi chụp ảnh minh chứng.**
+Kiểm thử bằng request HTTP thật tới Booking Service (8083) chạy với MySQL. Vì Pitch Service (Linh) và Auth Service (Hoàng) chưa hoàn thiện lúc kiểm thử, cổng 8082 dùng **Pitch Service giả lập** [`demo/MockPitchService.java`](../pitchos-booking-service/demo/MockPitchService.java) trả dữ liệu như `pitch-service.sql` (sân `1` hoạt động 300.000đ, sân `4` bảo trì) và token được ký bằng `jwt.secret` chung. Bộ ca kiểm thử có sẵn trong [`postman/PitchOS-Booking.postman_collection.json`](../pitchos-booking-service/postman/PitchOS-Booking.postman_collection.json) (thư mục 2 và 3). Chạy lại toàn bộ ngày 27/10/2026 sau khi thêm khóa chống đặt trùng: tất cả đạt. **Cần chạy lại với Pitch Service và Auth Service thật trước khi chụp ảnh minh chứng.**
 
 **Bảng 2.2. Ca kiểm thử Booking Service**
 
@@ -233,5 +235,8 @@ Kiểm thử bằng request HTTP thật tới Booking Service (8083) chạy vớ
 | 15 | `PATCH /999/status` | 404 | ✅ |
 | 16 | **Tắt Pitch Service**, gửi lại request ca #9 | **503** | ✅ |
 | 17 | `GET /my-bookings` khi Pitch Service đã tắt | 200 | ✅ |
+| 18 | 10 request **đồng thời** cùng sân `2`, cùng khung giờ | đúng 1 × 201, 9 × 400 | ✅ (lặp 6 lần) |
+| 19 | 3 request đồng thời vào 3 sân khác nhau, cùng giờ | 3 × 201 | ✅ |
+| 20 | Từ chối đơn ca #9 (`tu_choi`) rồi đặt lại đúng khung giờ đó | 200, rồi 201 | ✅ |
 
 Kiểm chứng CSDL sau ca #9: `SELECT * FROM pitchos_booking_db.bookings ORDER BY id DESC LIMIT 1;` → `start_time = 2026-10-30 18:00:00`, `total_price = 450000.00`, `status = cho_duyet`.
