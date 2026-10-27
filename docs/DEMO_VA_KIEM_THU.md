@@ -30,10 +30,10 @@ sequenceDiagram
     %% Giai đoạn Đặt sân thành công
     Note over User, DB: 3. Quy trình Đặt sân Liên dịch vụ (Nhật demo)
     User->>Booking: POST /api/v1/bookings (pitchId=1, startTime, endTime, kèm Token)
-    Booking->>DB: Kiểm tra trùng lịch (BookingRepository)
-    DB-->>Booking: Lịch trống (0 bản ghi xung đột)
     Booking->>Pitch: OpenFeign: GET /api/v1/pitches/1 (Lấy giá & trạng thái)
     Pitch-->>Booking: 200 OK (pricePerHour: 300.000, status: hoat_dong)
+    Booking->>DB: Kiểm tra trùng lịch (BookingRepository)
+    DB-->>Booking: Lịch trống (0 bản ghi xung đột)
     Booking->>Booking: Tính tổng tiền & gán status = cho_duyet
     Booking->>DB: Lưu booking vào pitchos_booking_db.bookings
     Booking-->>User: 201 Created (Thông tin đơn đặt)
