@@ -38,7 +38,7 @@
   - Kết nối CSDL `pitchos_booking_db` do Hùng bàn giao.
   - Tạo Entity `Booking` và `BookingRepository` (tích hợp câu truy vấn chống trùng lịch do Hùng thiết kế).
 - [x] **Xây dựng đầy đủ 3 API nghiệp vụ chính:**
-  1. `POST /api/v1/bookings`: Nhận yêu cầu đặt sân, gọi sang Pitch Service lấy giá, kiểm tra trùng lịch, tính tổng tiền, tạo đơn với trạng thái `cho_duyet`.
+  1. `POST /api/v1/bookings`: Nhận yêu cầu đặt sân, gọi sang Pitch Service lấy giá, kiểm tra trùng lịch, tính tổng tiền, tạo đơn với trạng thái `cho_duyet`. Khóa theo từng sân để nhiều request gửi **đồng thời** không đặt trùng 1 khung giờ.
   2. `GET /api/v1/bookings/my-bookings`: Truy vấn danh sách đơn đặt của khách hàng hiện tại trích xuất từ JWT Token (role `user`).
   3. `PATCH /api/v1/bookings/{id}/status`: Chủ sân duyệt đơn (`da_duyet`) hoặc từ chối (`tu_choi`) (yêu cầu role `chusan` hoặc `admin`).
 - [x] **Giao tiếp liên dịch vụ với Spring Cloud OpenFeign:**
@@ -81,6 +81,8 @@
 ---
 
 ### 🎤 D. Nhiệm vụ Demo trước Hội đồng (Nhật trực tiếp thao tác)
+- [x] **Chuẩn bị:** Postman Collection [`pitchos-booking-service/postman/PitchOS-Booking.postman_collection.json`](pitchos-booking-service/postman/PitchOS-Booking.postman_collection.json) (thư mục *1. Demo hội đồng* có sẵn 3 request Bước 1 → Bước 3 → Bước 3b, token điền sẵn) và Pitch Service giả lập [`pitchos-booking-service/demo/MockPitchService.java`](pitchos-booking-service/demo/MockPitchService.java) để tập dượt. Đã chạy thử trọn kịch bản: 201 → tắt Pitch → 503 → 200. Hướng dẫn: mục 4 trong [`pitchos-booking-service/README.md`](pitchos-booking-service/README.md).
+- [ ] **Tổng duyệt với Pitch Service thật (Linh) và token thật (Hoàng)** trước khi chụp ảnh minh chứng.
 - [ ] **Bước 1 (Thành công - 201 Created):**
   - Dùng token của `user` gửi request `POST /api/v1/bookings` đặt sân hợp lệ.
   - Chứng minh Booking Service tự động gọi OpenFeign sang Pitch Service (8082) lấy đơn giá 300.000đ, tính tổng tiền thành công và tạo đơn trạng thái `cho_duyet`, trả về mã **201 Created**.

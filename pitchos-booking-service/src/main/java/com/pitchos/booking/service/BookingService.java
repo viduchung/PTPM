@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
@@ -26,8 +27,11 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final PitchClient pitchClient;
 
+    /** Mỗi sân một khóa: các request đặt cùng sân phải lần lượt "kiểm tra trùng lịch → lưu đơn". */
+    private final ConcurrentHashMap<Long, Object> pitchLocks = new ConcurrentHashMap<>();
+
     /**
-     * Đặt sân: gọi Pitch Service lấy giá → kiểm tra trùng lịch → tính tổng tiền → lưu đơn cho_duyet.
+     * Đặt sân: gọi Pitch Service lấy giá → tính tổng tiền → kiểm tra trùng lịch → lưu đơn cho_duyet.
      * Pitch Service bị tắt thì pitchClient ném FeignException → GlobalExceptionHandler trả 503.
      */
     public BookingResponse createBooking(Long userId, BookingRequest request) {
@@ -44,30 +48,35 @@ public class BookingService {
             throw new BadRequestException("Sân đang bảo trì, không thể đặt");
         }
 
-        // 2. Kiểm tra trùng lịch (câu truy vấn của Hùng, bỏ qua đơn tu_choi)
-        Long overlapping = bookingRepository.countOverlappingBookings(
-                request.getPitchId(), request.getStartTime(), request.getEndTime());
-        if (overlapping > 0) {
-            throw new BadRequestException("Khung giờ này đã có người đặt");
-        }
-
-        // 3. totalPrice = số giờ * pricePerHour
+        // 2. totalPrice = số giờ * pricePerHour
         long minutes = Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
         BigDecimal totalPrice = pitch.getPricePerHour()
                 .multiply(BigDecimal.valueOf(minutes))
                 .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
 
-        // 4. Lưu đơn với trạng thái cho_duyet
-        Booking booking = Booking.builder()
-                .userId(userId)
-                .pitchId(request.getPitchId())
-                .startTime(request.getStartTime())
-                .endTime(request.getEndTime())
-                .totalPrice(totalPrice)
-                .status(BookingStatus.cho_duyet)
-                .build();
+        // 3-4. Kiểm tra trùng lịch và lưu đơn phải liền một khối cho từng sân: nếu 2 request gửi đồng thời
+        // cùng kiểm tra xong rồi mới lưu thì cả 2 đều qua → 1 khung giờ bị đặt 2 lần.
+        // Khóa nằm trong bộ nhớ nên chỉ đúng khi chạy 1 instance Booking Service.
+        synchronized (pitchLocks.computeIfAbsent(request.getPitchId(), id -> new Object())) {
+            // Câu truy vấn của Hùng, bỏ qua đơn tu_choi
+            Long overlapping = bookingRepository.countOverlappingBookings(
+                    request.getPitchId(), request.getStartTime(), request.getEndTime());
+            if (overlapping > 0) {
+                throw new BadRequestException("Khung giờ này đã có người đặt");
+            }
 
-        return BookingResponse.from(bookingRepository.save(booking));
+            // Lưu đơn với trạng thái cho_duyet (save() tự commit trước khi nhả khóa)
+            Booking booking = Booking.builder()
+                    .userId(userId)
+                    .pitchId(request.getPitchId())
+                    .startTime(request.getStartTime())
+                    .endTime(request.getEndTime())
+                    .totalPrice(totalPrice)
+                    .status(BookingStatus.cho_duyet)
+                    .build();
+
+            return BookingResponse.from(bookingRepository.save(booking));
+        }
     }
 
     public List<BookingResponse> getMyBookings(Long userId) {

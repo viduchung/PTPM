@@ -1,0 +1,443 @@
+{
+  "info": {
+    "name": "PitchOS - Booking Service (Nhật)",
+    "description": "Bộ request demo và kiểm thử Booking Service (Port 8083) — phần của Nhật trong Postman Collection dùng chung.\n\nCách dùng:\n1. Bật MySQL, Pitch Service (8082) và Booking Service (8083).\n2. Token mẫu đã điền sẵn trong tab Variables (ký bằng JWT_SECRET chung, hạn đến 30/06/2027). Khi Auth Service của Hoàng xong, chạy thư mục 0 để thay bằng token thật.\n3. Thư mục 1: kịch bản demo hội đồng. Thư mục 2: chạy cả thư mục bằng Collection Runner (Pitch Service đang BẬT). Thư mục 3: TẮT Pitch Service rồi mới chạy.\n\nNgày đặt sân được chọn ngẫu nhiên trong năm 2027 nên chạy lại nhiều lần không bị lỗi trùng lịch.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. (Tùy chọn) Lấy token thật từ Auth Service",
+      "description": "Chỉ chạy khi Auth Service (8081) của Hoàng đã có API đăng nhập. Script tự lưu token vào biến tokenUser / tokenChusan.",
+      "item": [
+        {
+          "name": "Đăng nhập user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const t = j.token || j.accessToken || j.access_token || (j.data && (j.data.token || j.data.accessToken));",
+                  "pm.test('Có token trong response', () => pm.expect(t).to.be.a('string'));",
+                  "if (t) pm.collectionVariables.set('tokenUser', String(t).replace(/^Bearer\\s+/i, ''));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"user\",\n  \"password\": \"123456\"\n}" },
+            "url": { "raw": "{{authUrl}}/api/v1/auth/login", "host": ["{{authUrl}}"], "path": ["api", "v1", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Đăng nhập chusan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const t = j.token || j.accessToken || j.access_token || (j.data && (j.data.token || j.data.accessToken));",
+                  "pm.test('Có token trong response', () => pm.expect(t).to.be.a('string'));",
+                  "if (t) pm.collectionVariables.set('tokenChusan', String(t).replace(/^Bearer\\s+/i, ''));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"chusan\",\n  \"password\": \"123456\"\n}" },
+            "url": { "raw": "{{authUrl}}/api/v1/auth/login", "host": ["{{authUrl}}"], "path": ["api", "v1", "auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Demo hội đồng (Nhật)",
+      "description": "Bước 1: đặt sân thành công (201). Bước 2: báo Hùng chạy SELECT kiểm chứng CSDL. Bước 3: TẮT Pitch Service (Ctrl + C cửa sổ 8082) rồi gửi request Bước 3 → 503. Bước 3b: chứng minh Booking Service vẫn sống.",
+      "item": [
+        {
+          "name": "Bước 1 - Đặt sân thành công (201 Created)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Chọn ngẫu nhiên 1 ngày năm 2027 để tập dượt nhiều lần không bị trùng lịch",
+                  "const d = new Date(Date.UTC(2027, 0, 1 + Math.floor(Math.random() * 365)));",
+                  "const day = d.toISOString().slice(0, 10);",
+                  "pm.collectionVariables.set('demoStart', day + 'T18:00:00');",
+                  "pm.collectionVariables.set('demoEnd', day + 'T19:30:00');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Trạng thái cho_duyet', () => pm.expect(j.status).to.eql('cho_duyet'));",
+                  "pm.test('totalPrice = 1,5 giờ x 300.000 = 450.000', () => pm.expect(Number(j.totalPrice)).to.eql(450000));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": 1,\n  \"startTime\": \"{{demoStart}}\",\n  \"endTime\": \"{{demoEnd}}\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "Bước 3 - TẮT Pitch Service rồi gửi lại (503)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('503 Service Unavailable', () => pm.response.to.have.status(503));",
+                  "pm.test('Có thông báo thân thiện', () => pm.expect(pm.response.json().message).to.include('không khả dụng'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": 1,\n  \"startTime\": \"{{demoStart}}\",\n  \"endTime\": \"{{demoEnd}}\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "Bước 3b - Booking Service vẫn sống: lịch sử đặt (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK dù Pitch Service đang tắt', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings/my-bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings", "my-bookings"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Kiểm thử Booking Service (Pitch Service BẬT)",
+      "description": "Ca 1-15 của Bảng 2.2 + ca 14b/14c (admin từ chối đơn → khung giờ được nhả và đặt lại được). Chạy cả thư mục bằng Collection Runner, theo đúng thứ tự.",
+      "item": [
+        {
+          "name": "01 - POST không gửi token (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('401 Unauthorized', () => pm.response.to.have.status(401));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": 1,\n  \"startTime\": \"2027-01-01T18:00:00\",\n  \"endTime\": \"2027-01-01T19:30:00\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "02 - POST token hết hạn (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('401 Unauthorized', () => pm.response.to.have.status(401));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenExpired}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": 1,\n  \"startTime\": \"2027-01-01T18:00:00\",\n  \"endTime\": \"2027-01-01T19:30:00\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "03 - POST token bị sửa chữ ký (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('401 Unauthorized', () => pm.response.to.have.status(401));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenTampered}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": 1,\n  \"startTime\": \"2027-01-01T18:00:00\",\n  \"endTime\": \"2027-01-01T19:30:00\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "04 - POST bằng token chusan (403)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('403 Forbidden', () => pm.response.to.have.status(403));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenChusan}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": 1,\n  \"startTime\": \"2027-01-01T18:00:00\",\n  \"endTime\": \"2027-01-01T19:30:00\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "05 - POST thiếu pitchId (400)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('400 Bad Request', () => pm.response.to.have.status(400));", "pm.test('Báo thiếu pitchId', () => pm.expect(pm.response.json().message).to.include('pitchId'));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"startTime\": \"2027-01-01T18:00:00\",\n  \"endTime\": \"2027-01-01T19:30:00\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "06 - POST endTime trước startTime (400)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('400 Bad Request', () => pm.response.to.have.status(400));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": 1,\n  \"startTime\": \"2027-01-01T19:30:00\",\n  \"endTime\": \"2027-01-01T18:00:00\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "07 - POST pitchId không tồn tại (404)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('404 Not Found', () => pm.response.to.have.status(404));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": 99,\n  \"startTime\": \"2027-01-01T18:00:00\",\n  \"endTime\": \"2027-01-01T19:30:00\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "08 - POST sân 4 đang bảo trì (400)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('400 Bad Request', () => pm.response.to.have.status(400));", "pm.test('Báo sân bảo trì', () => pm.expect(pm.response.json().message).to.include('bảo trì'));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": 4,\n  \"startTime\": \"2027-01-01T18:00:00\",\n  \"endTime\": \"2027-01-01T19:30:00\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "09 - POST hợp lệ sân 1, 18:00-19:30 (201)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date(Date.UTC(2027, 0, 1 + Math.floor(Math.random() * 365)));",
+                  "const day = d.toISOString().slice(0, 10);",
+                  "pm.collectionVariables.set('tcStart', day + 'T18:00:00');",
+                  "pm.collectionVariables.set('tcEnd', day + 'T19:30:00');",
+                  "pm.collectionVariables.set('tcOverlapStart', day + 'T19:00:00');",
+                  "pm.collectionVariables.set('tcOverlapEnd', day + 'T20:00:00');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Trạng thái cho_duyet', () => pm.expect(j.status).to.eql('cho_duyet'));",
+                  "pm.test('totalPrice = 450.000', () => pm.expect(Number(j.totalPrice)).to.eql(450000));",
+                  "pm.collectionVariables.set('tcBookingId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": 1,\n  \"startTime\": \"{{tcStart}}\",\n  \"endTime\": \"{{tcEnd}}\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "10 - POST 19:00-20:00 trùng ca 09 (400)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('400 Bad Request', () => pm.response.to.have.status(400));", "pm.test('Báo trùng lịch', () => pm.expect(pm.response.json().message).to.include('đã có người đặt'));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": 1,\n  \"startTime\": \"{{tcOverlapStart}}\",\n  \"endTime\": \"{{tcOverlapEnd}}\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "11 - GET my-bookings token user (200)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));", "pm.test('Có đơn vừa tạo ở ca 09', () => pm.expect(pm.response.json().map(b => b.id)).to.include(Number(pm.collectionVariables.get('tcBookingId'))));"] } }],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings/my-bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings", "my-bookings"] }
+          }
+        },
+        {
+          "name": "12 - PATCH status bằng token user (403)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('403 Forbidden', () => pm.response.to.have.status(403));"] } }],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"da_duyet\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings/{{tcBookingId}}/status", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings", "{{tcBookingId}}", "status"] }
+          }
+        },
+        {
+          "name": "13 - PATCH status sai giá trị \"abc\" (400)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('400 Bad Request', () => pm.response.to.have.status(400));"] } }],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenChusan}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"abc\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings/{{tcBookingId}}/status", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings", "{{tcBookingId}}", "status"] }
+          }
+        },
+        {
+          "name": "14 - PATCH da_duyet bằng token chusan (200)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));", "pm.test('Trạng thái da_duyet', () => pm.expect(pm.response.json().status).to.eql('da_duyet'));"] } }],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenChusan}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"da_duyet\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings/{{tcBookingId}}/status", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings", "{{tcBookingId}}", "status"] }
+          }
+        },
+        {
+          "name": "14b - PATCH tu_choi bằng token admin (200)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));", "pm.test('Trạng thái tu_choi', () => pm.expect(pm.response.json().status).to.eql('tu_choi'));"] } }],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenAdmin}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"tu_choi\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings/{{tcBookingId}}/status", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings", "{{tcBookingId}}", "status"] }
+          }
+        },
+        {
+          "name": "14c - Đặt lại khung giờ vừa bị từ chối (201)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('201 Created - đơn tu_choi đã nhả khung giờ', () => pm.response.to.have.status(201));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": 1,\n  \"startTime\": \"{{tcStart}}\",\n  \"endTime\": \"{{tcEnd}}\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "15 - PATCH đơn không tồn tại (404)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('404 Not Found', () => pm.response.to.have.status(404));"] } }],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenChusan}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"da_duyet\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings/999999/status", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings", "999999", "status"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Kiểm thử khi TẮT Pitch Service",
+      "description": "Tắt Pitch Service (8082) trước khi chạy thư mục này. Gửi lại đúng request ca 09 → 503; các API không cần Pitch Service vẫn 200.",
+      "item": [
+        {
+          "name": "16 - Gửi lại request ca 09 khi Pitch Service tắt (503)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('503 Service Unavailable', () => pm.response.to.have.status(503));", "pm.test('Có thông báo thân thiện', () => pm.expect(pm.response.json().message).to.include('không khả dụng'));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": 1,\n  \"startTime\": \"{{tcStart}}\",\n  \"endTime\": \"{{tcEnd}}\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] }
+          }
+        },
+        {
+          "name": "17 - GET my-bookings khi Pitch Service tắt (200)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK - Booking Service không sập theo', () => pm.response.to.have.status(200));"] } }],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings/my-bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings", "my-bookings"] }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "bookingUrl", "value": "http://localhost:8083" },
+    { "key": "authUrl", "value": "http://localhost:8081" },
+    { "key": "tokenUser", "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwidXNlcklkIjozLCJyb2xlIjoidXNlciIsImlhdCI6MTc5MzExNDM2NywiZXhwIjoxODE0Mzk5OTk5fQ.xkO43nZHrf03Fx5VxXhjROWmaPLD0j6TxTG86ZyGUpo", "description": "userId=3, role=user — hạn 30/06/2027" },
+    { "key": "tokenChusan", "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjaHVzYW4iLCJ1c2VySWQiOjIsInJvbGUiOiJjaHVzYW4iLCJpYXQiOjE3OTMxMTQzNjcsImV4cCI6MTgxNDM5OTk5OX0.VF8LCUDEroQdN59l9sx2u9hqSLX9knPpnZiAC3aF2ew", "description": "userId=2, role=chusan — hạn 30/06/2027" },
+    { "key": "tokenAdmin", "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInVzZXJJZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzkzMTE0MzY3LCJleHAiOjE4MTQzOTk5OTl9.bB-qnLb1ZyI1lpVRx_JMjlP9RAwWyeP5XIbPs4SllM8", "description": "userId=1, role=admin — hạn 30/06/2027" },
+    { "key": "tokenExpired", "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwidXNlcklkIjozLCJyb2xlIjoidXNlciIsImlhdCI6MTc5MzExNDM2NywiZXhwIjoxNzY3MjI1NjAwfQ.KFr7iMxlgKZP6eO5Fq0UPNUejnILIxTbKbTousM4WIc", "description": "Token user đã hết hạn (01/01/2026)" },
+    { "key": "tokenTampered", "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwidXNlcklkIjozLCJyb2xlIjoidXNlciIsImlhdCI6MTc5MzExNDM2NywiZXhwIjoxODE0Mzk5OTk5fQ.xkO43nZHrf03Fx5VxXhjROWmaPLD0j6TxAG86ZyGUpo", "description": "Token user bị sửa 1 ký tự ở chữ ký" },
+    { "key": "demoStart", "value": "" },
+    { "key": "demoEnd", "value": "" },
+    { "key": "tcStart", "value": "" },
+    { "key": "tcEnd", "value": "" },
+    { "key": "tcOverlapStart", "value": "" },
+    { "key": "tcOverlapEnd", "value": "" },
+    { "key": "tcBookingId", "value": "" }
+  ]
+}
