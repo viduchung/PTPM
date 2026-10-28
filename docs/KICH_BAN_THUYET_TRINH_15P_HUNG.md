@@ -66,13 +66,13 @@
 ---
 
 ### SLIDE 4: TỪ HÀNH VI SUY RA 3 CƠ SỞ DỮ LIỆU ĐỘC LẬP (03:00 - 04:00)
-* **Nội dung slide:** Phân rã 3 Bounded Contexts: `pitchos_user_db`, `pitchos_pitch_db`, `pitchos_booking_db`.
+* **Nội dung slide:** **Sơ đồ đồ họa 3 cột:** Phân tích hành vi thực tế tác nhân ➔ Ngữ cảnh nghiệp vụ (Bounded Contexts) ➔ 3 Cơ sở dữ liệu và bảng SQL vật lý.
 * **Lời nói thuyết trình của Hùng:**
-  > *"Từ việc phân tích 3 nhóm hành vi trên, em nhận thấy 3 mảng nghiệp vụ này có ranh giới ngữ cảnh (Bounded Context) và chu kỳ sống dữ liệu hoàn toàn khác biệt:  
-  > 1. Mảng Định danh & Bảo mật: Tần suất đọc khi xác thực token JWT, dữ liệu cực kỳ nhạy cảm -> Em quy hoạch thành CSDL `pitchos_user_db` giao cho Auth Service.  
-  > 2. Mảng Danh mục Sân & Giá cả: Tần suất đọc rất lớn khi khách duyệt sân, tần suất ghi thấp -> Em quy hoạch thành CSDL `pitchos_pitch_db` giao cho Pitch Service.  
-  > 3. Mảng Giao dịch Đơn hàng: Tần suất ghi rất cao, đòi hỏi xử lý tranh chấp thời gian thực và xung đột lịch thi đấu -> Em quy hoạch thành CSDL `pitchos_booking_db` giao cho Booking Service.  
-  > Đây chính là cơ sở thực tế dẫn đến quyết định phân chia thành 3 CSDL MySQL độc lập."*
+  > *"Kính mời Quý Thầy/Cô quan sát trên **Sơ đồ phân tích 3 cột** tại màn hình:  
+  > Cột 1 là Hành vi thực tế của 3 tác nhân: Admin giám sát tài khoản, Chủ sân quản lý cơ sở vật chất, và Khách hàng thực hiện giao dịch đặt sân.  
+  > Từ 3 nhóm hành vi này, em ánh xạ sang Cột 2 là 3 ranh giới ngữ cảnh nghiệp vụ (Bounded Contexts) và 3 microservice độc lập: Auth Service (Port 8081), Pitch Service (Port 8082) và Booking Service (Port 8083).  
+  > Và từ đó, ở Cột 3, em suy ra 3 CSDL vật lý hoàn toàn cách ly trên MySQL 8.0: `pitchos_user_db` với bảng `users`, `pitchos_pitch_db` với bảng `pitches`, và `pitchos_booking_db` với bảng `bookings`.  
+  > Đây là bằng chứng cho thấy việc tách 3 database xuất phát 100% từ phân tích nghiệp vụ thực tế, tuân thủ nguyên tắc kiến trúc Microservices."*
 
 ---
 
@@ -119,11 +119,13 @@
 ---
 
 ### SLIDE 9: SƠ ĐỒ THỰC THỂ QUAN HỆ PHÂN TÁN (DISTRIBUTED ERD) (08:15 - 09:15)
-* **Nội dung slide:** Mô hình ERD dạng 3 khối trực quan; Khẳng định không có Foreign Key vật lý.
+* **Nội dung slide:** **Sơ đồ đồ họa ERD Phân tán (Distributed ERD)** thể hiện 3 CSDL vật lý với các trường, khóa PK/UK và liên kết Khóa logic (Logical ID).
 * **Lời nói thuyết trình của Hùng:**
-  > *"Đây là Sơ đồ Quan hệ Thực thể Phân tán (Distributed ERD) do em thiết kế.  
-  > Thưa Thầy Cô, điểm khác biệt lớn nhất giữa ERD trong Microservices và ERD trong Monolith là: **Giữa 3 khối bảng `users`, `pitches` và `bookings` hoàn toàn không có các đường nối FOREIGN KEY vật lý**.  
-  > Ba cơ sở dữ liệu này hoạt động hoàn toàn biệt lập, có thể đặt trên 3 máy chủ vật lý ở 3 quốc gia khác nhau mà không gặp bất kỳ lỗi ràng buộc toàn vẹn cơ học nào của MySQL."*
+  > *"Kính mời Thầy Cô quan sát **Sơ đồ Thực thể Quan hệ Phân tán (Distributed ERD)** hiển thị trên màn hình.  
+  > Ba schema `pitchos_user_db`, `pitchos_pitch_db` và `pitchos_booking_db` được biểu diễn như 3 hòn đảo dữ liệu độc lập.  
+  > Thưa Thầy Cô, điểm kỹ thuật cốt lõi ở đây là: **Giữa 3 bảng `users`, `pitches` và `bookings` hoàn toàn không có đường nối FOREIGN KEY vật lý**.  
+  > Trong bảng `bookings`, hai cột `user_id` và `pitch_id` chỉ là kiểu `BIGINT NOT NULL` đóng vai trò là Khóa Logic (Logical ID).  
+  > Thiết kế này giúp tầng dữ liệu của từng dịch vụ cách ly tuyệt đối, có thể phân tán trên 3 cụm máy chủ khác nhau mà không bị ràng buộc cơ học bởi Database Engine."*
 
 ---
 
@@ -132,7 +134,6 @@
 * **Lời nói thuyết trình của Hùng:**
   > *"Vậy câu hỏi đặt ra là: Không có Foreign Key vật lý thì làm sao đảm bảo tính toàn vẹn dữ liệu?  
   > Em giải quyết vấn đề này bằng triết lý **Khóa Logic (Logical ID)** và **Toàn vẹn phi tập trung tại tầng ứng dụng (Decentralized Integrity)**:  
-  > Trong bảng `bookings`, hai cột `user_id` và `pitch_id` được khai báo là `BIGINT NOT NULL`.  
   > - Khi tạo đơn, `user_id` được trích xuất an toàn từ chữ ký số trong JWT Token của người dùng đã đăng nhập.  
   > - `pitch_id` được Booking Service gửi HTTP GET sang Pitch Service để xác minh sân có tồn tại và đang hoạt động hay không.  
   > Ngoài ra, hệ thống áp dụng cơ chế **Xóa mềm (Soft Delete)**: Khi một sân ngừng hoạt động, chủ sân chỉ đổi trạng thái sang `bao_tri` chứ không bao giờ DELETE dòng vật lý, giúp lịch sử các đơn đặt sân trong quá khứ không bao giờ bị mồ côi."*
@@ -159,25 +160,28 @@
 ---
 
 ### SLIDE 13: THUẬT TOÁN CHỐNG TRÙNG SÂN (ĐIỂM NHẤN CỦA HÙNG) (12:15 - 13:30)
-* **Nội dung slide:** Công thức toán học: `start_old < end_new AND end_old > start_new`; JPQL `SELECT COUNT(b)`.
+* **Nội dung slide:** **Sơ đồ trực quan 4 trường hợp giao thoa thời gian (Timeline Bars)** và Mã nguồn JPQL `SELECT COUNT(b)`.
 * **Lời nói thuyết trình của Hùng:**
-  > *"Bây giờ em xin phép trình bày điểm nhấn kỹ thuật tối ưu hóa do chính em trực tiếp đề xuất và cài đặt: **Thuật toán chống trùng lịch thi đấu (Anti-Double Booking)**.  
-  > Trong thực tế, một sân bóng tại một thời điểm chỉ có thể cho một đội bóng thuê.  
-  > Em giải quyết bài toán xung đột này bằng công thức toán học giao thoa khoảng thời gian: Khoảng thời gian cũ $[start_{old}, end_{old}]$ và khoảng mới $[start_{new}, end_{new}]$ giao nhau khi và chỉ khi thỏa mãn đồng thời:  
+  > *"Kính mời Thầy Cô quan sát **Sơ đồ hình học giao thoa thời gian** ở nửa bên trái màn hình:  
+  > Em mô phỏng trực quan 4 trường hợp trùng lịch: Bắt đầu trước kết thúc giữa, Bắt đầu giữa kết thúc sau, Nằm lọt bên trong, và Bao trùm toàn bộ.  
+  > Cả 4 trường hợp này đều được quy về một công thức toán học tối giản:  
   > `start_old < end_new VÀ end_old > start_new`.  
-  > Công thức này bao quát trọn vẹn cả 4 trường hợp trùng giờ, kể cả trường hợp khung giờ mới bao trùm hoàn toàn khung giờ cũ mà toán tử BETWEEN của SQL không bắt được.  
-  > Trong `BookingRepository`, em viết câu truy vấn JPQL tối ưu: `SELECT COUNT(b) FROM Booking b ...`. Database Engine chỉ cần đếm số dòng và trả về `0` hoặc `> 0`, tuyệt đối không load đối tượng lên RAM. Nếu `count > 0`, hệ thống ném ngoại lệ từ chối ngay lập tức!"*
+  > Điểm ưu việt là: Nếu dùng toán tử BETWEEN của SQL, hệ thống sẽ bị sót trường hợp Ca 4 (khung giờ mới bao trùm hoàn toàn khung giờ cũ). Nhưng công thức toán học này bao trùm chính xác 100% các ca xung đột.  
+  > Ở nửa bên phải màn hình là câu truy vấn JPQL tối ưu: `SELECT COUNT(b) FROM Booking b ...`. MySQL Engine chỉ cần đếm trên chỉ mục và trả về con số, tuyệt đối không tải toàn bộ Entity lên bộ nhớ RAM. Nếu `count > 0`, hệ thống ném ngoại lệ chặn ngay từ đầu!"*
 
 ---
 
 ### SLIDE 14: THỰC NGHIỆM KIỂM CHỨNG GHI ĐĨA CỨNG & DEMO (13:30 - 14:30)
-* **Nội dung slide:** Kịch bản đặt Sân 5 (18:00 - 19:30); SQL SELECT kiểm chứng trên DBeaver; Tệp `.ibd` InnoDB.
+* **Nội dung slide:** **Sơ đồ Tuần tự Xử lý Dữ liệu 6 bước (Data Sequence Diagram)** và kiểm chứng DBeaver / tệp `.ibd` InnoDB.
 * **Lời nói thuyết trình của Hùng:**
-  > *"Để đáp ứng yêu cầu thực nghiệm Câu 2 Ý 3: Thực hiện nghiệp vụ và kiểm tra kết quả ghi đĩa, em đã xây dựng kịch bản kiểm chứng:  
-  > Khách hàng `user` (ID = 3) đặt Sân 5 Cầu Giấy (ID = 1) từ 18:00 đến 19:30.  
-  > Hệ thống chạy hàm chống trùng lịch trả về 0, gửi Feign lấy đơn giá 300.000đ/h, tính tổng tiền 450.000đ và lưu đơn với trạng thái `cho_duyet`.  
-  > Ngay sau đó, em mở DBeaver và chạy lệnh `SELECT * FROM pitchos_booking_db.bookings ORDER BY id DESC LIMIT 1;`.  
-  > Kết quả hiển thị rõ ràng bản ghi ID = 2 với tổng tiền 450000.00 và trạng thái `cho_duyet`. Dữ liệu được ghi bền vững vào tệp `bookings.ibd` của InnoDB trên đĩa cứng máy chủ, kể cả khi tắt server bật lại vẫn nguyên vẹn."*
+  > *"Để chứng minh tính thực nghiệm theo Câu 2 Ý 3, em kính mời Thầy Cô theo dõi **Sơ đồ Tuần tự Xử lý Dữ liệu** tại màn hình:  
+  > Bước 1: Khách hàng gửi request đặt Sân 5 Cầu Giấy (18:00 - 19:30).  
+  > Bước 2: Booking Service chạy truy vấn kiểm tra trùng lịch ➔ Kết quả COUNT = 0 (Hợp lệ).  
+  > Bước 3: Gửi OpenFeign sang Pitch Service lấy đơn giá: 300.000 VNĐ/h.  
+  > Bước 4: Tính tổng tiền 450.000 VNĐ và gọi Repository INSERT vào CSDL `pitchos_booking_db`.  
+  > Bước 5: InnoDB Engine COMMIT transaction và ghi dữ liệu bền vững xuống tệp `bookings.ibd` trên ổ đĩa cứng.  
+  > Bước 6: Em mở DBeaver chạy lệnh SELECT kiểm chứng độc lập ➔ Bản ghi ID = 2 xuất hiện ngay lập tức trên màn hình với trạng thái `cho_duyet`.  
+  > Toàn bộ luồng dữ liệu minh chứng rằng: Dịch vụ chỉ truy cập CSDL của mình; dữ liệu khác phải qua Feign API; và dữ liệu được ghi đĩa bền vững."*
 
 ---
 
@@ -202,3 +206,4 @@
    $\rightarrow$ Áp dụng `@Transactional` kết hợp Khóa bi quan (**Pessimistic Locking**) hoặc trong hệ phân tán lớn dùng **Redis Distributed Lock (Redisson)** khóa theo `pitch_id`.
 5. **Chứng minh dữ liệu ghi xuống đĩa cứng?**  
    $\rightarrow$ Tắt server bật lại dữ liệu vẫn còn; kiểm tra trực tiếp qua client độc lập DBeaver; tệp `bookings.ibd` của InnoDB trên ổ đĩa vật lý tăng kích thước khi transaction COMMIT.
+

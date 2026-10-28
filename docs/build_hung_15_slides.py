@@ -310,56 +310,58 @@ def build_hung_15_deck():
     s4 = prs.slides.add_slide(blank_layout)
     add_header(s4, "TỪ HÀNH VI SUY RA 3 CƠ SỞ DỮ LIỆU ĐỘC LẬP", "04 / 15", "Phân rã ngữ cảnh nghiệp vụ (Bounded Contexts) theo tư duy Microservices")
 
-    create_card(
-        s4, Inches(0.8), Inches(1.4), Inches(3.7), Inches(5.5),
-        "CSDL người dùng (pitchos_user_db)",
-        [
-            "Xuất phát từ vai trò Quản trị viên & Khách hàng:",
-            "  + Ngữ cảnh: Định danh và Xác thực (Identity & Auth).",
-            "  + Dịch vụ chủ quản: Dịch vụ xác thực (Auth Service) - Port 8081.",
-            "  + Bảng lưu trữ: Bảng người dùng (users).",
-            "Đặc trưng nghiệp vụ:",
-            "  + Tần suất đọc khi đăng nhập / xác thực JWT.",
-            "  + Dữ liệu nhạy cảm cao, yêu cầu mã hóa mật khẩu an toàn.",
-            "  + Độc lập hoàn toàn với thông tin sân bóng."
-        ],
-        subtitle="Thuộc ngữ cảnh Quản lý Danh tính",
-        border_color=C_BLUE
-    )
-
-    create_card(
-        s4, Inches(4.8), Inches(1.4), Inches(3.7), Inches(5.5),
-        "CSDL sân bóng (pitchos_pitch_db)",
-        [
-            "Xuất phát từ vai trò Chủ sân:",
-            "  + Ngữ cảnh: Danh mục Sân & Giá cả (Pitch Catalog).",
-            "  + Dịch vụ chủ quản: Dịch vụ sân bóng (Pitch Service) - Port 8082.",
-            "  + Bảng lưu trữ: Bảng sân bóng (pitches).",
-            "Đặc trưng nghiệp vụ:",
-            "  + Tần suất đọc rất cao khi khách tra cứu danh sách sân.",
-            "  + Tần suất ghi thấp (chủ sân chỉ thêm/sửa khi đổi giá hoặc sửa sân).",
-            "  + Có thể áp dụng cache Redis độc lập mà không ảnh hưởng CSDL khác."
-        ],
-        subtitle="Thuộc ngữ cảnh Quản lý Tài nguyên Sân",
-        border_color=C_TEAL
-    )
-
-    create_card(
-        s4, Inches(8.8), Inches(1.4), Inches(3.7), Inches(5.5),
-        "CSDL đặt sân (pitchos_booking_db)",
-        [
-            "Xuất phát từ vai trò Người thuê sân & Giao dịch:",
-            "  + Ngữ cảnh: Giao dịch & Lịch thi đấu (Booking & Schedule).",
-            "  + Dịch vụ chủ quản: Dịch vụ đặt sân (Booking Service) - Port 8083.",
-            "  + Bảng lưu trữ: Bảng đơn đặt (bookings).",
-            "Đặc trưng nghiệp vụ:",
-            "  + Tần suất ghi rất cao (khách gửi đơn liên tục).",
-            "  + Đòi hỏi tính nhất quán giao dịch và chống xung đột thời gian (trùng lịch).",
-            "  + Tách riêng giúp đảm bảo hiệu năng I/O tối đa."
-        ],
-        subtitle="Thuộc ngữ cảnh Quản lý Giao dịch Đơn hàng",
-        border_color=C_GREEN
-    )
+    img_actor_path = os.path.join(r"c:\Users\viduc\Downloads\PTPM\docs\images", "pitchos-actor-to-db.png")
+    if os.path.exists(img_actor_path):
+        s4.shapes.add_picture(img_actor_path, Inches(1.51), Inches(1.3), width=Inches(10.31), height=Inches(5.8))
+    else:
+        create_card(
+            s4, Inches(0.8), Inches(1.4), Inches(3.7), Inches(5.5),
+            "CSDL người dùng (pitchos_user_db)",
+            [
+                "Xuất phát từ vai trò Quản trị viên & Khách hàng:",
+                "  + Ngữ cảnh: Định danh và Xác thực (Identity & Auth).",
+                "  + Dịch vụ chủ quản: Dịch vụ xác thực (Auth Service) - Port 8081.",
+                "  + Bảng lưu trữ: Bảng người dùng (users).",
+                "Đặc trưng nghiệp vụ:",
+                "  + Tần suất đọc khi đăng nhập / xác thực JWT.",
+                "  + Dữ liệu nhạy cảm cao, yêu cầu mã hóa mật khẩu an toàn.",
+                "  + Độc lập hoàn toàn với thông tin sân bóng."
+            ],
+            subtitle="Thuộc ngữ cảnh Quản lý Danh tính",
+            border_color=C_BLUE
+        )
+        create_card(
+            s4, Inches(4.8), Inches(1.4), Inches(3.7), Inches(5.5),
+            "CSDL sân bóng (pitchos_pitch_db)",
+            [
+                "Xuất phát từ vai trò Chủ sân:",
+                "  + Ngữ cảnh: Danh mục Sân & Giá cả (Pitch Catalog).",
+                "  + Dịch vụ chủ quản: Dịch vụ sân bóng (Pitch Service) - Port 8082.",
+                "  + Bảng lưu trữ: Bảng sân bóng (pitches).",
+                "Đặc trưng nghiệp vụ:",
+                "  + Tần suất đọc rất cao khi khách tra cứu danh sách sân.",
+                "  + Tần suất ghi thấp (chủ sân chỉ thêm/sửa khi đổi giá hoặc sửa sân).",
+                "  + Có thể áp dụng cache Redis độc lập mà không ảnh hưởng CSDL khác."
+            ],
+            subtitle="Thuộc ngữ cảnh Quản lý Tài nguyên Sân",
+            border_color=C_TEAL
+        )
+        create_card(
+            s4, Inches(8.8), Inches(1.4), Inches(3.7), Inches(5.5),
+            "CSDL đặt sân (pitchos_booking_db)",
+            [
+                "Xuất phát từ vai trò Người thuê sân & Giao dịch:",
+                "  + Ngữ cảnh: Giao dịch & Lịch thi đấu (Booking & Schedule).",
+                "  + Dịch vụ chủ quản: Dịch vụ đặt sân (Booking Service) - Port 8083.",
+                "  + Bảng lưu trữ: Bảng đơn đặt (bookings).",
+                "Đặc trưng nghiệp vụ:",
+                "  + Tần suất ghi rất cao (khách gửi đơn liên tục).",
+                "  + Đòi hỏi tính nhất quán giao dịch và chống xung đột thời gian (trùng lịch).",
+                "  + Tách riêng giúp đảm bảo hiệu năng I/O tối đa."
+            ],
+            subtitle="Thuộc ngữ cảnh Quản lý Giao dịch Đơn hàng",
+            border_color=C_GREEN
+        )
 
     # =========================================================================
     # SLIDE 5: NGUYÊN TẮC DATABASE-PER-SERVICE (CÂU 1 Ý 2b)
@@ -565,74 +567,74 @@ def build_hung_15_deck():
     s9 = prs.slides.add_slide(blank_layout)
     add_header(s9, "SƠ ĐỒ THỰC THỂ QUAN HỆ PHÂN TÁN (DISTRIBUTED ERD)", "09 / 15", "Mô hình ERD phân tán phi tập trung - Không có Foreign Key vật lý")
 
-    # Tạo 3 khối thực thể dạng trực quan
-    card_u = create_card(
-        s9, Inches(0.8), Inches(1.5), Inches(3.6), Inches(4.3),
-        "USERS (pitchos_user_db)",
-        [
-            "id: BIGINT (PK, Auto)",
-            "username: VARCHAR(50) (UK)",
-            "email: VARCHAR(100) (UK)",
-            "password: VARCHAR(255)",
-            "full_name: VARCHAR(100)",
-            "phone: VARCHAR(20)",
-            "role: ENUM(admin, chusan, user)",
-            "created_at: TIMESTAMP"
-        ],
-        subtitle="CSDL người dùng",
-        border_color=C_BLUE,
-        bg_color=C_LIGHT_BLUE
-    )
-
-    card_b = create_card(
-        s9, Inches(4.8), Inches(1.5), Inches(3.7), Inches(4.3),
-        "BOOKINGS (pitchos_booking_db)",
-        [
-            "id: BIGINT (PK, Auto)",
-            "user_id: BIGINT (Logical ID)",
-            "pitch_id: BIGINT (Logical ID)",
-            "start_time: DATETIME",
-            "end_time: DATETIME",
-            "total_price: DECIMAL(12,2)",
-            "status: ENUM(cho_duyet, ...)",
-            "created_at: TIMESTAMP"
-        ],
-        subtitle="CSDL đặt sân (Trung tâm giao dịch)",
-        border_color=C_GREEN,
-        bg_color=C_LIGHT_GREEN
-    )
-
-    card_p = create_card(
-        s9, Inches(8.9), Inches(1.5), Inches(3.6), Inches(4.3),
-        "PITCHES (pitchos_pitch_db)",
-        [
-            "id: BIGINT (PK, Auto)",
-            "name: VARCHAR(150)",
-            "pitch_type: ENUM(san_5, 7, 10)",
-            "price_per_hour: DECIMAL(12,2)",
-            "address: VARCHAR(255)",
-            "thumbnail_url: VARCHAR(500)",
-            "status: ENUM(hoat_dong, ...)",
-            "created_at: TIMESTAMP"
-        ],
-        subtitle="CSDL sân bóng",
-        border_color=C_TEAL,
-        bg_color=C_BG_CARD
-    )
-
-    # Card ghi chú bên dưới giải thích rõ ràng
-    create_card(
-        s9, Inches(0.8), Inches(5.95), Inches(11.7), Inches(1.15),
-        "ĐẶC ĐIỂM QUAN HỆ: LIÊN KẾT LOGIC HOÀN TOÀN - KHÔNG FOREIGN KEY VẬT LÝ",
-        [
-            "bookings.user_id liên kết logic với users.id (Xác thực qua JWT Claims khi gửi request).",
-            "bookings.pitch_id liên kết logic với pitches.id (Xác thực qua RESTful API của Pitch Service: GET /api/v1/pitches/{id}).",
-            "Ba CSDL hoàn toàn cách ly, có thể tách sang 3 máy chủ vật lý độc lập mà không bị ràng buộc cơ học."
-        ],
-        subtitle="Cơ chế toàn vẹn dữ liệu phi tập trung (Decentralized Integrity)",
-        border_color=C_BLUE,
-        bg_color=C_WHITE
-    )
+    img_erd_path = os.path.join(r"c:\Users\viduc\Downloads\PTPM\docs\images", "pitchos-distributed-erd.png")
+    if os.path.exists(img_erd_path):
+        s9.shapes.add_picture(img_erd_path, Inches(1.51), Inches(1.3), width=Inches(10.31), height=Inches(5.8))
+    else:
+        # Fallback card nếu không tìm thấy file ảnh
+        card_u = create_card(
+            s9, Inches(0.8), Inches(1.5), Inches(3.6), Inches(4.3),
+            "USERS (pitchos_user_db)",
+            [
+                "id: BIGINT (PK, Auto)",
+                "username: VARCHAR(50) (UK)",
+                "email: VARCHAR(100) (UK)",
+                "password: VARCHAR(255)",
+                "full_name: VARCHAR(100)",
+                "phone: VARCHAR(20)",
+                "role: ENUM(admin, chusan, user)",
+                "created_at: TIMESTAMP"
+            ],
+            subtitle="CSDL người dùng",
+            border_color=C_BLUE,
+            bg_color=C_LIGHT_BLUE
+        )
+        card_b = create_card(
+            s9, Inches(4.8), Inches(1.5), Inches(3.7), Inches(4.3),
+            "BOOKINGS (pitchos_booking_db)",
+            [
+                "id: BIGINT (PK, Auto)",
+                "user_id: BIGINT (Logical ID)",
+                "pitch_id: BIGINT (Logical ID)",
+                "start_time: DATETIME",
+                "end_time: DATETIME",
+                "total_price: DECIMAL(12,2)",
+                "status: ENUM(cho_duyet, ...)",
+                "created_at: TIMESTAMP"
+            ],
+            subtitle="CSDL đặt sân (Trung tâm giao dịch)",
+            border_color=C_GREEN,
+            bg_color=C_LIGHT_GREEN
+        )
+        card_p = create_card(
+            s9, Inches(8.9), Inches(1.5), Inches(3.6), Inches(4.3),
+            "PITCHES (pitchos_pitch_db)",
+            [
+                "id: BIGINT (PK, Auto)",
+                "name: VARCHAR(150)",
+                "pitch_type: ENUM(san_5, 7, 10)",
+                "price_per_hour: DECIMAL(12,2)",
+                "address: VARCHAR(255)",
+                "thumbnail_url: VARCHAR(500)",
+                "status: ENUM(hoat_dong, ...)",
+                "created_at: TIMESTAMP"
+            ],
+            subtitle="CSDL sân bóng",
+            border_color=C_TEAL,
+            bg_color=C_BG_CARD
+        )
+        create_card(
+            s9, Inches(0.8), Inches(5.95), Inches(11.7), Inches(1.15),
+            "ĐẶC ĐIỂM QUAN HỆ: LIÊN KẾT LOGIC HOÀN TOÀN - KHÔNG FOREIGN KEY VẬT LÝ",
+            [
+                "bookings.user_id liên kết logic với users.id (Xác thực qua JWT Claims khi gửi request).",
+                "bookings.pitch_id liên kết logic với pitches.id (Xác thực qua RESTful API của Pitch Service: GET /api/v1/pitches/{id}).",
+                "Ba CSDL hoàn toàn cách ly, có thể tách sang 3 máy chủ vật lý độc lập mà không bị ràng buộc cơ học."
+            ],
+            subtitle="Cơ chế toàn vẹn dữ liệu phi tập trung (Decentralized Integrity)",
+            border_color=C_BLUE,
+            bg_color=C_WHITE
+        )
 
     # =========================================================================
     # SLIDE 10: TRIẾT LÝ KHÓA LOGIC & TOÀN VẸN PHI TẬP TRUNG
@@ -774,44 +776,47 @@ def build_hung_15_deck():
     s13 = prs.slides.add_slide(blank_layout)
     add_header(s13, "THUẬT TOÁN & TRUY VẤN CHỐNG TRÙNG LỊCH THI ĐẤU", "13 / 15", "Điểm nhấn kỹ thuật tối ưu hóa do Hùng trực tiếp thiết kế và cài đặt")
 
-    create_card(
-        s13, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.5),
-        "ĐIỀU KIỆN TOÁN HỌC GIAO THOA THỜI GIAN",
-        [
-            "Bài toán: Một sân bóng tại một thời điểm chỉ cho 1 đội thuê.",
-            "Điều kiện toán học kiểm tra trùng giữa đơn cũ [start_old, end_old] và đơn mới [start_new, end_new]:",
-            "  + start_old < end_new VÀ end_old > start_new",
-            "Bao trùm toàn bộ 4 trường hợp giao thoa:",
-            "  1. Đơn cũ bắt đầu trước, kết thúc ở giữa khung giờ mới.",
-            "  2. Đơn cũ bắt đầu ở giữa, kết thúc sau khung giờ mới.",
-            "  3. Đơn cũ nằm lọt hoàn toàn bên trong khung giờ mới.",
-            "  4. Đơn cũ bao trùm toàn bộ khung giờ mới.",
-            "Quy tắc nghiệp vụ: Bỏ qua đơn có status = 'tu_choi' (sân coi như đang trống ở khung giờ đó)."
-        ],
-        subtitle="Mô hình toán học kiểm tra xung đột thời gian",
-        border_color=C_BLUE
-    )
-
-    create_card(
-        s13, Inches(6.8), Inches(1.4), Inches(5.7), Inches(5.5),
-        "CÀI ĐẶT TRUY VẤN JPQL TRONG BOOKINGREPOSITORY",
-        [
-            "@Query(\"SELECT COUNT(b) FROM Booking b \" +",
-            "       \"WHERE b.pitchId = :pitchId \" +",
-            "       \"  AND b.status <> com.pitchos.booking.entity.BookingStatus.tu_choi \" +",
-            "       \"  AND b.startTime < :endTime \" +",
-            "       \"  AND b.endTime > :startTime\")",
-            "Long countOverlappingBookings(@Param(\"pitchId\") Long pitchId,",
-            "                              @Param(\"startTime\") LocalDateTime start,",
-            "                              @Param(\"endTime\") LocalDateTime end);",
-            "Tối ưu hiệu năng vượt trội:",
-            "  + Dùng COUNT đếm trực tiếp trên Database Engine.",
-            "  + Trả về con số duy nhất (0 hoặc > 0), không nạp Entity lên RAM.",
-            "  + Nếu count > 0 -> Ném ngoại lệ chặn ngay từ đầu."
-        ],
-        subtitle="Cài đặt thực tế bằng truy vấn JPQL tối ưu",
-        border_color=C_GREEN
-    )
+    img_algo_path = os.path.join(r"c:\Users\viduc\Downloads\PTPM\docs\images", "pitchos-time-overlap-algorithm.png")
+    if os.path.exists(img_algo_path):
+        s13.shapes.add_picture(img_algo_path, Inches(1.51), Inches(1.3), width=Inches(10.31), height=Inches(5.8))
+    else:
+        create_card(
+            s13, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.5),
+            "ĐIỀU KIỆN TOÁN HỌC GIAO THOA THỜI GIAN",
+            [
+                "Bài toán: Một sân bóng tại một thời điểm chỉ cho 1 đội thuê.",
+                "Điều kiện toán học kiểm tra trùng giữa đơn cũ [start_old, end_old] và đơn mới [start_new, end_new]:",
+                "  + start_old < end_new VÀ end_old > start_new",
+                "Bao trùm toàn bộ 4 trường hợp giao thoa:",
+                "  1. Đơn cũ bắt đầu trước, kết thúc ở giữa khung giờ mới.",
+                "  2. Đơn cũ bắt đầu ở giữa, kết thúc sau khung giờ mới.",
+                "  3. Đơn cũ nằm lọt hoàn toàn bên trong khung giờ mới.",
+                "  4. Đơn cũ bao trùm toàn bộ khung giờ mới.",
+                "Quy tắc nghiệp vụ: Bỏ qua đơn có status = 'tu_choi' (sân coi như đang trống ở khung giờ đó)."
+            ],
+            subtitle="Mô hình toán học kiểm tra xung đột thời gian",
+            border_color=C_BLUE
+        )
+        create_card(
+            s13, Inches(6.8), Inches(1.4), Inches(5.7), Inches(5.5),
+            "CÀI ĐẶT TRUY VẤN JPQL TRONG BOOKINGREPOSITORY",
+            [
+                "@Query(\"SELECT COUNT(b) FROM Booking b \" +",
+                "       \"WHERE b.pitchId = :pitchId \" +",
+                "       \"  AND b.status <> com.pitchos.booking.entity.BookingStatus.tu_choi \" +",
+                "       \"  AND b.startTime < :endTime \" +",
+                "       \"  AND b.endTime > :startTime\")",
+                "Long countOverlappingBookings(@Param(\"pitchId\") Long pitchId,",
+                "                              @Param(\"startTime\") LocalDateTime start,",
+                "                              @Param(\"endTime\") LocalDateTime end);",
+                "Tối ưu hiệu năng vượt trội:",
+                "  + Dùng COUNT đếm trực tiếp trên Database Engine.",
+                "  + Trả về con số duy nhất (0 hoặc > 0), không nạp Entity lên RAM.",
+                "  + Nếu count > 0 -> Ném ngoại lệ chặn ngay từ đầu."
+            ],
+            subtitle="Cài đặt thực tế bằng truy vấn JPQL tối ưu",
+            border_color=C_GREEN
+        )
 
     # =========================================================================
     # SLIDE 14: THỰC NGHIỆM KIỂM CHỨNG GHI ĐĨA CỨNG & DEMO (CÂU 2 Ý 3)
@@ -819,42 +824,45 @@ def build_hung_15_deck():
     s14 = prs.slides.add_slide(blank_layout)
     add_header(s14, "THỰC NGHIỆM KIỂM CHỨNG DỮ LIỆU GHI ĐĨA CỨNG", "14 / 15", "Đáp ứng Câu 2 Ý 3: Thực hiện một nghiệp vụ có thao tác dữ liệu và kiểm tra kết quả")
 
-    create_card(
-        s14, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.5),
-        "KỊCH BẢN THAO TÁC DỮ LIỆU THỰC TẾ",
-        [
-            "Khách hàng 'user' (ID = 3) đặt Sân 5 Cầu Giấy (ID = 1):",
-            "  + Khung giờ: 18:00 - 19:30 (1,5 giờ).",
-            "Luồng thực thi trong Booking Service:",
-            "  1. Chạy countOverlappingBookings: Trả về 0 (Không trùng).",
-            "  2. Gửi OpenFeign GET /api/v1/pitches/1 sang Pitch Service:",
-            "     Nhận về đơn giá: 300.000 VNĐ/giờ.",
-            "  3. Tính tổng tiền: 1,5 h x 300.000 = 450.000 VNĐ.",
-            "  4. Gọi bookingRepository.save(newBooking) ghi xuống đĩa.",
-            "  5. Trả về mã HTTP 201 Created."
-        ],
-        subtitle="Quy trình thực thi nghiệp vụ mẫu",
-        border_color=C_BLUE
-    )
-
-    create_card(
-        s14, Inches(6.8), Inches(1.4), Inches(5.7), Inches(5.5),
-        "KẾT QUẢ XÁC MINH TRỰC TIẾP TRÊN DBEAVER",
-        [
-            "Câu lệnh SQL kiểm chứng:",
-            "SELECT id, user_id, pitch_id, start_time, end_time,",
-            "       total_price, status, created_at",
-            "FROM pitchos_booking_db.bookings",
-            "ORDER BY id DESC LIMIT 1;",
-            "Kết quả hiển thị trên bảng dữ liệu DBeaver:",
-            "  + id = 2 (Tăng tự động AUTO_INCREMENT).",
-            "  + user_id = 3 | pitch_id = 1 (Lưu đúng Khóa logic).",
-            "  + total_price = 450000.00 (Chính xác đến số thập phân).",
-            "  + status = 'cho_duyet' (Lưu bền vững vào tệp bookings.ibd của InnoDB trên đĩa cứng)."
-        ],
-        subtitle="Minh chứng thực nghiệm trực quan",
-        border_color=C_GREEN
-    )
+    img_seq_path = os.path.join(r"c:\Users\viduc\Downloads\PTPM\docs\images", "pitchos-data-sequence.png")
+    if os.path.exists(img_seq_path):
+        s14.shapes.add_picture(img_seq_path, Inches(1.51), Inches(1.3), width=Inches(10.31), height=Inches(5.8))
+    else:
+        create_card(
+            s14, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.5),
+            "KỊCH BẢN THAO TÁC DỮ LIỆU THỰC TẾ",
+            [
+                "Khách hàng 'user' (ID = 3) đặt Sân 5 Cầu Giấy (ID = 1):",
+                "  + Khung giờ: 18:00 - 19:30 (1,5 giờ).",
+                "Luồng thực thi trong Booking Service:",
+                "  1. Chạy countOverlappingBookings: Trả về 0 (Không trùng).",
+                "  2. Gửi OpenFeign GET /api/v1/pitches/1 sang Pitch Service:",
+                "     Nhận về đơn giá: 300.000 VNĐ/giờ.",
+                "  3. Tính tổng tiền: 1,5 h x 300.000 = 450.000 VNĐ.",
+                "  4. Gọi bookingRepository.save(newBooking) ghi xuống đĩa.",
+                "  5. Trả về mã HTTP 201 Created."
+            ],
+            subtitle="Quy trình thực thi nghiệp vụ mẫu",
+            border_color=C_BLUE
+        )
+        create_card(
+            s14, Inches(6.8), Inches(1.4), Inches(5.7), Inches(5.5),
+            "KẾT QUẢ XÁC MINH TRỰC TIẾP TRÊN DBEAVER",
+            [
+                "Câu lệnh SQL kiểm chứng:",
+                "SELECT id, user_id, pitch_id, start_time, end_time,",
+                "       total_price, status, created_at",
+                "FROM pitchos_booking_db.bookings",
+                "ORDER BY id DESC LIMIT 1;",
+                "Kết quả hiển thị trên bảng dữ liệu DBeaver:",
+                "  + id = 2 (Tăng tự động AUTO_INCREMENT).",
+                "  + user_id = 3 | pitch_id = 1 (Lưu đúng Khóa logic).",
+                "  + total_price = 450000.00 (Chính xác đến số thập phân).",
+                "  + status = 'cho_duyet' (Lưu bền vững vào tệp bookings.ibd của InnoDB trên đĩa cứng)."
+            ],
+            subtitle="Minh chứng thực nghiệm trực quan",
+            border_color=C_GREEN
+        )
 
     # =========================================================================
     # SLIDE 15: TỔNG KẾT ĐÁNH GIÁ & BỘ CÂU HỎI PHẢN BIỆN (Q&A)
@@ -906,8 +914,8 @@ if __name__ == "__main__":
     deck.save(out_file1)
     print(f"Saved: {out_file1}")
 
-    # Also save to Downloads as PitchOS-Bao-Cao-Hung-15-Slide.pptx and PitchOS-Bao-Cao-Hung.pptx
-    out_file2 = r"c:\Users\viduc\Downloads\PitchOS-Bao-Cao-Hung-15-Slide.pptx"
+    # Also save to Downloads
+    out_file2 = r"c:\Users\viduc\Downloads\PitchOS-Slide-Hung-Visual.pptx"
     try:
         deck.save(out_file2)
         print(f"Saved: {out_file2}")
