@@ -37,14 +37,14 @@
       height: 60px;
     }
     .actor-box {
-      width: 220px;
+      width: 250px;
       background: #ffffff;
       border: 2px solid #3b82f6;
       border-radius: 8px;
       text-align: center;
       padding: 16px 10px;
       font-weight: 800;
-      font-size: 15px;
+      font-size: 14px;
       color: #1e3a8a;
       box-shadow: 0 2px 4px rgba(0,0,0,0.04);
       z-index: 10;
@@ -74,11 +74,11 @@
   <div class="diagram-area">
     <!-- Lifelines -->
     <div class="lifelines">
-      <div class="actor-box user">Khách hàng</div>
-      <div class="actor-box auth">Dịch vụ xác thực</div>
-      <div class="actor-box booking">Dịch vụ đặt sân</div>
-      <div class="actor-box pitch">Dịch vụ sân bóng</div>
-      <div class="actor-box db">Cơ sở dữ liệu</div>
+      <div class="actor-box user">Khách hàng (User)</div>
+      <div class="actor-box auth">Dịch vụ xác thực (Auth Service)</div>
+      <div class="actor-box booking">Dịch vụ đặt sân (Booking Service)</div>
+      <div class="actor-box pitch">Dịch vụ sân bóng (Pitch Service)</div>
+      <div class="actor-box db">Cơ sở dữ liệu (MySQL)</div>
     </div>
 
     <!-- SVG Content -->
@@ -102,37 +102,37 @@
       </defs>
 
       <!-- 5 Lifeline Dashed Columns -->
-      <!-- Centers: 110, 480, 850, 1220, 1590 -->
-      <line x1="110" y1="0" x2="110" y2="760" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <line x1="480" y1="0" x2="480" y2="760" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <line x1="850" y1="0" x2="850" y2="760" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <line x1="1220" y1="0" x2="1220" y2="760" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <line x1="1590" y1="0" x2="1590" y2="760" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <!-- Centers: 125, 495, 865, 1235, 1605 -->
+      <line x1="125" y1="0" x2="125" y2="760" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <line x1="495" y1="0" x2="495" y2="760" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <line x1="865" y1="0" x2="865" y2="760" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <line x1="1235" y1="0" x2="1235" y2="760" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <line x1="1605" y1="0" x2="1605" y2="760" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
 
       <!-- BƯỚC 1: Đăng nhập -->
-      <text x="295" y="32" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">1. Gửi thông tin tài khoản và mật khẩu để đăng nhập</text>
-      <line x1="110" y1="42" x2="475" y2="42" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+      <text x="310" y="32" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">1. Gửi thông tin tài khoản và mật khẩu để đăng nhập</text>
+      <line x1="125" y1="42" x2="490" y2="42" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
 
-      <text x="295" y="75" text-anchor="middle" font-size="13" font-weight="600" fill="#166534">2. Xác thực thành công, cấp mã xác thực cho người dùng</text>
-      <line x1="480" y1="85" x2="115" y2="85" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-green)"/>
+      <text x="310" y="75" text-anchor="middle" font-size="13" font-weight="600" fill="#166534">2. Xác thực thành công, cấp mã xác thực cho người dùng</text>
+      <line x1="495" y1="85" x2="130" y2="85" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-green)"/>
 
       <!-- BƯỚC 2: Gửi yêu cầu đặt sân -->
-      <text x="480" y="132" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">3. Gửi yêu cầu đặt sân kèm mã xác thực và khung giờ thi đấu</text>
-      <line x1="110" y1="142" x2="845" y2="142" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+      <text x="495" y="132" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">3. Gửi yêu cầu đặt sân kèm mã xác thực và khung giờ thi đấu</text>
+      <line x1="125" y1="142" x2="860" y2="142" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
 
       <!-- BƯỚC 3: Kiểm tra khung giờ trong CSDL -->
-      <text x="1220" y="175" text-anchor="middle" font-size="13" font-weight="600" fill="#475569">4. Kiểm tra khung giờ yêu cầu trong cơ sở dữ liệu đặt sân</text>
-      <line x1="850" y1="185" x2="1585" y2="185" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
-      <line x1="1590" y1="210" x2="855" y2="210" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-gray)"/>
-      <text x="1220" y="205" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">Khung giờ hiện tại chưa có ai đặt</text>
+      <text x="1235" y="175" text-anchor="middle" font-size="13" font-weight="600" fill="#475569">4. Kiểm tra khung giờ trong bảng đơn đặt (bookings)</text>
+      <line x1="865" y1="185" x2="1600" y2="185" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+      <line x1="1605" y1="210" x2="870" y2="210" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-gray)"/>
+      <text x="1235" y="205" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">Khung giờ hiện tại chưa có ai đặt</text>
 
       <!-- BƯỚC 4: Gọi sang Dịch vụ sân bóng -->
-      <rect x="810" y="235" width="450" height="70" rx="8" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
-      <text x="1035" y="255" text-anchor="middle" font-size="12.5" font-weight="800" fill="#c2410c">Giao tiếp trực tiếp giữa hai dịch vụ</text>
-      <line x1="850" y1="270" x2="1215" y2="270" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
-      <text x="1035" y="267" text-anchor="middle" font-size="11" font-weight="600" fill="#ea580c">5. Lấy giá thuê và kiểm tra trạng thái hoạt động</text>
-      <line x1="1220" y1="292" x2="855" y2="292" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-orange)"/>
-      <text x="1035" y="288" text-anchor="middle" font-size="11" font-weight="600" fill="#ea580c">Trả về đơn giá và trạng thái đang hoạt động</text>
+      <rect x="825" y="235" width="450" height="70" rx="8" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+      <text x="1050" y="255" text-anchor="middle" font-size="12.5" font-weight="800" fill="#c2410c">Giao tiếp trực tiếp giữa hai dịch vụ</text>
+      <line x1="865" y1="270" x2="1230" y2="270" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
+      <text x="1050" y="267" text-anchor="middle" font-size="11" font-weight="600" fill="#ea580c">5. Lấy giá thuê và kiểm tra trạng thái hoạt động</text>
+      <line x1="1235" y1="292" x2="870" y2="292" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-orange)"/>
+      <text x="1050" y="288" text-anchor="middle" font-size="11" font-weight="600" fill="#ea580c">Trả về đơn giá và trạng thái đang hoạt động</text>
 
       <!-- KHỐI XỬ LÝ TÌNH HUỐNG -->
       <rect x="50" y="330" width="1680" height="410" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
@@ -140,37 +140,37 @@
       <text x="130" y="348" text-anchor="middle" font-size="12" font-weight="800" fill="#ffffff">Xử lý các tình huống</text>
 
       <!-- Tình huống 1: Dịch vụ sân bóng gặp sự cố -->
-      <text x="80" y="380" font-size="13" font-weight="700" fill="#dc2626">Tình huống 1: Dịch vụ sân bóng tạm thời không liên lạc được</text>
-      <text x="480" y="405" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">Thông báo dịch vụ sân bóng tạm thời gián đoạn, ngắt kết nối an toàn</text>
-      <line x1="850" y1="415" x2="115" y2="415" stroke="#dc2626" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-red)"/>
+      <text x="80" y="380" font-size="13" font-weight="700" fill="#dc2626">Tình huống 1: Dịch vụ sân bóng (Pitch Service) tạm thời không liên lạc được</text>
+      <text x="495" y="405" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">Thông báo dịch vụ sân bóng tạm thời gián đoạn, ngắt kết nối an toàn</text>
+      <line x1="865" y1="415" x2="130" y2="415" stroke="#dc2626" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-red)"/>
 
       <line x1="50" y1="440" x2="1730" y2="440" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 4"/>
 
       <!-- Tình huống 2: Sân đang bảo trì -->
       <text x="80" y="470" font-size="13" font-weight="700" fill="#d97706">Tình huống 2: Sân bóng đang bảo trì sửa chữa</text>
-      <text x="480" y="495" text-anchor="middle" font-size="12" font-weight="700" fill="#d97706">Từ chối yêu cầu vì sân bóng đang trong thời gian bảo dưỡng</text>
-      <line x1="850" y1="505" x2="115" y2="505" stroke="#d97706" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-orange)"/>
+      <text x="495" y="495" text-anchor="middle" font-size="12" font-weight="700" fill="#d97706">Từ chối yêu cầu vì sân bóng đang trong thời gian bảo dưỡng</text>
+      <line x1="865" y1="505" x2="130" y2="505" stroke="#d97706" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-orange)"/>
 
       <line x1="50" y1="530" x2="1730" y2="530" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 4"/>
 
       <!-- Tình huống 3: Trùng giờ -->
       <text x="80" y="560" font-size="13" font-weight="700" fill="#ea580c">Tình huống 3: Trùng khung giờ đã có người đặt trước</text>
-      <text x="480" y="585" text-anchor="middle" font-size="12" font-weight="700" fill="#ea580c">Báo lỗi khung giờ này đã có người đặt, gợi ý chọn giờ thi đấu khác</text>
-      <line x1="850" y1="595" x2="115" y2="595" stroke="#ea580c" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-orange)"/>
+      <text x="495" y="585" text-anchor="middle" font-size="12" font-weight="700" fill="#ea580c">Báo lỗi khung giờ này đã có người đặt, gợi ý chọn giờ thi đấu khác</text>
+      <line x1="865" y1="595" x2="130" y2="595" stroke="#ea580c" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-orange)"/>
 
       <line x1="50" y1="620" x2="1730" y2="620" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 4"/>
 
       <!-- Tình huống 4: Thành công -->
       <text x="80" y="650" font-size="13" font-weight="700" fill="#16a34a">Tình huống 4: Thông tin hợp lệ và sân sẵn sàng phục vụ</text>
       
-      <text x="1220" y="665" text-anchor="middle" font-size="12" font-weight="700" fill="#166534">6. Lưu đơn đặt sân vào cơ sở dữ liệu với trạng thái chờ duyệt</text>
-      <line x1="850" y1="675" x2="1585" y2="675" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-green)"/>
+      <text x="1235" y="665" text-anchor="middle" font-size="12" font-weight="700" fill="#166534">6. Lưu đơn vào bảng đơn đặt (bookings) với trạng thái chờ duyệt</text>
+      <line x1="865" y1="675" x2="1600" y2="675" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-green)"/>
 
-      <line x1="1590" y1="695" x2="855" y2="695" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-green)"/>
-      <text x="1220" y="692" text-anchor="middle" font-size="11.5" font-weight="600" fill="#166534">Ghi nhận dữ liệu thành công</text>
+      <line x1="1605" y1="695" x2="870" y2="695" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-green)"/>
+      <text x="1235" y="692" text-anchor="middle" font-size="11.5" font-weight="600" fill="#166534">Ghi nhận dữ liệu thành công</text>
 
-      <text x="480" y="715" text-anchor="middle" font-size="13" font-weight="800" fill="#166534">Thông báo đặt sân thành công, trả về thông tin đơn và trạng thái chờ duyệt</text>
-      <line x1="850" y1="725" x2="115" y2="725" stroke="#16a34a" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-green)"/>
+      <text x="495" y="715" text-anchor="middle" font-size="13" font-weight="800" fill="#166534">Thông báo đặt sân thành công, trả về thông tin đơn và trạng thái chờ duyệt</text>
+      <line x1="865" y1="725" x2="130" y2="725" stroke="#16a34a" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-green)"/>
 
     </svg>
   </div>

@@ -59,7 +59,7 @@ def create_deck():
         p = tf.paragraphs[0]
         p.text = title
         p.font.name = "Segoe UI"
-        p.font.size = Pt(16)
+        p.font.size = Pt(15.5)
         p.font.bold = True
         p.font.color.rgb = C_BLUE
 
@@ -142,7 +142,7 @@ def create_deck():
     add_header(s2, "Tác nhân và chức năng", "02 / 12")
 
     add_card(s2, Inches(0.8), Inches(1.6), Inches(3.6), Inches(4.5), 
-             "Khách hàng", 
+             "Khách hàng (User)", 
              ["Đăng ký tài khoản và đăng nhập",
               "Tìm kiếm sân bóng và xem bảng giá",
               "Xem giờ trống và gửi yêu cầu đặt sân",
@@ -151,7 +151,7 @@ def create_deck():
              "Vai trò người dùng thông thường")
 
     add_card(s2, Inches(4.8), Inches(1.6), Inches(3.6), Inches(4.5), 
-             "Chủ sân bóng", 
+             "Chủ sân bóng (Pitch Owner)", 
              ["Thêm mới và quản lý danh sách sân",
               "Cập nhật giá thuê theo từng khung giờ",
               "Chuyển trạng thái hoạt động hoặc bảo trì",
@@ -160,7 +160,7 @@ def create_deck():
              "Vai trò quản lý sân bãi")
 
     add_card(s2, Inches(8.8), Inches(1.6), Inches(3.6), Inches(4.5), 
-             "Quản trị viên", 
+             "Quản trị viên (Admin)", 
              ["Quản lý người dùng và cấp phát quyền hạn",
               "Giám sát trạng thái hoạt động của hệ thống",
               "Khóa các tài khoản vi phạm quy định",
@@ -191,28 +191,28 @@ def create_deck():
     add_header(s4, "Vì sao phân chia thành các dịch vụ độc lập?", "04 / 12")
     
     add_card(s4, Inches(0.8), Inches(1.5), Inches(5.6), Inches(2.5),
-             "Dịch vụ xác thực",
+             "Dịch vụ xác thực (Auth Service)",
              ["Chuyên trách quản lý danh tính và bảo mật",
               "Cấp phát mã xác thực cho toàn bộ hệ thống",
               "Tách biệt để mọi dịch vụ dùng chung cơ chế bảo mật"],
              "Phân hệ bảo mật và danh tính")
 
     add_card(s4, Inches(6.8), Inches(1.5), Inches(5.6), Inches(2.5),
-             "Dịch vụ sân bóng",
+             "Dịch vụ sân bóng (Pitch Service)",
              ["Quản lý thông tin sân và chính sách giá thuê",
               "Đáp ứng lượng tra cứu lớn từ khách hàng",
               "Vận hành độc lập mà không ảnh hưởng tới việc đặt sân"],
              "Phân hệ quản lý sân bãi")
 
     add_card(s4, Inches(0.8), Inches(4.3), Inches(5.6), Inches(2.5),
-             "Dịch vụ đặt sân",
+             "Dịch vụ đặt sân (Booking Service)",
              ["Xử lý các giao dịch đặt lịch và kiểm tra trùng giờ",
               "Chuyên trách đảm bảo tính nhất quán của đơn đặt",
               "Độc lập giúp bảo toàn dữ liệu nghiệp vụ quan trọng"],
              "Phân hệ giao dịch và đặt lịch")
 
     add_card(s4, Inches(6.8), Inches(4.3), Inches(5.6), Inches(2.5),
-             "Cơ sở dữ liệu phân tán",
+             "Cơ sở dữ liệu phân tán (Database-per-Service)",
              ["Mỗi dịch vụ sở hữu một kho dữ liệu riêng biệt",
               "Tránh tranh chấp tài nguyên và khóa chéo dữ liệu",
               "Cho phép nâng cấp cấu trúc bảng độc lập"],
@@ -225,28 +225,28 @@ def create_deck():
     add_header(s5, "Các kiểu giao tiếp trong hệ thống", "05 / 12")
 
     add_card(s5, Inches(0.8), Inches(1.6), Inches(5.6), Inches(2.4),
-             "Giao tiếp trực tiếp",
+             "Giao tiếp trực tiếp (REST API)",
              ["Ứng dụng web gửi yêu cầu và nhận kết quả tức thì",
               "Các phương thức rõ ràng cho tra cứu, tạo mới và sửa đổi",
               "Dữ liệu trao đổi theo định dạng chuẩn rõ ràng"],
              "Giao tiếp người dùng với dịch vụ")
 
     add_card(s5, Inches(6.8), Inches(1.6), Inches(5.6), Inches(2.4),
-             "Giao tiếp giữa các dịch vụ",
+             "Giao tiếp giữa các dịch vụ (OpenFeign)",
              ["Dịch vụ đặt sân tự động gọi sang dịch vụ sân bóng",
               "Lấy giá thuê thực tế và kiểm tra trạng thái hoạt động",
               "Tự động ngắt kết nối an toàn khi dịch vụ đích gặp sự cố"],
              "Giao tiếp nội bộ giữa các dịch vụ")
 
     add_card(s5, Inches(0.8), Inches(4.3), Inches(5.6), Inches(2.5),
-             "Xác thực và phân quyền",
+             "Xác thực và phân quyền (JWT & RBAC)",
              ["Dịch vụ xác thực tạo mã chứng nhận danh tính",
               "Các dịch vụ tự kiểm tra quyền mà không cần gọi lại",
               "Bảo đảm an toàn và không làm quá tải dịch vụ xác thực"],
              "Bảo mật quyền truy cập")
 
     add_card(s5, Inches(6.8), Inches(4.3), Inches(5.6), Inches(2.5),
-             "Truy cập dữ liệu độc lập",
+             "Truy cập dữ liệu độc lập (Spring Data JPA)",
              ["Mỗi dịch vụ chỉ kết nối với cơ sở dữ liệu của mình",
               "Tuyệt đối không truy vấn chéo vào dữ liệu của dịch vụ khác",
               "Bảo đảm tính độc lập của từng phân hệ"],
@@ -259,12 +259,12 @@ def create_deck():
     add_header(s6, "Quy trình nghiệp vụ đặt sân từ đầu đến cuối", "06 / 12")
 
     steps = [
-        ("Bước 1: Đăng nhập", "Khách hàng đăng nhập vào hệ thống và nhận mã xác thực người dùng."),
-        ("Bước 2: Tìm kiếm sân", "Khách hàng xem danh mục các sân đang ở trạng thái sẵn sàng hoạt động."),
-        ("Bước 3: Gửi yêu cầu đặt", "Khách hàng chọn sân và khung giờ thi đấu rồi gửi yêu cầu đặt sân."),
-        ("Bước 4: Kiểm tra trùng giờ", "Dịch vụ đặt sân kiểm tra trong cơ sở dữ liệu xem khung giờ đã bị trùng chưa."),
-        ("Bước 5: Lấy thông tin sân", "Dịch vụ đặt sân gọi sang dịch vụ sân bóng để lấy giá thuê và kiểm tra trạng thái."),
-        ("Bước 6: Lưu đơn thành công", "Dịch vụ đặt sân lưu bản ghi ở trạng thái chờ duyệt và gửi thông báo thành công.")
+        ("Bước 1: Đăng nhập", "Khách hàng đăng nhập qua Dịch vụ xác thực (Auth Service) và nhận mã token."),
+        ("Bước 2: Tìm kiếm sân", "Khách hàng tra cứu danh mục sân qua Dịch vụ sân bóng (Pitch Service)."),
+        ("Bước 3: Gửi yêu cầu đặt", "Khách hàng gửi yêu cầu đặt lịch sang Dịch vụ đặt sân (Booking Service)."),
+        ("Bước 4: Kiểm tra trùng giờ", "Dịch vụ đặt sân kiểm tra khung giờ trong bảng đơn đặt (bookings)."),
+        ("Bước 5: Lấy thông tin sân", "Dịch vụ đặt sân gọi sang Dịch vụ sân bóng (Pitch Service) để lấy giá và kiểm tra trạng thái."),
+        ("Bước 6: Lưu đơn thành công", "Lưu bản ghi vào bảng đơn đặt (bookings) ở trạng thái chờ duyệt và báo thành công.")
     ]
 
     for idx, (stitle, sdesc) in enumerate(steps):
@@ -281,20 +281,20 @@ def create_deck():
     add_header(s7, "Quản lý trạng thái đơn đặt và sân bóng", "07 / 12")
 
     add_card(s7, Inches(0.8), Inches(1.6), Inches(5.6), Inches(4.8),
-             "Trạng thái đơn đặt sân",
+             "Trạng thái đơn đặt trong bảng bookings",
              ["Chờ duyệt: Đơn mới tạo thành công, chờ chủ sân xác nhận",
               "Đã duyệt: Chủ sân chấp nhận, khung giờ chính thức được khóa",
               "Từ chối: Chủ sân từ chối đơn do lý do vận hành sân",
               "Đã hủy: Khách hàng chủ động hủy lịch trước giờ thi đấu"],
-             "Lưu tại bảng đơn đặt trong cơ sở dữ liệu đặt sân")
+             "Lưu tại CSDL đặt sân (pitchos_booking_db)")
 
     add_card(s7, Inches(6.8), Inches(1.6), Inches(5.6), Inches(4.8),
-             "Trạng thái sân bóng",
+             "Trạng thái sân trong bảng pitches",
              ["Hoạt động: Sân sẵn sàng cho khách hàng tra cứu và đặt lịch",
               "Bảo trì: Sân đang sửa chữa hoặc bảo dưỡng định kỳ",
               "Hệ thống tự động từ chối đặt lịch nếu sân đang bảo trì",
               "Chủ sân có thể cập nhật trạng thái này bất kỳ lúc nào"],
-             "Lưu tại bảng sân bóng trong cơ sở dữ liệu sân")
+             "Lưu tại CSDL sân bóng (pitchos_pitch_db)")
 
     # -------------------------------------------------------------------------
     # SLIDE 8: CHỐNG ĐẶT TRÙNG KHUNG GIỜ
@@ -303,7 +303,7 @@ def create_deck():
     add_header(s8, "Kỹ thuật chống đặt trùng khung giờ", "08 / 12")
 
     add_card(s8, Inches(0.8), Inches(1.6), Inches(5.6), Inches(4.8),
-             "Kiểm tra tại tầng dữ liệu",
+             "Kiểm tra bảng bookings và booking_slots",
              ["1. So sánh khoảng thời gian bắt đầu và kết thúc với các đơn đã có",
               "2. Kiểm tra điều kiện loại trừ các đơn đã bị từ chối hoặc đã hủy",
               "3. Gom nhóm thao tác kiểm tra và ghi dữ liệu thành một khối an toàn",
@@ -311,7 +311,7 @@ def create_deck():
              "Cơ chế kiểm soát tính toàn vẹn")
 
     add_card(s8, Inches(6.8), Inches(1.6), Inches(5.6), Inches(4.8),
-             "Xử lý yêu cầu gửi cùng lúc",
+             "Xử lý yêu cầu gửi cùng lúc (Concurrency)",
              ["Khách hàng thứ nhất: Ghi nhận đơn thành công và khóa khung giờ",
               "Khách hàng thứ hai gửi cùng lúc: Hệ thống phát hiện xung đột dữ liệu",
               "Khách hàng thứ hai nhận được thông báo khung giờ đã có người đặt",
@@ -325,12 +325,12 @@ def create_deck():
     add_header(s9, "Xử lý lỗi và phòng thủ sự cố", "09 / 12")
 
     errors = [
-        ("Lỗi dữ liệu đầu vào", "Dữ liệu gửi lên sai quy cách", "Tên sân để trống hoặc giá thuê là số âm sẽ bị từ chối ngay lập tức kèm thông điệp rõ ràng."),
-        ("Lỗi chưa đăng nhập", "Chưa xác thực danh tính", "Yêu cầu thiếu mã xác thực hoặc mã không đúng sẽ bị từ chối truy cập hệ thống."),
-        ("Lỗi không đủ quyền hạn", "Truy cập vượt quá quyền cho phép", "Khách hàng thông thường cố tình gọi chức năng tạo sân hoặc sửa sân sẽ bị chặn."),
-        ("Lỗi tài nguyên không có", "Thông tin tra cứu không tồn tại", "Mã định danh sân bóng tra cứu không có trong hệ thống dữ liệu."),
-        ("Lỗi dịch vụ gián đoạn", "Phòng thủ sự cố đường truyền", "Khi dịch vụ sân bóng bị tắt, dịch vụ đặt sân báo lỗi gián đoạn an toàn thay vì bị treo hệ thống."),
-        ("Tính bao đóng sự cố", "Khoanh vùng phạm vi ảnh hưởng", "Sự cố xảy ra ở một dịch vụ không làm hỏng dữ liệu của các dịch vụ độc lập khác.")
+        ("Lỗi dữ liệu đầu vào (Bad Request)", "Dữ liệu gửi lên sai quy cách", "Tên sân để trống hoặc giá thuê là số âm sẽ bị từ chối ngay lập tức kèm thông điệp rõ ràng."),
+        ("Lỗi chưa đăng nhập (Unauthorized)", "Chưa xác thực danh tính", "Yêu cầu thiếu mã xác thực hoặc mã không đúng sẽ bị từ chối truy cập hệ thống."),
+        ("Lỗi không đủ quyền (Forbidden)", "Truy cập vượt quá quyền cho phép", "Khách hàng thông thường cố tình gọi chức năng tạo sân hoặc sửa sân sẽ bị chặn."),
+        ("Lỗi tài nguyên không có (Not Found)", "Thông tin tra cứu không tồn tại", "Mã định danh sân bóng tra cứu không có trong hệ thống dữ liệu."),
+        ("Lỗi dịch vụ gián đoạn (Service Unavailable)", "Phòng thủ sự cố đường truyền", "Khi dịch vụ sân bóng bị tắt, dịch vụ đặt sân báo lỗi gián đoạn an toàn thay vì bị treo hệ thống."),
+        ("Tính bao đóng sự cố (Fault Isolation)", "Khoanh vùng phạm vi ảnh hưởng", "Sự cố xảy ra ở một dịch vụ không làm hỏng dữ liệu của các dịch vụ độc lập khác.")
     ]
 
     for idx, (code, title, desc) in enumerate(errors):
@@ -349,9 +349,9 @@ def create_deck():
     table_shape = s10.shapes.add_table(5, 4, Inches(0.8), Inches(1.6), Inches(11.733), Inches(4.5))
     table = table_shape.table
 
-    table.columns[0].width = Inches(2.2)
-    table.columns[1].width = Inches(3.4)
-    table.columns[2].width = Inches(3.4)
+    table.columns[0].width = Inches(2.6)
+    table.columns[1].width = Inches(3.2)
+    table.columns[2].width = Inches(3.2)
     table.columns[3].width = Inches(2.733)
 
     headers = ["Phân hệ", "Nhiệm vụ lý thuyết", "Nhiệm vụ thực nghiệm", "Cổng giao tiếp và dữ liệu"]
@@ -367,10 +367,10 @@ def create_deck():
         p.font.color.rgb = C_WHITE
 
     rows_data = [
-        ("Dịch vụ xác thực", "Phân biệt xác thực và phân quyền, cấu trúc mã bảo vệ và các mã lỗi", "Xây dựng dịch vụ xác thực, cấp mã bảo vệ, kiểm thử an toàn", "Cổng giao tiếp 8081, CSDL người dùng"),
-        ("Dịch vụ sân bóng", "Đặc điểm kiến trúc hướng dịch vụ, phân rã các dịch vụ và các giao diện mẫu", "Xây dựng dịch vụ sân bóng, kiểm tra dữ liệu đầu vào và tài liệu giao diện", "Cổng giao tiếp 8082, CSDL sân bóng"),
-        ("Quản trị cơ sở dữ liệu", "Nguyên tắc cơ sở dữ liệu riêng cho từng dịch vụ và rủi ro vi phạm", "Thiết lập ba cơ sở dữ liệu độc lập, cấu trúc bảng và kiểm chứng ghi đĩa", "Ba cơ sở dữ liệu riêng biệt không khóa ngoại"),
-        ("Dịch vụ đặt sân", "Mô tả quy trình giao tiếp giữa hai dịch vụ và mã trạng thái kết quả", "Kết nối trực tiếp hai dịch vụ, sơ đồ tuần tự và xử lý lỗi gián đoạn", "Cổng giao tiếp 8083, CSDL đặt sân")
+        ("Dịch vụ xác thực (Auth Service)", "Phân biệt xác thực và phân quyền, cấu trúc mã bảo vệ và các mã lỗi", "Xây dựng dịch vụ xác thực, cấp mã bảo vệ, kiểm thử an toàn", "Cổng 8081, bảng users, roles trong pitchos_user_db"),
+        ("Dịch vụ sân bóng (Pitch Service)", "Đặc điểm kiến trúc hướng dịch vụ, phân rã các dịch vụ và các giao diện mẫu", "Xây dựng dịch vụ sân bóng, kiểm tra dữ liệu đầu vào và tài liệu giao diện", "Cổng 8082, bảng pitches trong pitchos_pitch_db"),
+        ("Quản trị CSDL (Database-per-Service)", "Nguyên tắc cơ sở dữ liệu riêng cho từng dịch vụ và rủi ro vi phạm", "Thiết lập ba cơ sở dữ liệu độc lập, cấu trúc bảng và kiểm chứng ghi đĩa", "Ba cơ sở dữ liệu riêng biệt không khóa ngoại"),
+        ("Dịch vụ đặt sân (Booking Service)", "Mô tả quy trình giao tiếp giữa hai dịch vụ và mã trạng thái kết quả", "Kết nối trực tiếp hai dịch vụ, sơ đồ tuần tự và xử lý lỗi gián đoạn", "Cổng 8083, bảng bookings trong pitchos_booking_db")
     ]
 
     for row_idx, data in enumerate(rows_data, start=1):

@@ -121,7 +121,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 15.5px;
       font-weight: 700;
       color: #1e293b;
     }
@@ -222,7 +222,7 @@
       justify-content: space-between;
     }
     .service-card h4 {
-      font-size: 16px;
+      font-size: 15.5px;
       font-weight: 800;
       color: #166534;
       margin-bottom: 2px;
@@ -286,15 +286,16 @@
     .table-tags {
       display: flex;
       gap: 6px;
+      flex-wrap: wrap;
     }
     .table-tag {
       background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #cbd5e1;
       font-size: 10.5px;
       font-weight: 600;
       padding: 3px 8px;
       border-radius: 4px;
-      color: #334155;
+      color: #1e293b;
     }
 
     /* Hạ tầng */
@@ -426,9 +427,9 @@
           <div class="layer-desc">Các tác nhân truy cập hệ thống</div>
         </div>
         <div class="layer-content">
-          <div class="user-card">Khách hàng</div>
-          <div class="user-card">Chủ sân bóng</div>
-          <div class="user-card">Quản trị viên</div>
+          <div class="user-card">Khách hàng (User)</div>
+          <div class="user-card">Chủ sân bóng (Pitch Owner)</div>
+          <div class="user-card">Quản trị viên (Admin)</div>
         </div>
       </div>
 
@@ -505,7 +506,7 @@
             <!-- Auth Service -->
             <div class="service-card">
               <div>
-                <h4>Dịch vụ xác thực</h4>
+                <h4>Dịch vụ xác thực (Auth Service)</h4>
                 <div class="subtext">Cổng giao tiếp 8081</div>
               </div>
               <div class="feature-list">
@@ -519,7 +520,7 @@
             <!-- Pitch Service -->
             <div class="service-card">
               <div>
-                <h4>Dịch vụ sân bóng</h4>
+                <h4>Dịch vụ sân bóng (Pitch Service)</h4>
                 <div class="subtext">Cổng giao tiếp 8082</div>
               </div>
               <div class="feature-list">
@@ -533,7 +534,7 @@
             <!-- Booking Service -->
             <div class="service-card">
               <div>
-                <h4>Dịch vụ đặt sân</h4>
+                <h4>Dịch vụ đặt sân (Booking Service)</h4>
                 <div class="subtext">Cổng giao tiếp 8083</div>
               </div>
               <div class="feature-list">
@@ -543,7 +544,7 @@
                 <div class="feature-item">Phòng thủ sự cố</div>
               </div>
               <div class="feign-note">
-                Tự động gọi sang Dịch vụ sân bóng để lấy giá
+                Tự động gọi sang Dịch vụ sân bóng (Pitch Service) để lấy giá
               </div>
             </div>
 
@@ -564,29 +565,28 @@
           <div class="db-grid">
             
             <div class="db-card">
-              <h4>CSDL người dùng</h4>
-              <div class="sub">Thuộc quyền quản lý của Dịch vụ xác thực</div>
+              <h4>CSDL người dùng (pitchos_user_db)</h4>
+              <div class="sub">Thuộc quyền quản lý của Dịch vụ xác thực (Auth Service)</div>
               <div class="table-tags">
-                <span class="table-tag">Bảng tài khoản</span>
-                <span class="table-tag">Bảng quyền hạn</span>
+                <span class="table-tag">Bảng tài khoản (users)</span>
+                <span class="table-tag">Bảng quyền hạn (roles)</span>
               </div>
             </div>
 
             <div class="db-card">
-              <h4>CSDL sân bóng</h4>
-              <div class="sub">Thuộc quyền quản lý của Dịch vụ sân bóng</div>
+              <h4>CSDL sân bóng (pitchos_pitch_db)</h4>
+              <div class="sub">Thuộc quyền quản lý của Dịch vụ sân bóng (Pitch Service)</div>
               <div class="table-tags">
-                <span class="table-tag">Bảng sân bóng</span>
-                <span class="table-tag">Bảng giá thuê</span>
+                <span class="table-tag">Bảng sân bóng (pitches)</span>
               </div>
             </div>
 
             <div class="db-card">
-              <h4>CSDL đặt sân</h4>
-              <div class="sub">Thuộc quyền quản lý của Dịch vụ đặt sân</div>
+              <h4>CSDL đặt sân (pitchos_booking_db)</h4>
+              <div class="sub">Thuộc quyền quản lý của Dịch vụ đặt sân (Booking Service)</div>
               <div class="table-tags">
-                <span class="table-tag">Bảng đơn đặt</span>
-                <span class="table-tag">Bảng khung giờ</span>
+                <span class="table-tag">Bảng đơn đặt (bookings)</span>
+                <span class="table-tag">Bảng khung giờ (booking_slots)</span>
               </div>
             </div>
 
