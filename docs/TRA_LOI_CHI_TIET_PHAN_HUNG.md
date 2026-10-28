@@ -575,3 +575,4 @@ public interface PitchClient {
 
 ### Câu 5: *"Bằng chứng nào chứng minh dữ liệu này được lưu xuống đĩa cứng chứ không phải biến tĩnh trong RAM?"*
 > **Hùng trả lời:** *"Thưa Thầy Cô, minh chứng là khi tắt toàn bộ ứng dụng Spring Boot và bật lại, dữ liệu vẫn còn nguyên vẹn. Thêm vào đó, câu truy vấn được thực hiện độc lập từ công cụ DBeaver trực tiếp tới MySQL Server, và dữ liệu được ghi vào các tệp `.ibd` của InnoDB Engine trên đĩa cứng máy chủ ạ."*
+

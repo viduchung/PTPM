@@ -319,3 +319,4 @@ Tài liệu này và slide trình chiếu `PitchOS-Bao-Cao-Hung.pptx` được t
 1. Mở file PowerPoint `PitchOS-Bao-Cao-Hung.pptx` tập dượt trước 1-2 lần theo kịch bản nói.
 2. Mở sẵn DBeaver với 3 tab SQL cho 3 database.
 3. Khi đến lượt, tự tin trình bày theo cấu trúc trên. Chắc chắn bạn sẽ đạt điểm tuyệt đối **2,25 / 2,25 điểm**! Chúc Hùng bảo vệ thành công rực rỡ!
+
