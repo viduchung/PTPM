@@ -127,7 +127,6 @@ HTML_CONTENT = """<!DOCTYPE html>
       font-size: 16px;
       font-weight: 700;
       color: #1e293b;
-      gap: 10px;
     }
 
     /* Tầng 2: Giao diện web */
@@ -224,19 +223,6 @@ HTML_CONTENT = """<!DOCTYPE html>
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      position: relative;
-    }
-    .service-lead {
-      position: absolute;
-      top: -10px;
-      right: 14px;
-      background: #f0fdf4;
-      border: 1px solid #86efac;
-      color: #15803d;
-      font-size: 10.5px;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 4px;
     }
     .service-card h4 {
       font-size: 16px;
@@ -245,7 +231,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       margin-bottom: 2px;
     }
     .service-card .subtext {
-      font-size: 11px;
+      font-size: 11.5px;
       color: #64748b;
       margin-bottom: 10px;
     }
@@ -288,27 +274,11 @@ HTML_CONTENT = """<!DOCTYPE html>
       border: 1.5px solid #64748b;
       border-radius: 10px;
       padding: 12px 14px;
-      position: relative;
-    }
-    .db-lead {
-      position: absolute;
-      top: -10px;
-      right: 14px;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      color: #475569;
-      font-size: 10.5px;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 4px;
     }
     .db-card h4 {
       font-size: 14px;
       font-weight: 800;
       color: #1e293b;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
     .db-card .sub {
       font-size: 11px;
@@ -414,26 +384,21 @@ HTML_CONTENT = """<!DOCTYPE html>
       color: #052e16;
     }
 
-    .members-card {
+    .summary-card {
       background: #ffffff;
       border: 1px solid #bbf7d0;
       border-radius: 8px;
       padding: 10px;
       font-size: 11.5px;
     }
-    .members-card h5 {
+    .summary-card h5 {
       font-weight: 800;
       color: #166534;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
-    .member-line {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 3px;
-    }
-    .score-txt {
-      font-weight: 700;
-      color: #0284c7;
+    .summary-card p {
+      color: #334155;
+      line-height: 1.35;
     }
   </style>
 </head>
@@ -464,9 +429,9 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="layer-desc">Các tác nhân truy cập hệ thống</div>
         </div>
         <div class="layer-content">
-          <div class="user-card">👤 Khách hàng</div>
-          <div class="user-card">🏟️ Chủ sân bóng</div>
-          <div class="user-card">👑 Quản trị viên</div>
+          <div class="user-card">Khách hàng</div>
+          <div class="user-card">Chủ sân bóng</div>
+          <div class="user-card">Quản trị viên</div>
         </div>
       </div>
 
@@ -500,7 +465,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       <!-- Đường kết nối giao tiếp -->
       <div class="flow-bar">
         <span class="flow-badge">
-          ⬇ Giao thức kết nối trực tiếp qua mạng kèm mã xác thực người dùng
+          Giao thức kết nối trực tiếp qua mạng kèm mã xác thực người dùng
         </span>
       </div>
 
@@ -516,7 +481,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         <div class="layer-content">
           <div class="security-box">
             <div class="security-info">
-              <h4>🛡️ Kiểm tra danh tính và phân quyền tự động</h4>
+              <h4>Kiểm tra danh tính và phân quyền tự động</h4>
               <p>Từng dịch vụ tự kiểm tra tính hợp lệ của mã xác thực mà không cần gọi lại dịch vụ tài khoản</p>
             </div>
             <div class="security-tags">
@@ -542,7 +507,6 @@ HTML_CONTENT = """<!DOCTYPE html>
             
             <!-- Auth Service -->
             <div class="service-card">
-              <div class="service-lead">Hoàng phụ trách</div>
               <div>
                 <h4>Dịch vụ xác thực</h4>
                 <div class="subtext">Cổng giao tiếp 8081</div>
@@ -557,7 +521,6 @@ HTML_CONTENT = """<!DOCTYPE html>
 
             <!-- Pitch Service -->
             <div class="service-card">
-              <div class="service-lead">Linh phụ trách</div>
               <div>
                 <h4>Dịch vụ sân bóng</h4>
                 <div class="subtext">Cổng giao tiếp 8082</div>
@@ -572,7 +535,6 @@ HTML_CONTENT = """<!DOCTYPE html>
 
             <!-- Booking Service -->
             <div class="service-card">
-              <div class="service-lead">Nhật phụ trách</div>
               <div>
                 <h4>Dịch vụ đặt sân</h4>
                 <div class="subtext">Cổng giao tiếp 8083</div>
@@ -584,7 +546,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <div class="feature-item">Phòng thủ sự cố</div>
               </div>
               <div class="feign-note">
-                ⇄ Tự động gọi sang Dịch vụ sân bóng để lấy giá
+                Tự động gọi sang Dịch vụ sân bóng để lấy giá
               </div>
             </div>
 
@@ -605,8 +567,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="db-grid">
             
             <div class="db-card">
-              <div class="db-lead">Hùng phụ trách</div>
-              <h4>🗄️ CSDL người dùng</h4>
+              <h4>CSDL người dùng</h4>
               <div class="sub">Thuộc quyền quản lý của Dịch vụ xác thực</div>
               <div class="table-tags">
                 <span class="table-tag">Bảng tài khoản</span>
@@ -615,8 +576,7 @@ HTML_CONTENT = """<!DOCTYPE html>
             </div>
 
             <div class="db-card">
-              <div class="db-lead">Hùng phụ trách</div>
-              <h4>🗄️ CSDL sân bóng</h4>
+              <h4>CSDL sân bóng</h4>
               <div class="sub">Thuộc quyền quản lý của Dịch vụ sân bóng</div>
               <div class="table-tags">
                 <span class="table-tag">Bảng sân bóng</span>
@@ -625,8 +585,7 @@ HTML_CONTENT = """<!DOCTYPE html>
             </div>
 
             <div class="db-card">
-              <div class="db-lead">Hùng phụ trách</div>
-              <h4>🗄️ CSDL đặt sân</h4>
+              <h4>CSDL đặt sân</h4>
               <div class="sub">Thuộc quyền quản lý của Dịch vụ đặt sân</div>
               <div class="table-tags">
                 <span class="table-tag">Bảng đơn đặt</span>
@@ -640,7 +599,7 @@ HTML_CONTENT = """<!DOCTYPE html>
 
       <!-- Hạ tầng -->
       <div class="infra-bar">
-        <div class="infra-title">🐳 Hạ tầng đóng gói dịch vụ</div>
+        <div class="infra-title">Hạ tầng đóng gói dịch vụ</div>
         <div class="infra-text">
           Tất cả dịch vụ và cơ sở dữ liệu được đóng gói độc lập, khởi động tự động bằng một câu lệnh duy nhất
         </div>
@@ -653,7 +612,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       
       <!-- Chú giải kết nối -->
       <div class="sidebar-card">
-        <div class="sidebar-title">📌 Chú giải kết nối</div>
+        <div class="sidebar-title">Chú giải kết nối</div>
         
         <div class="legend-row">
           <div class="legend-bar l-rest"></div>
@@ -674,7 +633,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       <!-- Nguyên tắc thiết kế -->
       <div class="rule-card">
         <div>
-          <div class="rule-title">💡 Ba nguyên tắc thiết kế chính</div>
+          <div class="rule-title">Ba nguyên tắc thiết kế chính</div>
           
           <div class="rule-item">
             <strong>1. Cơ sở dữ liệu riêng:</strong><br>
@@ -692,25 +651,10 @@ HTML_CONTENT = """<!DOCTYPE html>
           </div>
         </div>
 
-        <!-- Phân công nhiệm vụ -->
-        <div class="members-card">
-          <h5>👥 Phân công thành viên</h5>
-          <div class="member-line">
-            <span>👑 Hoàng: Dịch vụ xác thực</span>
-            <span class="score-txt">3,0 điểm</span>
-          </div>
-          <div class="member-line">
-            <span>👤 Linh: Dịch vụ sân bóng</span>
-            <span class="score-txt">2,5 điểm</span>
-          </div>
-          <div class="member-line">
-            <span>👤 Hùng: Cơ sở dữ liệu</span>
-            <span class="score-txt">2,25 điểm</span>
-          </div>
-          <div class="member-line">
-            <span>👤 Nhật: Dịch vụ đặt sân</span>
-            <span class="score-txt">2,25 điểm</span>
-          </div>
+        <!-- Mục tiêu thiết kế -->
+        <div class="summary-card">
+          <h5>Mục tiêu thiết kế</h5>
+          <p>Tối ưu hóa tính độc lập giữa các dịch vụ, bảo vệ toàn vẹn dữ liệu nghiệp vụ và sẵn sàng mở rộng quy mô khi lưu lượng người dùng tăng cao.</p>
         </div>
 
       </div>

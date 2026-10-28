@@ -123,7 +123,7 @@ def create_deck():
     p3.space_after = Pt(30)
 
     p4 = tf1.add_paragraph()
-    p4.text = "Thành viên nhóm: Hoàng, Linh, Hùng, Nhật"
+    p4.text = "Nhóm thực hiện: Hoàng, Linh, Hùng, Nhật"
     p4.font.name = "Segoe UI"
     p4.font.size = Pt(14)
     p4.font.bold = True
@@ -142,7 +142,7 @@ def create_deck():
     add_header(s2, "Tác nhân và chức năng", "02 / 12")
 
     add_card(s2, Inches(0.8), Inches(1.6), Inches(3.6), Inches(4.5), 
-             "👤 Khách hàng", 
+             "Khách hàng", 
              ["Đăng ký tài khoản và đăng nhập",
               "Tìm kiếm sân bóng và xem bảng giá",
               "Xem giờ trống và gửi yêu cầu đặt sân",
@@ -151,7 +151,7 @@ def create_deck():
              "Vai trò người dùng thông thường")
 
     add_card(s2, Inches(4.8), Inches(1.6), Inches(3.6), Inches(4.5), 
-             "🏟️ Chủ sân bóng", 
+             "Chủ sân bóng", 
              ["Thêm mới và quản lý danh sách sân",
               "Cập nhật giá thuê theo từng khung giờ",
               "Chuyển trạng thái hoạt động hoặc bảo trì",
@@ -160,7 +160,7 @@ def create_deck():
              "Vai trò quản lý sân bãi")
 
     add_card(s2, Inches(8.8), Inches(1.6), Inches(3.6), Inches(4.5), 
-             "👑 Quản trị viên", 
+             "Quản trị viên", 
              ["Quản lý người dùng và cấp phát quyền hạn",
               "Giám sát trạng thái hoạt động của hệ thống",
               "Khóa các tài khoản vi phạm quy định",
@@ -170,12 +170,12 @@ def create_deck():
 
     bn2 = s2.shapes.add_textbox(Inches(0.8), Inches(6.3), Inches(11.6), Inches(0.5))
     bp2 = bn2.text_frame.paragraphs[0]
-    bp2.text = "💡 Người dùng sau khi đăng nhập thành công sẽ truy cập đúng khu vực chức năng theo quyền hạn được cấp."
+    bp2.text = "Người dùng sau khi đăng nhập thành công sẽ truy cập đúng khu vực chức năng theo quyền hạn được cấp."
     bp2.font.size = Pt(12)
     bp2.font.color.rgb = C_GRAY
 
     # -------------------------------------------------------------------------
-    # SLIDE 3: KIẾN TRÚC TỔNG THỂ (IMAGE ĐƠN GIẢN HÓA)
+    # SLIDE 3: KIẾN TRÚC TỔNG THỂ
     # -------------------------------------------------------------------------
     s3 = prs.slides.add_slide(blank_layout)
     arch_img_path = r'c:\Users\viduc\Downloads\PTPM\docs\images\pitchos-kien-truc-tong-the.png'
@@ -191,32 +191,32 @@ def create_deck():
     add_header(s4, "Vì sao phân chia thành các dịch vụ độc lập?", "04 / 12")
     
     add_card(s4, Inches(0.8), Inches(1.5), Inches(5.6), Inches(2.5),
-             "🛡️ Dịch vụ xác thực",
+             "Dịch vụ xác thực",
              ["Chuyên trách quản lý danh tính và bảo mật",
               "Cấp phát mã xác thực cho toàn bộ hệ thống",
               "Tách biệt để mọi dịch vụ dùng chung cơ chế bảo mật"],
-             "Hoàng phụ trách")
+             "Phân hệ bảo mật và danh tính")
 
     add_card(s4, Inches(6.8), Inches(1.5), Inches(5.6), Inches(2.5),
-             "🏟️ Dịch vụ sân bóng",
+             "Dịch vụ sân bóng",
              ["Quản lý thông tin sân và chính sách giá thuê",
               "Đáp ứng lượng tra cứu lớn từ khách hàng",
               "Vận hành độc lập mà không ảnh hưởng tới việc đặt sân"],
-             "Linh phụ trách")
+             "Phân hệ quản lý sân bãi")
 
     add_card(s4, Inches(0.8), Inches(4.3), Inches(5.6), Inches(2.5),
-             "📅 Dịch vụ đặt sân",
+             "Dịch vụ đặt sân",
              ["Xử lý các giao dịch đặt lịch và kiểm tra trùng giờ",
               "Chuyên trách đảm bảo tính nhất quán của đơn đặt",
               "Độc lập giúp bảo toàn dữ liệu nghiệp vụ quan trọng"],
-             "Nhật phụ trách")
+             "Phân hệ giao dịch và đặt lịch")
 
     add_card(s4, Inches(6.8), Inches(4.3), Inches(5.6), Inches(2.5),
-             "🗄️ Cơ sở dữ liệu phân tán",
+             "Cơ sở dữ liệu phân tán",
              ["Mỗi dịch vụ sở hữu một kho dữ liệu riêng biệt",
               "Tránh tranh chấp tài nguyên và khóa chéo dữ liệu",
               "Cho phép nâng cấp cấu trúc bảng độc lập"],
-             "Hùng phụ trách")
+             "Phân hệ lưu trữ độc lập")
 
     # -------------------------------------------------------------------------
     # SLIDE 5: CÁC KIỂU GIAO TIẾP VÀ BẢO MẬT
@@ -225,28 +225,28 @@ def create_deck():
     add_header(s5, "Các kiểu giao tiếp trong hệ thống", "05 / 12")
 
     add_card(s5, Inches(0.8), Inches(1.6), Inches(5.6), Inches(2.4),
-             "🌐 Giao tiếp trực tiếp",
+             "Giao tiếp trực tiếp",
              ["Ứng dụng web gửi yêu cầu và nhận kết quả tức thì",
               "Các phương thức rõ ràng cho tra cứu, tạo mới và sửa đổi",
               "Dữ liệu trao đổi theo định dạng chuẩn rõ ràng"],
              "Giao tiếp người dùng với dịch vụ")
 
     add_card(s5, Inches(6.8), Inches(1.6), Inches(5.6), Inches(2.4),
-             "⚡ Giao tiếp giữa các dịch vụ",
+             "Giao tiếp giữa các dịch vụ",
              ["Dịch vụ đặt sân tự động gọi sang dịch vụ sân bóng",
               "Lấy giá thuê thực tế và kiểm tra trạng thái hoạt động",
               "Tự động ngắt kết nối an toàn khi dịch vụ đích gặp sự cố"],
              "Giao tiếp nội bộ giữa các dịch vụ")
 
     add_card(s5, Inches(0.8), Inches(4.3), Inches(5.6), Inches(2.5),
-             "🔑 Xác thực và phân quyền",
+             "Xác thực và phân quyền",
              ["Dịch vụ xác thực tạo mã chứng nhận danh tính",
               "Các dịch vụ tự kiểm tra quyền mà không cần gọi lại",
               "Bảo đảm an toàn và không làm quá tải dịch vụ xác thực"],
              "Bảo mật quyền truy cập")
 
     add_card(s5, Inches(6.8), Inches(4.3), Inches(5.6), Inches(2.5),
-             "💾 Truy cập dữ liệu độc lập",
+             "Truy cập dữ liệu độc lập",
              ["Mỗi dịch vụ chỉ kết nối với cơ sở dữ liệu của mình",
               "Tuyệt đối không truy vấn chéo vào dữ liệu của dịch vụ khác",
               "Bảo đảm tính độc lập của từng phân hệ"],
@@ -281,19 +281,19 @@ def create_deck():
     add_header(s7, "Quản lý trạng thái đơn đặt và sân bóng", "07 / 12")
 
     add_card(s7, Inches(0.8), Inches(1.6), Inches(5.6), Inches(4.8),
-             "📋 Trạng thái đơn đặt sân",
-             ["⏳ Chờ duyệt: Đơn mới tạo thành công, chờ chủ sân xác nhận",
-              "✅ Đã duyệt: Chủ sân chấp nhận, khung giờ chính thức được khóa",
-              "❌ Từ chối: Chủ sân từ chối đơn do lý do vận hành sân",
-              "🚫 Đã hủy: Khách hàng chủ động hủy lịch trước giờ thi đấu"],
+             "Trạng thái đơn đặt sân",
+             ["Chờ duyệt: Đơn mới tạo thành công, chờ chủ sân xác nhận",
+              "Đã duyệt: Chủ sân chấp nhận, khung giờ chính thức được khóa",
+              "Từ chối: Chủ sân từ chối đơn do lý do vận hành sân",
+              "Đã hủy: Khách hàng chủ động hủy lịch trước giờ thi đấu"],
              "Lưu tại bảng đơn đặt trong cơ sở dữ liệu đặt sân")
 
     add_card(s7, Inches(6.8), Inches(1.6), Inches(5.6), Inches(4.8),
-             "🏟️ Trạng thái sân bóng",
-             ["🟢 Hoạt động: Sân sẵn sàng cho khách hàng tra cứu và đặt lịch",
-              "🟡 Bảo trì: Sân đang sửa chữa hoặc bảo dưỡng định kỳ",
-              "🚫 Hệ thống tự động từ chối đặt lịch nếu sân đang bảo trì",
-              "🛠️ Chủ sân có thể cập nhật trạng thái này bất kỳ lúc nào"],
+             "Trạng thái sân bóng",
+             ["Hoạt động: Sân sẵn sàng cho khách hàng tra cứu và đặt lịch",
+              "Bảo trì: Sân đang sửa chữa hoặc bảo dưỡng định kỳ",
+              "Hệ thống tự động từ chối đặt lịch nếu sân đang bảo trì",
+              "Chủ sân có thể cập nhật trạng thái này bất kỳ lúc nào"],
              "Lưu tại bảng sân bóng trong cơ sở dữ liệu sân")
 
     # -------------------------------------------------------------------------
@@ -303,15 +303,15 @@ def create_deck():
     add_header(s8, "Kỹ thuật chống đặt trùng khung giờ", "08 / 12")
 
     add_card(s8, Inches(0.8), Inches(1.6), Inches(5.6), Inches(4.8),
-             "🔍 Kiểm tra tại tầng dữ liệu",
+             "Kiểm tra tại tầng dữ liệu",
              ["1. So sánh khoảng thời gian bắt đầu và kết thúc với các đơn đã có",
               "2. Kiểm tra điều kiện loại trừ các đơn đã bị từ chối hoặc đã hủy",
               "3. Gom nhóm thao tác kiểm tra và ghi dữ liệu thành một khối an toàn",
               "4. Phản hồi thông báo lỗi rõ ràng nếu khung giờ đã có người giữ chỗ"],
-             "Hùng và Nhật phối hợp triển khai")
+             "Cơ chế kiểm soát tính toàn vẹn")
 
     add_card(s8, Inches(6.8), Inches(1.6), Inches(5.6), Inches(4.8),
-             "⚡ Xử lý yêu cầu gửi cùng lúc",
+             "Xử lý yêu cầu gửi cùng lúc",
              ["Khách hàng thứ nhất: Ghi nhận đơn thành công và khóa khung giờ",
               "Khách hàng thứ hai gửi cùng lúc: Hệ thống phát hiện xung đột dữ liệu",
               "Khách hàng thứ hai nhận được thông báo khung giờ đã có người đặt",
@@ -338,24 +338,23 @@ def create_deck():
         row = idx // 2
         x = Inches(0.8 + col * 5.9)
         y = Inches(1.6 + row * 1.7)
-        add_card(s9, x, y, Inches(5.6), Inches(1.5), f"🔴 {code} — {title}", [desc])
+        add_card(s9, x, y, Inches(5.6), Inches(1.5), f"{code} — {title}", [desc])
 
     # -------------------------------------------------------------------------
-    # SLIDE 10: MA TRẬN PHÂN CÔNG & ĐÁNH GIÁ
+    # SLIDE 10: MA TRẬN PHÂN RÃ TRÁCH NHIỆM
     # -------------------------------------------------------------------------
     s10 = prs.slides.add_slide(blank_layout)
-    add_header(s10, "Bảng phân công nhiệm vụ và barem điểm", "10 / 12")
+    add_header(s10, "Bảng phân rã trách nhiệm các dịch vụ trong hệ thống", "10 / 12")
 
-    table_shape = s10.shapes.add_table(5, 5, Inches(0.8), Inches(1.6), Inches(11.733), Inches(4.5))
+    table_shape = s10.shapes.add_table(5, 4, Inches(0.8), Inches(1.6), Inches(11.733), Inches(4.5))
     table = table_shape.table
 
     table.columns[0].width = Inches(2.2)
-    table.columns[1].width = Inches(3.2)
-    table.columns[2].width = Inches(3.2)
-    table.columns[3].width = Inches(1.8)
-    table.columns[4].width = Inches(1.3)
+    table.columns[1].width = Inches(3.4)
+    table.columns[2].width = Inches(3.4)
+    table.columns[3].width = Inches(2.733)
 
-    headers = ["Thành viên", "Nhiệm vụ lý thuyết", "Nhiệm vụ thực nghiệm", "Phân hệ phụ trách", "Barem điểm"]
+    headers = ["Phân hệ", "Nhiệm vụ lý thuyết", "Nhiệm vụ thực nghiệm", "Cổng giao tiếp và dữ liệu"]
     for col_idx, h in enumerate(headers):
         cell = table.cell(0, col_idx)
         cell.fill.solid()
@@ -368,10 +367,10 @@ def create_deck():
         p.font.color.rgb = C_WHITE
 
     rows_data = [
-        ("👑 Hoàng, Nhóm trưởng", "Phân biệt xác thực và phân quyền, cấu trúc mã bảo vệ và các mã lỗi", "Xây dựng dịch vụ xác thực, cấp mã bảo vệ, kiểm thử an toàn", "Dịch vụ xác thực", "3,0 điểm"),
-        ("👤 Linh", "Đặc điểm kiến trúc hướng dịch vụ, phân rã các dịch vụ và các giao diện mẫu", "Xây dựng dịch vụ sân bóng, kiểm tra dữ liệu đầu vào và tài liệu giao diện", "Dịch vụ sân bóng", "2,5 điểm"),
-        ("👤 Hùng", "Nguyên tắc cơ sở dữ liệu riêng cho từng dịch vụ và rủi ro vi phạm", "Thiết lập ba cơ sở dữ liệu độc lập, cấu trúc bảng và kiểm chứng ghi đĩa", "Quản trị cơ sở dữ liệu", "2,25 điểm"),
-        ("👤 Nhật", "Mô tả quy trình giao tiếp giữa hai dịch vụ và mã trạng thái kết quả", "Kết nối trực tiếp hai dịch vụ, sơ đồ tuần tự và xử lý lỗi gián đoạn", "Dịch vụ đặt sân", "2,25 điểm")
+        ("Dịch vụ xác thực", "Phân biệt xác thực và phân quyền, cấu trúc mã bảo vệ và các mã lỗi", "Xây dựng dịch vụ xác thực, cấp mã bảo vệ, kiểm thử an toàn", "Cổng giao tiếp 8081, CSDL người dùng"),
+        ("Dịch vụ sân bóng", "Đặc điểm kiến trúc hướng dịch vụ, phân rã các dịch vụ và các giao diện mẫu", "Xây dựng dịch vụ sân bóng, kiểm tra dữ liệu đầu vào và tài liệu giao diện", "Cổng giao tiếp 8082, CSDL sân bóng"),
+        ("Quản trị cơ sở dữ liệu", "Nguyên tắc cơ sở dữ liệu riêng cho từng dịch vụ và rủi ro vi phạm", "Thiết lập ba cơ sở dữ liệu độc lập, cấu trúc bảng và kiểm chứng ghi đĩa", "Ba cơ sở dữ liệu riêng biệt không khóa ngoại"),
+        ("Dịch vụ đặt sân", "Mô tả quy trình giao tiếp giữa hai dịch vụ và mã trạng thái kết quả", "Kết nối trực tiếp hai dịch vụ, sơ đồ tuần tự và xử lý lỗi gián đoạn", "Cổng giao tiếp 8083, CSDL đặt sân")
     ]
 
     for row_idx, data in enumerate(rows_data, start=1):
@@ -384,12 +383,12 @@ def create_deck():
             p.font.name = "Segoe UI"
             p.font.size = Pt(11)
             p.font.color.rgb = C_DARK
-            if col_idx == 4:
+            if col_idx == 0:
                 p.font.bold = True
-                p.font.color.rgb = C_GREEN
+                p.font.color.rgb = C_BLUE
 
     bn10 = s10.shapes.add_textbox(Inches(0.8), Inches(6.3), Inches(11.7), Inches(0.5))
-    bn10.text_frame.paragraphs[0].text = "Tổng điểm toàn nhóm đạt 10 điểm, các phần việc phân tách rõ ràng và độc lập."
+    bn10.text_frame.paragraphs[0].text = "Các phân hệ được thiết kế và triển khai độc lập, đáp ứng đầy đủ yêu cầu của đề tài."
     bn10.text_frame.paragraphs[0].font.size = Pt(12)
     bn10.text_frame.paragraphs[0].font.bold = True
     bn10.text_frame.paragraphs[0].font.color.rgb = C_GREEN
@@ -448,14 +447,14 @@ def create_deck():
     out_downloads_v2 = r'c:\Users\viduc\Downloads\PitchOS-mo-hinh-kien-truc-moi.pptx'
 
     prs.save(out_ptpm)
-    print(f"Saved: {out_ptpm}")
+    print("Saved: " + out_ptpm)
 
     try:
         prs.save(out_downloads)
         print("Saved to Downloads: " + out_downloads)
     except PermissionError:
         prs.save(out_downloads_v2)
-        print("PitchOS-mo-hinh-kien-truc.pptx is locked by PowerPoint. Saved to: " + out_downloads_v2)
+        print("Locked. Saved to: " + out_downloads_v2)
 
 if __name__ == '__main__':
     create_deck()

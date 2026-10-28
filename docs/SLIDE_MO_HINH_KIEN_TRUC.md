@@ -22,11 +22,10 @@ File trình chiếu PowerPoint đã được cập nhật tại hai vị trí:
    - Từng dịch vụ tự thẩm định tính hợp lệ của mã xác thực
    - Tự động chặn các yêu cầu chưa đăng nhập hoặc không đủ quyền hạn
 4. Tầng nghiệp vụ:
-   - Dịch vụ xác thực: Cổng 8081, Hoàng phụ trách 3,0 điểm
-   - Dịch vụ sân bóng: Cổng 8082, Linh phụ trách 2,5 điểm
-   - Dịch vụ đặt sân: Cổng 8083, Nhật phụ trách 2,25 điểm
+   - Dịch vụ xác thực: Cổng giao tiếp 8081
+   - Dịch vụ sân bóng: Cổng giao tiếp 8082
+   - Dịch vụ đặt sân: Cổng giao tiếp 8083
 5. Tầng cơ sở dữ liệu:
-   - Hùng phụ trách 2,25 điểm
    - Ba cơ sở dữ liệu độc lập: CSDL người dùng, CSDL sân bóng, CSDL đặt sân
    - Không tạo khóa ngoại trực tiếp, liên kết dữ liệu hoàn toàn qua mã số định danh
 6. Hạ tầng đóng gói:
@@ -54,17 +53,17 @@ File trình chiếu PowerPoint đã được cập nhật tại hai vị trí:
 
 ## 3. DANH MỤC 12 SLIDE BẢO VỆ ĐỒ ÁN
 
-| Số slide | Tiêu đề slide | Nội dung tóm tắt | Thành viên phụ trách |
-| :---: | :--- | :--- | :---: |
-| 01 | Bìa báo cáo kiến trúc | Giới thiệu tên hệ thống, kiến trúc và danh sách bốn thành viên | Cả nhóm |
-| 02 | Tác nhân và chức năng | Phân chia ba vai trò khách hàng, chủ sân và quản trị viên | Hoàng |
-| 03 | Mô hình kiến trúc tổng thể | Sơ đồ năm tầng trực quan | Cả nhóm |
-| 04 | Vì sao chia thành các dịch vụ độc lập | Luận giải lý do phân rã hệ thống và ưu điểm cơ sở dữ liệu riêng | Linh |
-| 05 | Các kiểu giao tiếp trong hệ thống | Giao tiếp người dùng, giao tiếp giữa các dịch vụ và truy cập dữ liệu | Nhật |
-| 06 | Quy trình nghiệp vụ đặt sân | Luồng sáu bước từ đăng nhập đến khi lưu đơn hoàn tất | Nhật |
-| 07 | Quản lý trạng thái thực thể | Vòng đời đơn đặt sân và trạng thái của sân bóng | Hùng |
-| 08 | Kỹ thuật chống đặt trùng khung giờ | Kiểm tra tầng dữ liệu và xử lý hai yêu cầu gửi cùng lúc | Hùng |
-| 09 | Xử lý lỗi và phòng thủ sự cố | Các nhóm lỗi thường gặp và giải pháp ngắt kết nối an toàn | Linh |
-| 10 | Bảng phân công nhiệm vụ và barem điểm | Bảng chi tiết điểm số của từng thành viên, tổng mười điểm | Hoàng |
-| 11 | Kịch bản kiểm thử và trình diễn thực tế | Năm bước trình diễn trực tiếp theo đúng yêu cầu đề bài | Cả nhóm |
-| 12 | Phụ lục: Sơ đồ tuần tự | Sơ đồ tuần tự quy trình đặt sân phục vụ giải thích chi tiết | Nhật |
+| Số slide | Tiêu đề slide | Nội dung tóm tắt |
+| :---: | :--- | :--- |
+| 01 | Bìa báo cáo kiến trúc | Giới thiệu tên hệ thống, kiến trúc và danh sách thành viên |
+| 02 | Tác nhân và chức năng | Phân chia ba vai trò khách hàng, chủ sân và quản trị viên |
+| 03 | Mô hình kiến trúc tổng thể | Sơ đồ năm tầng trực quan |
+| 04 | Vì sao chia thành các dịch vụ độc lập | Luận giải lý do phân rã hệ thống và ưu điểm cơ sở dữ liệu riêng |
+| 05 | Các kiểu giao tiếp trong hệ thống | Giao tiếp người dùng, giao tiếp giữa các dịch vụ và truy cập dữ liệu |
+| 06 | Quy trình nghiệp vụ đặt sân | Luồng sáu bước từ đăng nhập đến khi lưu đơn hoàn tất |
+| 07 | Quản lý trạng thái thực thể | Vòng đời đơn đặt sân và trạng thái của sân bóng |
+| 08 | Kỹ thuật chống đặt trùng khung giờ | Kiểm tra tầng dữ liệu và xử lý hai yêu cầu gửi cùng lúc |
+| 09 | Xử lý lỗi và phòng thủ sự cố | Các nhóm lỗi thường gặp và giải pháp ngắt kết nối an toàn |
+| 10 | Bảng phân rã trách nhiệm các dịch vụ | Bảng chi tiết trách nhiệm lý thuyết và thực nghiệm của từng phân hệ |
+| 11 | Kịch bản kiểm thử và trình diễn thực tế | Năm bước trình diễn trực tiếp theo đúng yêu cầu đề bài |
+| 12 | Phụ lục: Sơ đồ tuần tự | Sơ đồ tuần tự quy trình đặt sân phục vụ giải thích chi tiết |

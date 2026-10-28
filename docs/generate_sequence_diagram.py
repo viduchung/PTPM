@@ -45,7 +45,7 @@ SEQUENCE_HTML = """<!DOCTYPE html>
       border: 2px solid #3b82f6;
       border-radius: 8px;
       text-align: center;
-      padding: 12px 10px;
+      padding: 16px 10px;
       font-weight: 800;
       font-size: 15px;
       color: #1e3a8a;
@@ -77,11 +77,11 @@ SEQUENCE_HTML = """<!DOCTYPE html>
   <div class="diagram-area">
     <!-- Lifelines -->
     <div class="lifelines">
-      <div class="actor-box user">👤 Khách hàng</div>
-      <div class="actor-box auth">🛡️ Dịch vụ xác thực</div>
-      <div class="actor-box booking">📅 Dịch vụ đặt sân</div>
-      <div class="actor-box pitch">🏟️ Dịch vụ sân bóng</div>
-      <div class="actor-box db">🗄️ Cơ sở dữ liệu</div>
+      <div class="actor-box user">Khách hàng</div>
+      <div class="actor-box auth">Dịch vụ xác thực</div>
+      <div class="actor-box booking">Dịch vụ đặt sân</div>
+      <div class="actor-box pitch">Dịch vụ sân bóng</div>
+      <div class="actor-box db">Cơ sở dữ liệu</div>
     </div>
 
     <!-- SVG Content -->
