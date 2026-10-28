@@ -10,21 +10,18 @@ def create_deck():
     prs = Presentation()
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
-    blank_layout = prs.slide_layouts[6] # Blank slide
+    blank_layout = prs.slide_layouts[6]
 
-    # Colors
-    C_DARK = RGBColor(15, 23, 42)      # #0f172a
-    C_BLUE = RGBColor(30, 64, 175)     # #1e40af
-    C_LIGHT_BLUE = RGBColor(224, 242, 254) # #e0f2fe
-    C_GREEN = RGBColor(22, 101, 52)    # #166534
-    C_GRAY = RGBColor(100, 116, 139)   # #64748b
+    # Bảng màu tối giản hiện đại
+    C_DARK = RGBColor(15, 23, 42)          # Slate 900
+    C_BLUE = RGBColor(30, 64, 175)         # Blue 700
+    C_GREEN = RGBColor(22, 101, 52)        # Green 800
+    C_GRAY = RGBColor(100, 116, 139)       # Slate 500
     C_WHITE = RGBColor(255, 255, 255)
-    C_BG_CARD = RGBColor(248, 250, 252)# #f8fafc
-    C_BORDER = RGBColor(203, 213, 225) # #cbd5e1
-    C_ORANGE = RGBColor(194, 65, 12)   # #c2410c
+    C_BG_CARD = RGBColor(248, 250, 252)    # Slate 50
+    C_BORDER = RGBColor(203, 213, 225)     # Slate 300
 
     def add_header(slide, title_text, page_num_str):
-        # Title
         tb = slide.shapes.add_textbox(Inches(0.8), Inches(0.5), Inches(10.5), Inches(0.8))
         tf = tb.text_frame
         tf.word_wrap = True
@@ -36,7 +33,6 @@ def create_deck():
         p.font.bold = True
         p.font.color.rgb = C_DARK
 
-        # Page Number
         pb = slide.shapes.add_textbox(Inches(11.5), Inches(0.5), Inches(1.2), Inches(0.4))
         ptf = pb.text_frame
         ptf.margin_left = ptf.margin_top = ptf.margin_right = ptf.margin_bottom = 0
@@ -71,7 +67,7 @@ def create_deck():
             p_sub = tf.add_paragraph()
             p_sub.text = subtitle
             p_sub.font.name = "Segoe UI"
-            p_sub.font.size = Pt(11)
+            p_sub.font.size = Pt(11.5)
             p_sub.font.color.rgb = C_GRAY
             p_sub.space_after = Pt(8)
 
@@ -84,196 +80,191 @@ def create_deck():
             p_item.space_after = Pt(4)
 
     # -------------------------------------------------------------------------
-    # SLIDE 1: COVER
+    # SLIDE 1: BÌA
     # -------------------------------------------------------------------------
     s1 = prs.slides.add_slide(blank_layout)
-    # Background accent
-    bg_shape = s1.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(13.333), Inches(7.5))
-    bg_shape.fill.solid()
-    bg_shape.fill.fore_color.rgb = RGBColor(248, 250, 252)
-    bg_shape.line.fill.background()
+    bg1 = s1.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(13.333), Inches(7.5))
+    bg1.fill.solid()
+    bg1.fill.fore_color.rgb = RGBColor(248, 250, 252)
+    bg1.line.fill.background()
 
-    tb = s1.shapes.add_textbox(Inches(1.0), Inches(1.8), Inches(11.333), Inches(4.0))
-    tf = tb.text_frame
-    tf.word_wrap = True
+    tb1 = s1.shapes.add_textbox(Inches(1.0), Inches(1.8), Inches(11.333), Inches(4.0))
+    tf1 = tb1.text_frame
+    tf1.word_wrap = True
 
-    p0 = tf.paragraphs[0]
-    p0.text = "BÁO CÁO KIẾN TRÚC PHẦN MỀM — BÀI KIỂM TRA SỐ 1"
+    p0 = tf1.paragraphs[0]
+    p0.text = "BÁO CÁO KIẾN TRÚC PHẦN MỀM"
     p0.font.name = "Segoe UI"
     p0.font.size = Pt(14)
     p0.font.bold = True
     p0.font.color.rgb = C_BLUE
     p0.space_after = Pt(14)
 
-    p1 = tf.add_paragraph()
+    p1 = tf1.add_paragraph()
     p1.text = "MÔ HÌNH KIẾN TRÚC TỔNG THỂ"
     p1.font.name = "Segoe UI"
     p1.font.size = Pt(36)
     p1.font.bold = True
     p1.font.color.rgb = C_DARK
 
-    p2 = tf.add_paragraph()
-    p2.text = "Hệ thống Quản lý & Đặt lịch Sân bóng đá (PitchOS)"
+    p2 = tf1.add_paragraph()
+    p2.text = "Hệ thống quản lý và đặt lịch sân bóng đá PitchOS"
     p2.font.name = "Segoe UI"
     p2.font.size = Pt(24)
     p2.font.bold = True
     p2.font.color.rgb = C_BLUE
     p2.space_after = Pt(20)
 
-    p3 = tf.add_paragraph()
-    p3.text = "Kiến trúc SOA / Microservices · Spring Boot 3 · MySQL 8.0 (Database-per-Service) · JWT Bearer RBAC"
+    p3 = tf1.add_paragraph()
+    p3.text = "Kiến trúc hướng dịch vụ, cơ sở dữ liệu phân tán và phân quyền bảo mật"
     p3.font.name = "Segoe UI"
     p3.font.size = Pt(14)
     p3.font.color.rgb = C_GRAY
     p3.space_after = Pt(30)
 
-    p4 = tf.add_paragraph()
-    p4.text = "Thành viên nhóm: Hoàng (Nhóm trưởng - Auth) · Linh (Pitch API) · Hùng (Database) · Nhật (Booking OpenFeign)"
+    p4 = tf1.add_paragraph()
+    p4.text = "Thành viên nhóm: Hoàng, Linh, Hùng, Nhật"
     p4.font.name = "Segoe UI"
-    p4.font.size = Pt(13)
+    p4.font.size = Pt(14)
     p4.font.bold = True
     p4.font.color.rgb = C_GREEN
 
-    # Page number
-    pnum = s1.shapes.add_textbox(Inches(11.5), Inches(6.5), Inches(1.2), Inches(0.4))
-    pnum.text_frame.paragraphs[0].text = "01 / 12"
-    pnum.text_frame.paragraphs[0].font.size = Pt(13)
-    pnum.text_frame.paragraphs[0].font.bold = True
-    pnum.text_frame.paragraphs[0].font.color.rgb = C_GRAY
+    pnum1 = s1.shapes.add_textbox(Inches(11.5), Inches(6.5), Inches(1.2), Inches(0.4))
+    pnum1.text_frame.paragraphs[0].text = "01 / 12"
+    pnum1.text_frame.paragraphs[0].font.size = Pt(13)
+    pnum1.text_frame.paragraphs[0].font.bold = True
+    pnum1.text_frame.paragraphs[0].font.color.rgb = C_GRAY
 
     # -------------------------------------------------------------------------
     # SLIDE 2: TÁC NHÂN VÀ PHÂN HỆ CHỨC NĂNG
     # -------------------------------------------------------------------------
     s2 = prs.slides.add_slide(blank_layout)
-    add_header(s2, "Tác nhân và Phân hệ Chức năng", "02 / 12")
+    add_header(s2, "Tác nhân và chức năng", "02 / 12")
+
     add_card(s2, Inches(0.8), Inches(1.6), Inches(3.6), Inches(4.5), 
-             "👤 Khách hàng (User)", 
-             ["Đăng ký tài khoản, đăng nhập hệ thống",
-              "Tìm kiếm sân bóng theo loại sân (5, 7, 11)",
-              "Tra cứu lịch trống và bảng giá theo giờ",
-              "Gửi yêu cầu đặt sân trực tuyến",
-              "Xem lịch sử đơn đặt sân của cá nhân",
-              "Nhận mã đơn đặt với trạng thái 'cho_duyet'"],
-             "Quyền hạn: ROLE_USER")
+             "👤 Khách hàng", 
+             ["Đăng ký tài khoản và đăng nhập",
+              "Tìm kiếm sân bóng và xem bảng giá",
+              "Xem giờ trống và gửi yêu cầu đặt sân",
+              "Theo dõi lịch sử đơn đặt của bản thân",
+              "Nhận thông báo mã đơn chờ duyệt"],
+             "Vai trò người dùng thông thường")
 
     add_card(s2, Inches(4.8), Inches(1.6), Inches(3.6), Inches(4.5), 
-             "🏟️ Chủ sân / Nhân viên", 
-             ["Đăng tải thông tin sân bóng mới",
-              "Cập nhật bảng giá, mô tả, địa chỉ sân",
-              "Chuyển trạng thái sân (hoat_dong / bao_tri)",
-              "Duyệt hoặc từ chối các đơn đặt sân",
-              "Theo dõi lịch thi đấu trong ngày",
-              "Quản lý doanh thu và tần suất sử dụng sân"],
-             "Quyền hạn: ROLE_CHUSAN")
+             "🏟️ Chủ sân bóng", 
+             ["Thêm mới và quản lý danh sách sân",
+              "Cập nhật giá thuê theo từng khung giờ",
+              "Chuyển trạng thái hoạt động hoặc bảo trì",
+              "Tiếp nhận duyệt hoặc từ chối các đơn đặt",
+              "Theo dõi lịch thi đấu hàng ngày"],
+             "Vai trò quản lý sân bãi")
 
     add_card(s2, Inches(8.8), Inches(1.6), Inches(3.6), Inches(4.5), 
-             "👑 Quản trị viên (Admin)", 
-             ["Quản lý toàn bộ tài khoản người dùng",
-              "Cấp phát và thay đổi quyền truy cập RBAC",
-              "Khóa / mở khóa tài khoản vi phạm",
-              "Giám sát tình trạng hoạt động các dịch vụ",
-              "Xem báo cáo thống kê toàn hệ thống",
-              "Kiểm soát tính toàn vẹn dữ liệu"],
-             "Quyền hạn: ROLE_ADMIN")
+             "👑 Quản trị viên", 
+             ["Quản lý người dùng và cấp phát quyền hạn",
+              "Giám sát trạng thái hoạt động của hệ thống",
+              "Khóa các tài khoản vi phạm quy định",
+              "Kiểm soát tính nhất quán của dữ liệu",
+              "Xem báo cáo thống kê toàn bộ hệ thống"],
+             "Vai trò quản trị cao cấp")
 
-    # Bottom note
-    bn = s2.shapes.add_textbox(Inches(0.8), Inches(6.3), Inches(11.6), Inches(0.5))
-    bp = bn.text_frame.paragraphs[0]
-    bp.text = "💡 Phân quyền tự động qua JWT Bearer: Sau khi đăng nhập, Client tự giải mã claim 'role' để điều hướng đúng giao diện chức năng."
-    bp.font.size = Pt(12)
-    bp.font.color.rgb = C_GRAY
+    bn2 = s2.shapes.add_textbox(Inches(0.8), Inches(6.3), Inches(11.6), Inches(0.5))
+    bp2 = bn2.text_frame.paragraphs[0]
+    bp2.text = "💡 Người dùng sau khi đăng nhập thành công sẽ truy cập đúng khu vực chức năng theo quyền hạn được cấp."
+    bp2.font.size = Pt(12)
+    bp2.font.color.rgb = C_GRAY
 
     # -------------------------------------------------------------------------
-    # SLIDE 3: KIẾN TRÚC TỔNG THỂ (IMAGE 4K)
+    # SLIDE 3: KIẾN TRÚC TỔNG THỂ (IMAGE ĐƠN GIẢN HÓA)
     # -------------------------------------------------------------------------
     s3 = prs.slides.add_slide(blank_layout)
     arch_img_path = r'c:\Users\viduc\Downloads\PTPM\docs\images\pitchos-kien-truc-tong-the.png'
     if os.path.exists(arch_img_path):
         s3.shapes.add_picture(arch_img_path, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
     else:
-        add_header(s3, "Kiến trúc tổng thể — PitchOS", "03 / 12")
+        add_header(s3, "Kiến trúc tổng thể PitchOS", "03 / 12")
 
     # -------------------------------------------------------------------------
-    # SLIDE 4: VÌ SAO CHIA THÀNH CÁC SERVICE
+    # SLIDE 4: VÌ SAO CHIA THÀNH CÁC DỊCH VỤ ĐỘC LẬP
     # -------------------------------------------------------------------------
     s4 = prs.slides.add_slide(blank_layout)
-    add_header(s4, "Vì sao phân chia thành các Microservice độc lập?", "04 / 12")
+    add_header(s4, "Vì sao phân chia thành các dịch vụ độc lập?", "04 / 12")
     
     add_card(s4, Inches(0.8), Inches(1.5), Inches(5.6), Inches(2.5),
-             "🛡️ Identity & Auth Service (:8081)",
-             ["Chịu trách nhiệm duy nhất về bảo mật tài khoản & danh tính",
-              "Mã hóa mật khẩu một chiều BCrypt và sinh Bearer JWT Token",
-              "Tách biệt hoàn toàn để mọi service khác dùng chung cơ chế xác thực"],
-             "Hoàng phụ trách (3.0 điểm - Leader)")
+             "🛡️ Dịch vụ xác thực",
+             ["Chuyên trách quản lý danh tính và bảo mật",
+              "Cấp phát mã xác thực cho toàn bộ hệ thống",
+              "Tách biệt để mọi dịch vụ dùng chung cơ chế bảo mật"],
+             "Hoàng phụ trách")
 
     add_card(s4, Inches(6.8), Inches(1.5), Inches(5.6), Inches(2.5),
-             "🏟️ Pitch Service (:8082)",
-             ["Chuyên biệt hóa danh mục sân bóng đá và chính sách giá",
-              "Tần suất đọc (Read-heavy) cực lớn từ khách hàng tra cứu sân",
-              "Được scale độc lập mà không ảnh hưởng tới luồng đặt sân"],
-             "Linh phụ trách (2.5 điểm)")
+             "🏟️ Dịch vụ sân bóng",
+             ["Quản lý thông tin sân và chính sách giá thuê",
+              "Đáp ứng lượng tra cứu lớn từ khách hàng",
+              "Vận hành độc lập mà không ảnh hưởng tới việc đặt sân"],
+             "Linh phụ trách")
 
     add_card(s4, Inches(0.8), Inches(4.3), Inches(5.6), Inches(2.5),
-             "📅 Booking Service (:8083)",
-             ["Chuyên trách xử lý giao dịch đặt lịch (Write-heavy) & chống trùng",
-              "Giao tiếp OpenFeign sang Pitch Service để lấy giá thời gian thực",
-              "Độc lập giúp bảo toàn tính toàn vẹn nghiệp vụ đơn đặt"],
-             "Nhật phụ trách (2.25 điểm)")
+             "📅 Dịch vụ đặt sân",
+             ["Xử lý các giao dịch đặt lịch và kiểm tra trùng giờ",
+              "Chuyên trách đảm bảo tính nhất quán của đơn đặt",
+              "Độc lập giúp bảo toàn dữ liệu nghiệp vụ quan trọng"],
+             "Nhật phụ trách")
 
     add_card(s4, Inches(6.8), Inches(4.3), Inches(5.6), Inches(2.5),
-             "🗄️ Quản trị CSDL Database-per-Service",
-             ["3 Database MySQL riêng biệt (pitchos_user, pitch_db, booking_db)",
-              "Triệt tiêu hoàn toàn Schema Coupling và Deadlock khóa chéo",
-              "Chỉ lưu Logical ID, bảo đảm tính bao đóng tuyệt đối giữa các dịch vụ"],
-             "Hùng phụ trách (2.25 điểm)")
+             "🗄️ Cơ sở dữ liệu phân tán",
+             ["Mỗi dịch vụ sở hữu một kho dữ liệu riêng biệt",
+              "Tránh tranh chấp tài nguyên và khóa chéo dữ liệu",
+              "Cho phép nâng cấp cấu trúc bảng độc lập"],
+             "Hùng phụ trách")
 
     # -------------------------------------------------------------------------
     # SLIDE 5: CÁC KIỂU GIAO TIẾP VÀ BẢO MẬT
     # -------------------------------------------------------------------------
     s5 = prs.slides.add_slide(blank_layout)
-    add_header(s5, "Các Cơ chế Giao tiếp & Mô hình Bảo mật", "05 / 12")
+    add_header(s5, "Các kiểu giao tiếp trong hệ thống", "05 / 12")
 
     add_card(s5, Inches(0.8), Inches(1.6), Inches(5.6), Inches(2.4),
-             "🌐 Giao tiếp HTTP/REST Đồng bộ",
-             ["Frontend Client gọi vào các Microservice qua chuẩn RESTful API",
-              "Phương thức HTTP rõ ràng: GET, POST, PATCH với mã trạng thái chuẩn",
-              "Dữ liệu trao đổi 100% định dạng chuẩn JSON UTF-8"],
-             "Giao tiếp ngoài (Client to Service)")
+             "🌐 Giao tiếp trực tiếp",
+             ["Ứng dụng web gửi yêu cầu và nhận kết quả tức thì",
+              "Các phương thức rõ ràng cho tra cứu, tạo mới và sửa đổi",
+              "Dữ liệu trao đổi theo định dạng chuẩn rõ ràng"],
+             "Giao tiếp người dùng với dịch vụ")
 
     add_card(s5, Inches(6.8), Inches(1.6), Inches(5.6), Inches(2.4),
-             "⚡ Spring Cloud OpenFeign",
-             ["Booking Service gọi liên dịch vụ sang Pitch Service (:8082)",
-              "Khai báo giao diện @FeignClient trực quan, tự động đóng gói request",
-              "Tích hợp xử lý ngắt mạch (Fault Tolerance) trả về mã 503 khi có sự cố"],
-             "Giao tiếp liên dịch vụ (Service to Service)")
+             "⚡ Giao tiếp giữa các dịch vụ",
+             ["Dịch vụ đặt sân tự động gọi sang dịch vụ sân bóng",
+              "Lấy giá thuê thực tế và kiểm tra trạng thái hoạt động",
+              "Tự động ngắt kết nối an toàn khi dịch vụ đích gặp sự cố"],
+             "Giao tiếp nội bộ giữa các dịch vụ")
 
     add_card(s5, Inches(0.8), Inches(4.3), Inches(5.6), Inches(2.5),
-             "🔑 Xác thực & Phân quyền JWT Bearer",
-             ["Auth Service ký số Token bằng thuật toán HMAC-SHA256 bí mật",
-              "Các service tự giải mã claims (sub, role) mà không cần truy vấn Auth DB",
-              "Tự động chặn truy cập trái phép: HTTP 401 Unauthorized & 403 Forbidden"],
-             "Bảo mật Stateless RBAC")
+             "🔑 Xác thực và phân quyền",
+             ["Dịch vụ xác thực tạo mã chứng nhận danh tính",
+              "Các dịch vụ tự kiểm tra quyền mà không cần gọi lại",
+              "Bảo đảm an toàn và không làm quá tải dịch vụ xác thực"],
+             "Bảo mật quyền truy cập")
 
     add_card(s5, Inches(6.8), Inches(4.3), Inches(5.6), Inches(2.5),
-             "💾 Truy cập Dữ liệu Độc lập qua JPA",
-             ["Mỗi dịch vụ chỉ dùng Spring Data JPA kết nối CSDL thuộc quyền quản lý",
-              "Thao tác ghi dữ liệu có Transactional an toàn, kiểm chứng ghi đĩa cứng",
-              "Không truy vấn chéo hoặc chia sẻ connection pool giữa các dịch vụ"],
-             "Quản trị CSDL Phân tán")
+             "💾 Truy cập dữ liệu độc lập",
+             ["Mỗi dịch vụ chỉ kết nối với cơ sở dữ liệu của mình",
+              "Tuyệt đối không truy vấn chéo vào dữ liệu của dịch vụ khác",
+              "Bảo đảm tính độc lập của từng phân hệ"],
+             "Quản trị dữ liệu phân tán")
 
     # -------------------------------------------------------------------------
     # SLIDE 6: LUỒNG NGHIỆP VỤ ĐẶT SÂN
     # -------------------------------------------------------------------------
     s6 = prs.slides.add_slide(blank_layout)
-    add_header(s6, "Quy trình Nghiệp vụ Đặt Sân Từ A đến Z", "06 / 12")
+    add_header(s6, "Quy trình nghiệp vụ đặt sân từ đầu đến cuối", "06 / 12")
 
     steps = [
-        ("Bước 1: Đăng nhập", "Khách hàng gửi POST /api/v1/auth/login. Auth Service xác thực và trả về Bearer JWT token."),
-        ("Bước 2: Tìm kiếm sân", "Client gửi GET /api/v1/pitches lấy danh sách sân khả dụng (status = 'hoat_dong')."),
-        ("Bước 3: Gửi yêu cầu đặt", "Khách gửi POST /api/v1/bookings kèm Header: Authorization và thời gian đặt mong muốn."),
-        ("Bước 4: Kiểm tra chống trùng", "Booking Service truy vấn booking_db kiểm tra khung giờ đã có người đặt trước chưa."),
-        ("Bước 5: OpenFeign gọi giá sân", "Booking Service gọi sang Pitch Service lấy giá thuê/giờ và xác nhận trạng thái sân."),
-        ("Bước 6: Ghi nhận & Phản hồi", "Booking Service ghi đơn vào booking_db (status = 'cho_duyet') và trả mã 201 Created.")
+        ("Bước 1: Đăng nhập", "Khách hàng đăng nhập vào hệ thống và nhận mã xác thực người dùng."),
+        ("Bước 2: Tìm kiếm sân", "Khách hàng xem danh mục các sân đang ở trạng thái sẵn sàng hoạt động."),
+        ("Bước 3: Gửi yêu cầu đặt", "Khách hàng chọn sân và khung giờ thi đấu rồi gửi yêu cầu đặt sân."),
+        ("Bước 4: Kiểm tra trùng giờ", "Dịch vụ đặt sân kiểm tra trong cơ sở dữ liệu xem khung giờ đã bị trùng chưa."),
+        ("Bước 5: Lấy thông tin sân", "Dịch vụ đặt sân gọi sang dịch vụ sân bóng để lấy giá thuê và kiểm tra trạng thái."),
+        ("Bước 6: Lưu đơn thành công", "Dịch vụ đặt sân lưu bản ghi ở trạng thái chờ duyệt và gửi thông báo thành công.")
     ]
 
     for idx, (stitle, sdesc) in enumerate(steps):
@@ -284,62 +275,62 @@ def create_deck():
         add_card(s6, x, y, Inches(3.7), Inches(2.3), stitle, [sdesc], f"Giai đoạn {idx+1}")
 
     # -------------------------------------------------------------------------
-    # SLIDE 7: MÁY TRẠNG THÁI (STATE MACHINE)
+    # SLIDE 7: MÁY TRẠNG THÁI
     # -------------------------------------------------------------------------
     s7 = prs.slides.add_slide(blank_layout)
-    add_header(s7, "Vòng đời & Quản lý Trạng thái Thực thể", "07 / 12")
+    add_header(s7, "Quản lý trạng thái đơn đặt và sân bóng", "07 / 12")
 
     add_card(s7, Inches(0.8), Inches(1.6), Inches(5.6), Inches(4.8),
-             "📋 Trạng thái Đơn Đặt Sân (Booking)",
-             ["⏳ cho_duyet (Pending): Trạng thái khởi tạo sau khi khách đặt sân thành công (201 Created). Đơn chờ chủ sân xác nhận.",
-              "✅ da_duyet (Confirmed): Chủ sân kiểm tra và chấp nhận đơn đặt. Khung giờ chính thức được khóa cho khách hàng.",
-              "❌ tu_choi (Rejected): Chủ sân từ chối đơn do trùng lịch đột xuất hoặc lý do vận hành sân.",
-              "🚫 da_huy (Cancelled): Khách hàng chủ động hủy lịch đặt theo đúng chính sách trước giờ thi đấu."],
-             "Lưu tại bảng bookings trong pitchos_booking_db")
+             "📋 Trạng thái đơn đặt sân",
+             ["⏳ Chờ duyệt: Đơn mới tạo thành công, chờ chủ sân xác nhận",
+              "✅ Đã duyệt: Chủ sân chấp nhận, khung giờ chính thức được khóa",
+              "❌ Từ chối: Chủ sân từ chối đơn do lý do vận hành sân",
+              "🚫 Đã hủy: Khách hàng chủ động hủy lịch trước giờ thi đấu"],
+             "Lưu tại bảng đơn đặt trong cơ sở dữ liệu đặt sân")
 
     add_card(s7, Inches(6.8), Inches(1.6), Inches(5.6), Inches(4.8),
-             "🏟️ Trạng thái Sân Bóng (Pitch)",
-             ["🟢 hoat_dong (Active): Sân bóng hoạt động bình thường, sẵn sàng hiển thị cho khách hàng tra cứu và đặt lịch.",
-              "🟡 bao_tri (Maintenance): Sân bóng đang sửa chữa cỏ, đèn hoặc bảo dưỡng định kỳ.",
-              "🚫 Chặn nghiệp vụ tự động: Khi sân ở trạng thái 'bao_tri', Booking Service gọi OpenFeign kiểm tra sẽ lập tức từ chối đơn đặt và trả về HTTP 400 Bad Request.",
-              "🛠️ Cập nhật linh hoạt: Chủ sân có thể đổi trạng thái qua API PATCH /api/v1/pitches/{id}/status."],
-             "Lưu tại bảng pitches trong pitchos_pitch_db")
+             "🏟️ Trạng thái sân bóng",
+             ["🟢 Hoạt động: Sân sẵn sàng cho khách hàng tra cứu và đặt lịch",
+              "🟡 Bảo trì: Sân đang sửa chữa hoặc bảo dưỡng định kỳ",
+              "🚫 Hệ thống tự động từ chối đặt lịch nếu sân đang bảo trì",
+              "🛠️ Chủ sân có thể cập nhật trạng thái này bất kỳ lúc nào"],
+             "Lưu tại bảng sân bóng trong cơ sở dữ liệu sân")
 
     # -------------------------------------------------------------------------
     # SLIDE 8: CHỐNG ĐẶT TRÙNG KHUNG GIỜ
     # -------------------------------------------------------------------------
     s8 = prs.slides.add_slide(blank_layout)
-    add_header(s8, "Cơ chế Kỹ thuật Chống Đặt Trùng Khung Giờ", "08 / 12")
+    add_header(s8, "Kỹ thuật chống đặt trùng khung giờ", "08 / 12")
 
     add_card(s8, Inches(0.8), Inches(1.6), Inches(5.6), Inches(4.8),
-             "🔍 Kiểm tra Trùng lịch ở Tầng Dữ liệu",
-             ["1. Truy vấn giao thoa thời gian (Time-overlap query):",
-              "SELECT count(*) FROM bookings WHERE pitch_id = :pitchId AND booking_date = :date AND status != 'tu_choi' AND (:startTime < end_time AND :endTime > start_time)",
-              "2. Ràng buộc Transactional: Thao tác kiểm tra và lưu đơn được bọc trong một @Transactional để ngăn chặn hiện tượng Dirty Read.",
-              "3. Phản hồi lỗi chuẩn mực: Nếu có tranh chấp khung giờ, trả về HTTP 409 Conflict hoặc 400 Bad Request kèm thông điệp rõ ràng."],
-             "Hùng & Nhật phối hợp triển khai")
+             "🔍 Kiểm tra tại tầng dữ liệu",
+             ["1. So sánh khoảng thời gian bắt đầu và kết thúc với các đơn đã có",
+              "2. Kiểm tra điều kiện loại trừ các đơn đã bị từ chối hoặc đã hủy",
+              "3. Gom nhóm thao tác kiểm tra và ghi dữ liệu thành một khối an toàn",
+              "4. Phản hồi thông báo lỗi rõ ràng nếu khung giờ đã có người giữ chỗ"],
+             "Hùng và Nhật phối hợp triển khai")
 
     add_card(s8, Inches(6.8), Inches(1.6), Inches(5.6), Inches(4.8),
-             "⚡ Xử lý Yêu cầu Đồng thời (Concurrency)",
-             ["• Kịch bản: Hai khách hàng A và B cùng ấn nút Đặt sân cho Sân 5A lúc 18:00 - 19:00 cùng một thời điểm.",
-              "• Xử lý: Transaction của khách A hoàn thành trước, ghi bản ghi đơn đặt thành công (HTTP 201 Created).",
-              "• Chặn khách B: Transaction của khách B phát hiện xung đột dữ liệu, tự động Rollback và trả về HTTP 409 Conflict.",
-              "• Kết quả: Tuyệt đối không thể xảy ra tình trạng 2 khách cùng được cấp một sân trong cùng một khung giờ."],
-             "Bảo đảm tính toàn vẹn dữ liệu ACID")
+             "⚡ Xử lý yêu cầu gửi cùng lúc",
+             ["Khách hàng thứ nhất: Ghi nhận đơn thành công và khóa khung giờ",
+              "Khách hàng thứ hai gửi cùng lúc: Hệ thống phát hiện xung đột dữ liệu",
+              "Khách hàng thứ hai nhận được thông báo khung giờ đã có người đặt",
+              "Ràng buộc tại cơ sở dữ liệu bảo đảm không bao giờ có hai đơn trùng giờ trên cùng một sân"],
+             "Bảo đảm tính nhất quán của dữ liệu")
 
     # -------------------------------------------------------------------------
     # SLIDE 9: XỬ LÝ LỖI VÀ CHỊU LỖI PHÂN TÁN
     # -------------------------------------------------------------------------
     s9 = prs.slides.add_slide(blank_layout)
-    add_header(s9, "Xử lý Lỗi Toàn diện & Phòng thủ Lỗi Mạng", "09 / 12")
+    add_header(s9, "Xử lý lỗi và phòng thủ sự cố", "09 / 12")
 
     errors = [
-        ("400 Bad Request", "Dữ liệu đầu vào sai quy chuẩn (@Valid)", "Tên sân để trống, giá thuê là số âm, định dạng ngày giờ không hợp lệ. GlobalExceptionHandler bắt lỗi và trả về JSON danh sách trường vi phạm."),
-        ("401 Unauthorized", "Chưa xác thực danh tính người dùng", "Request thiếu Header Authorization hoặc token JWT sai chữ ký, hết hạn. AuthenticationEntryPoint trả về mã 401 chuẩn JSON."),
-        ("403 Forbidden", "Không đủ quyền truy cập tài nguyên (RBAC)", "Khách hàng thông thường (role: user) cố tình gọi API tạo sân mới (POST) hoặc sửa trạng thái sân. AccessDeniedHandler trả về mã 403."),
-        ("404 Not Found", "Tài nguyên tra cứu không tồn tại", "Truy vấn ID sân bóng không có trong CSDL. CustomErrorDecoder bắt lỗi từ FeignClient và phản hồi thông báo tài nguyên không tồn tại."),
-        ("503 Service Unavailable", "Phòng thủ sụp đổ dây chuyền (Cascading Failure)", "Khi Pitch Service (port 8082) bị tắt hoặc sự cố mạng, Booking Service bắt ngoại lệ kết nối và lập tức trả về mã 503 thay vì bị treo luồng hệ thống."),
-        ("Tính bao đóng lỗi", "Tách biệt phạm vi ảnh hưởng giữa các service", "Sự cố ở dịch vụ này không làm hỏng dữ liệu hoặc làm treo các dịch vụ độc lập khác.")
+        ("Lỗi dữ liệu đầu vào", "Dữ liệu gửi lên sai quy cách", "Tên sân để trống hoặc giá thuê là số âm sẽ bị từ chối ngay lập tức kèm thông điệp rõ ràng."),
+        ("Lỗi chưa đăng nhập", "Chưa xác thực danh tính", "Yêu cầu thiếu mã xác thực hoặc mã không đúng sẽ bị từ chối truy cập hệ thống."),
+        ("Lỗi không đủ quyền hạn", "Truy cập vượt quá quyền cho phép", "Khách hàng thông thường cố tình gọi chức năng tạo sân hoặc sửa sân sẽ bị chặn."),
+        ("Lỗi tài nguyên không có", "Thông tin tra cứu không tồn tại", "Mã định danh sân bóng tra cứu không có trong hệ thống dữ liệu."),
+        ("Lỗi dịch vụ gián đoạn", "Phòng thủ sự cố đường truyền", "Khi dịch vụ sân bóng bị tắt, dịch vụ đặt sân báo lỗi gián đoạn an toàn thay vì bị treo hệ thống."),
+        ("Tính bao đóng sự cố", "Khoanh vùng phạm vi ảnh hưởng", "Sự cố xảy ra ở một dịch vụ không làm hỏng dữ liệu của các dịch vụ độc lập khác.")
     ]
 
     for idx, (code, title, desc) in enumerate(errors):
@@ -350,23 +341,21 @@ def create_deck():
         add_card(s9, x, y, Inches(5.6), Inches(1.5), f"🔴 {code} — {title}", [desc])
 
     # -------------------------------------------------------------------------
-    # SLIDE 10: MA TRẬN PHÂN CÔNG & ĐÁNH GIÁ (10.0 ĐIỂM)
+    # SLIDE 10: MA TRẬN PHÂN CÔNG & ĐÁNH GIÁ
     # -------------------------------------------------------------------------
     s10 = prs.slides.add_slide(blank_layout)
-    add_header(s10, "Bảng Phân công Nhiệm vụ & Barem Điểm Chi tiết", "10 / 12")
+    add_header(s10, "Bảng phân công nhiệm vụ và barem điểm", "10 / 12")
 
-    # Add Table
     table_shape = s10.shapes.add_table(5, 5, Inches(0.8), Inches(1.6), Inches(11.733), Inches(4.5))
     table = table_shape.table
 
-    # Column widths
     table.columns[0].width = Inches(2.2)
-    table.columns[1].width = Inches(3.0)
+    table.columns[1].width = Inches(3.2)
     table.columns[2].width = Inches(3.2)
     table.columns[3].width = Inches(1.8)
-    table.columns[4].width = Inches(1.5)
+    table.columns[4].width = Inches(1.3)
 
-    headers = ["Thành viên", "Nhiệm vụ Lý thuyết (Câu 1)", "Nhiệm vụ Thực nghiệm (Câu 2)", "Dịch vụ phụ trách", "Barem điểm"]
+    headers = ["Thành viên", "Nhiệm vụ lý thuyết", "Nhiệm vụ thực nghiệm", "Phân hệ phụ trách", "Barem điểm"]
     for col_idx, h in enumerate(headers):
         cell = table.cell(0, col_idx)
         cell.fill.solid()
@@ -379,10 +368,10 @@ def create_deck():
         p.font.color.rgb = C_WHITE
 
     rows_data = [
-        ("👑 Hoàng (Nhóm trưởng)", "Ý 3: Phân biệt Auth vs Authz, cấu trúc JWT, HTTP 401 vs 403 (1,0đ)", "Ý 4: Triển khai Auth Service, cấp Bearer Token, kiểm thử bảo mật (2,0đ)", "Auth Service (:8081)", "3,0 / 10,0"),
-        ("👤 Linh", "Ý 1: Đặc điểm SOA, phân rã dịch vụ PitchOS, 03 API tiêu biểu (1,5đ)", "Ý 1: Xây dựng 4 REST API Pitch Service, Validation 400, Swagger UI (1,0đ)", "Pitch Service (:8082)", "2,5 / 10,0"),
-        ("👤 Hùng", "Ý 2b: Nguyên tắc Database-per-service & rủi ro vi phạm (0,75đ)", "Ý 3: 3 CSDL MySQL độc lập, Entity, Repository JPA, kiểm chứng ghi đĩa (1,5đ)", "Quản trị 3 Database", "2,25 / 10,0"),
-        ("👤 Nhật", "Ý 2a: Giao tiếp HTTP/REST, Request/Response, Status code (0,75đ)", "Ý 2: Giao tiếp OpenFeign liên dịch vụ, Sequence Diagram, lỗi 503 (1,5đ)", "Booking Service (:8083)", "2,25 / 10,0")
+        ("👑 Hoàng, Nhóm trưởng", "Phân biệt xác thực và phân quyền, cấu trúc mã bảo vệ và các mã lỗi", "Xây dựng dịch vụ xác thực, cấp mã bảo vệ, kiểm thử an toàn", "Dịch vụ xác thực", "3,0 điểm"),
+        ("👤 Linh", "Đặc điểm kiến trúc hướng dịch vụ, phân rã các dịch vụ và các giao diện mẫu", "Xây dựng dịch vụ sân bóng, kiểm tra dữ liệu đầu vào và tài liệu giao diện", "Dịch vụ sân bóng", "2,5 điểm"),
+        ("👤 Hùng", "Nguyên tắc cơ sở dữ liệu riêng cho từng dịch vụ và rủi ro vi phạm", "Thiết lập ba cơ sở dữ liệu độc lập, cấu trúc bảng và kiểm chứng ghi đĩa", "Quản trị cơ sở dữ liệu", "2,25 điểm"),
+        ("👤 Nhật", "Mô tả quy trình giao tiếp giữa hai dịch vụ và mã trạng thái kết quả", "Kết nối trực tiếp hai dịch vụ, sơ đồ tuần tự và xử lý lỗi gián đoạn", "Dịch vụ đặt sân", "2,25 điểm")
     ]
 
     for row_idx, data in enumerate(rows_data, start=1):
@@ -399,9 +388,8 @@ def create_deck():
                 p.font.bold = True
                 p.font.color.rgb = C_GREEN
 
-    # Bottom note
     bn10 = s10.shapes.add_textbox(Inches(0.8), Inches(6.3), Inches(11.7), Inches(0.5))
-    bn10.text_frame.paragraphs[0].text = "Tổng điểm toàn nhóm: 10,0 / 10,0 Điểm · Các phần việc độc lập hoàn toàn, không ai trùng ai, khớp 100% đề thi."
+    bn10.text_frame.paragraphs[0].text = "Tổng điểm toàn nhóm đạt 10 điểm, các phần việc phân tách rõ ràng và độc lập."
     bn10.text_frame.paragraphs[0].font.size = Pt(12)
     bn10.text_frame.paragraphs[0].font.bold = True
     bn10.text_frame.paragraphs[0].font.color.rgb = C_GREEN
@@ -410,14 +398,14 @@ def create_deck():
     # SLIDE 11: KỊCH BẢN DEMO 5 BƯỚC
     # -------------------------------------------------------------------------
     s11 = prs.slides.add_slide(blank_layout)
-    add_header(s11, "Kịch bản Kiểm thử & Demo Thực nghiệm (10–15 Phút)", "11 / 12")
+    add_header(s11, "Kịch bản kiểm thử và trình diễn thực tế", "11 / 12")
 
     demo_steps = [
-        ("1. Khởi chạy hệ thống", "Show 3 Microservices (:8081, :8082, :8083) và 3 Database MySQL đang hoạt động bình thường."),
-        ("2. Kiểm tra REST API", "Mở Swagger UI gọi API hợp lệ (200/201) và gửi dữ liệu giá âm/tên rỗng chứng minh bắt lỗi 400 Bad Request."),
-        ("3. Kiểm tra Giao tiếp", "Gọi đặt sân thành công (OpenFeign hoạt động); sau đó TẮT Pitch Service để chứng minh trả về mã 503 Service Unavailable."),
-        ("4. Kiểm tra Ghi đĩa CSDL", "Mở DBeaver/Workbench chạy câu lệnh SELECT chứng minh đơn đặt sân đã được lưu đĩa cứng với trạng thái 'cho_duyet'."),
-        ("5. Kiểm tra Bảo mật JWT", "Gọi API khi chưa đăng nhập (401), đăng nhập cấp token, và dùng tài khoản User gọi API của Chủ sân (403 Forbidden).")
+        ("Bước 1: Khởi chạy hệ thống", "Cho thấy các dịch vụ và các cơ sở dữ liệu cần thiết đã hoạt động ổn định."),
+        ("Bước 2: Kiểm tra giao diện kết nối", "Thực hiện gọi thử với dữ liệu hợp lệ và trường hợp dữ liệu sai quy cách."),
+        ("Bước 3: Kiểm tra giao tiếp giữa các dịch vụ", "Thực hiện nghiệp vụ cần hai dịch vụ, minh họa kết quả khi dịch vụ đích bị tắt."),
+        ("Bước 4: Kiểm tra lưu trữ dữ liệu", "Thực hiện ghi dữ liệu đơn đặt, sau đó truy vấn lại để xác minh dữ liệu đã lưu vào đĩa cứng."),
+        ("Bước 5: Kiểm tra bảo mật và phân quyền", "Gọi thử khi chưa đăng nhập, khi có mã xác thực và khi người dùng không đủ quyền.")
     ]
 
     for idx, (dtitle, ddesc) in enumerate(demo_steps):
@@ -445,22 +433,29 @@ def create_deck():
         p_desc.font.color.rgb = C_DARK
 
     # -------------------------------------------------------------------------
-    # SLIDE 12: PHỤ LỤC: SƠ ĐỒ TUẦN TỰ (SEQUENCE DIAGRAM)
+    # SLIDE 12: PHỤ LỤC: SƠ ĐỒ TUẦN TỰ
     # -------------------------------------------------------------------------
     s12 = prs.slides.add_slide(blank_layout)
     seq_img_path = r'c:\Users\viduc\Downloads\PTPM\docs\images\pitchos-sequence-diagram.png'
     if os.path.exists(seq_img_path):
         s12.shapes.add_picture(seq_img_path, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
     else:
-        add_header(s12, "Phụ lục: Sơ đồ tuần tự (Sequence Diagram)", "12 / 12")
+        add_header(s12, "Phụ lục: Sơ đồ tuần tự nghiệp vụ đặt sân", "12 / 12")
 
-    # Save to both paths
+    # Lưu cả 2 vị trí
     out_ptpm = r'c:\Users\viduc\Downloads\PTPM\docs\PitchOS-mo-hinh-kien-truc.pptx'
     out_downloads = r'c:\Users\viduc\Downloads\PitchOS-mo-hinh-kien-truc.pptx'
+    out_downloads_v2 = r'c:\Users\viduc\Downloads\PitchOS-mo-hinh-kien-truc-moi.pptx'
 
     prs.save(out_ptpm)
-    prs.save(out_downloads)
-    print(f"Presentation saved successfully to:\n - {out_ptpm}\n - {out_downloads}")
+    print(f"Saved: {out_ptpm}")
+
+    try:
+        prs.save(out_downloads)
+        print("Saved to Downloads: " + out_downloads)
+    except PermissionError:
+        prs.save(out_downloads_v2)
+        print("PitchOS-mo-hinh-kien-truc.pptx is locked by PowerPoint. Saved to: " + out_downloads_v2)
 
 if __name__ == '__main__':
     create_deck()
