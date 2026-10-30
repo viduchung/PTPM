@@ -1,0 +1,610 @@
+{
+  "info": {
+    "name": "PitchOS - Auth & Security (Hoàng)",
+    "description": "Bộ kiểm thử Xác thực và Phân quyền RBAC — phần của Hoàng (Nhóm trưởng) trong Postman Collection dùng chung.\n\nCách dùng:\n1. Bật MySQL và Auth Service (8081). Thư mục 2 và 3 cần bật thêm Pitch Service (8082) của Linh.\n2. Chạy thư mục 0 trước để đăng nhập 3 vai trò và nạp token vào biến tokenAdmin / tokenChusan / tokenUser.\n3. Thư mục 1: kịch bản demo hội đồng 3 ca bảo mật kinh điển (401 / 403 / 201).\n4. Thư mục 2 và 3: bộ test cases đầy đủ, chạy được bằng Collection Runner.\n\nTài khoản mẫu: admin / chusan / user — mật khẩu dùng chung 123456.\nToken ký HMAC-SHA256 bằng jwt.secret dùng chung, claim role viết thường (admin | chusan | user).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Chuẩn bị - Đăng nhập 3 vai trò",
+      "description": "Chạy cả thư mục này đầu tiên. Script tự lưu token và userId vào biến collection cho các thư mục sau dùng.",
+      "item": [
+        {
+          "name": "Đăng nhập admin (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Có accessToken', () => pm.expect(j.accessToken).to.be.a('string'));",
+                  "pm.test('tokenType là Bearer', () => pm.expect(j.tokenType).to.eql('Bearer'));",
+                  "pm.test('role trả về đúng admin', () => pm.expect(j.role).to.eql('admin'));",
+                  "pm.collectionVariables.set('tokenAdmin', j.accessToken);",
+                  "pm.collectionVariables.set('userIdAdmin', j.userId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123456\"\n}" },
+            "url": { "raw": "{{authUrl}}/api/v1/auth/login", "host": ["{{authUrl}}"], "path": ["api", "v1", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Đăng nhập chusan (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Có accessToken', () => pm.expect(j.accessToken).to.be.a('string'));",
+                  "pm.test('role trả về đúng chusan', () => pm.expect(j.role).to.eql('chusan'));",
+                  "pm.collectionVariables.set('tokenChusan', j.accessToken);",
+                  "pm.collectionVariables.set('userIdChusan', j.userId);",
+                  "console.log('Token chusan (dán vào jwt.io để soi 3 phần Header / Payload / Signature):');",
+                  "console.log(j.accessToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"chusan\",\n  \"password\": \"123456\"\n}" },
+            "url": { "raw": "{{authUrl}}/api/v1/auth/login", "host": ["{{authUrl}}"], "path": ["api", "v1", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Đăng nhập user (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Có accessToken', () => pm.expect(j.accessToken).to.be.a('string'));",
+                  "pm.test('role trả về đúng user', () => pm.expect(j.role).to.eql('user'));",
+                  "pm.collectionVariables.set('tokenUser', j.accessToken);",
+                  "pm.collectionVariables.set('userIdUser', j.userId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"user\",\n  \"password\": \"123456\"\n}" },
+            "url": { "raw": "{{authUrl}}/api/v1/auth/login", "host": ["{{authUrl}}"], "path": ["api", "v1", "auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Demo hội đồng - 3 ca bảo mật (Hoàng)",
+      "description": "Kịch bản Hoàng trực tiếp thao tác trước hội đồng.\nBước 1: chạy thư mục 0, mở Console lấy token chusan dán vào jwt.io chỉ rõ Header / Payload (sub, role, userId) / Signature.\nBước 2: chạy lần lượt 3 ca dưới đây — cần Pitch Service (8082) đang BẬT.",
+      "item": [
+        {
+          "name": "Ca 1 - Không gửi token (401 Unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 Unauthorized', () => pm.response.to.have.status(401));",
+                  "pm.test('Hệ thống không biết người gọi là ai', () => pm.expect(pm.response.code).to.eql(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Sân demo hội đồng\",\n  \"pitchType\": \"san_5\",\n  \"pricePerHour\": 300000.00,\n  \"address\": \"Số 1 Đại học Công nghiệp Hà Nội\"\n}" },
+            "url": { "raw": "{{pitchUrl}}/api/v1/pitches", "host": ["{{pitchUrl}}"], "path": ["api", "v1", "pitches"] },
+            "description": "Gọi API thêm sân mới nhưng KHÔNG gửi Header Authorization → AuthenticationEntryPoint trả về 401."
+          }
+        },
+        {
+          "name": "Ca 2 - Token user gọi API của chusan (403 Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403 Forbidden', () => pm.response.to.have.status(403));",
+                  "pm.test('Biết là ai nhưng không đủ quyền', () => pm.expect(pm.response.code).to.eql(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Sân demo hội đồng\",\n  \"pitchType\": \"san_5\",\n  \"pricePerHour\": 300000.00,\n  \"address\": \"Số 1 Đại học Công nghiệp Hà Nội\"\n}" },
+            "url": { "raw": "{{pitchUrl}}/api/v1/pitches", "host": ["{{pitchUrl}}"], "path": ["api", "v1", "pitches"] },
+            "description": "Token hợp lệ nhưng role 'user' không nằm trong hasAnyRole('chusan','admin') → AccessDeniedHandler trả về 403."
+          }
+        },
+        {
+          "name": "Ca 3 - Token chusan gọi lại (201 Created)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('demoPitchName', 'Sân demo hội đồng ' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Trả về sân vừa tạo', () => pm.expect(j.id).to.be.a('number'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenChusan}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"{{demoPitchName}}\",\n  \"pitchType\": \"san_5\",\n  \"pricePerHour\": 300000.00,\n  \"address\": \"Số 1 Đại học Công nghiệp Hà Nội\"\n}" },
+            "url": { "raw": "{{pitchUrl}}/api/v1/pitches", "host": ["{{pitchUrl}}"], "path": ["api", "v1", "pitches"] },
+            "description": "Đúng vai trò 'chusan' → tạo sân thành công, nhận 201 Created."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Test cases Xác thực (Authentication)",
+      "description": "Kiểm thử đăng ký, mã hóa BCrypt và validation dữ liệu đầu vào trên Auth Service (8081).",
+      "item": [
+        {
+          "name": "TC01 - Đăng ký tài khoản mới (201 Created)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const n = 'khach' + Date.now();",
+                  "pm.collectionVariables.set('newUsername', n);",
+                  "pm.collectionVariables.set('newEmail', n + '@gmail.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Tài khoản mới mặc định role user', () => pm.expect(j.role).to.eql('user'));",
+                  "pm.test('Response KHÔNG chứa trường password', () => pm.expect(j.password).to.be.undefined);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"{{newUsername}}\",\n  \"email\": \"{{newEmail}}\",\n  \"password\": \"123456\",\n  \"fullName\": \"Khách Hàng Kiểm Thử\",\n  \"phone\": \"0912345678\"\n}" },
+            "url": { "raw": "{{authUrl}}/api/v1/auth/register", "host": ["{{authUrl}}"], "path": ["api", "v1", "auth", "register"] }
+          }
+        },
+        {
+          "name": "TC02 - Đăng ký trùng tên đăng nhập (400 Bad Request)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const j = pm.response.json();",
+                  "pm.test('Thông báo đã tồn tại', () => pm.expect(j.message).to.include('đã tồn tại'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"admin\",\n  \"email\": \"trungten@gmail.com\",\n  \"password\": \"123456\",\n  \"fullName\": \"Trùng Tên Đăng Nhập\",\n  \"phone\": \"0912345678\"\n}" },
+            "url": { "raw": "{{authUrl}}/api/v1/auth/register", "host": ["{{authUrl}}"], "path": ["api", "v1", "auth", "register"] }
+          }
+        },
+        {
+          "name": "TC03 - Đăng ký dữ liệu sai quy cách (400 Bad Request)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const j = pm.response.json();",
+                  "pm.test('Có map errors chi tiết từng trường', () => pm.expect(j.errors).to.be.an('object'));",
+                  "pm.test('Bắt lỗi email sai định dạng', () => pm.expect(j.errors).to.have.property('email'));",
+                  "pm.test('Bắt lỗi mật khẩu quá ngắn', () => pm.expect(j.errors).to.have.property('password'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"abc\",\n  \"email\": \"khong-phai-email\",\n  \"password\": \"123\",\n  \"fullName\": \"\",\n  \"phone\": \"123\"\n}" },
+            "url": { "raw": "{{authUrl}}/api/v1/auth/register", "host": ["{{authUrl}}"], "path": ["api", "v1", "auth", "register"] }
+          }
+        },
+        {
+          "name": "TC04 - Đăng nhập sai mật khẩu (401 Unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 Unauthorized', () => pm.response.to.have.status(401));",
+                  "const j = pm.response.json();",
+                  "pm.test('Không tiết lộ tài khoản có tồn tại hay không', () => pm.expect(j.message).to.include('không đúng'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"chusan\",\n  \"password\": \"sai-mat-khau\"\n}" },
+            "url": { "raw": "{{authUrl}}/api/v1/auth/login", "host": ["{{authUrl}}"], "path": ["api", "v1", "auth", "login"] }
+          }
+        },
+        {
+          "name": "TC05 - Đăng nhập tài khoản không tồn tại (401 Unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 Unauthorized', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"khong-ton-tai-abcxyz\",\n  \"password\": \"123456\"\n}" },
+            "url": { "raw": "{{authUrl}}/api/v1/auth/login", "host": ["{{authUrl}}"], "path": ["api", "v1", "auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Test cases Phân quyền (Authorization / RBAC)",
+      "description": "Kiểm thử ma trận phân quyền 3 vai trò và cơ chế kiểm tra quyền sở hữu tài nguyên. Chạy thư mục 0 trước.",
+      "item": [
+        {
+          "name": "TC06 - Gọi API bảo vệ khi không có token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 Unauthorized', () => pm.response.to.have.status(401));",
+                  "const j = pm.response.json();",
+                  "pm.test('Khuôn JSON lỗi chuẩn có status / error / path', () => {",
+                  "  pm.expect(j.status).to.eql(401);",
+                  "  pm.expect(j.error).to.eql('Unauthorized');",
+                  "  pm.expect(j.path).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{authUrl}}/api/v1/users/me", "host": ["{{authUrl}}"], "path": ["api", "v1", "users", "me"] }
+          }
+        },
+        {
+          "name": "TC07 - Token sai chữ ký (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 Unauthorized', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYWNrZXIiLCJyb2xlIjoiYWRtaW4ifQ.chu-ky-gia-mao" }
+            ],
+            "url": { "raw": "{{authUrl}}/api/v1/users/me", "host": ["{{authUrl}}"], "path": ["api", "v1", "users", "me"] },
+            "description": "Token tự bịa payload role admin nhưng không ký bằng jwt.secret → chữ ký không khớp, bị từ chối 401."
+          }
+        },
+        {
+          "name": "TC08 - Token hợp lệ xem thông tin của mình (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Đúng tài khoản user', () => pm.expect(j.username).to.eql('user'));",
+                  "pm.test('Response KHÔNG chứa password', () => pm.expect(j.password).to.be.undefined);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": { "raw": "{{authUrl}}/api/v1/users/me", "host": ["{{authUrl}}"], "path": ["api", "v1", "users", "me"] }
+          }
+        },
+        {
+          "name": "TC09 - Role user gọi API danh sách của admin (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403 Forbidden', () => pm.response.to.have.status(403));",
+                  "const j = pm.response.json();",
+                  "pm.test('Khuôn JSON lỗi chuẩn', () => {",
+                  "  pm.expect(j.status).to.eql(403);",
+                  "  pm.expect(j.error).to.eql('Forbidden');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": { "raw": "{{authUrl}}/api/v1/users", "host": ["{{authUrl}}"], "path": ["api", "v1", "users"] }
+          }
+        },
+        {
+          "name": "TC10 - Role chusan gọi API danh sách của admin (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenChusan}}" }],
+            "url": { "raw": "{{authUrl}}/api/v1/users", "host": ["{{authUrl}}"], "path": ["api", "v1", "users"] }
+          }
+        },
+        {
+          "name": "TC11 - Role admin gọi API danh sách (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Trả về danh sách người dùng', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenAdmin}}" }],
+            "url": { "raw": "{{authUrl}}/api/v1/users", "host": ["{{authUrl}}"], "path": ["api", "v1", "users"] }
+          }
+        },
+        {
+          "name": "TC12 - Role user xem thông tin người khác (403 - quyền sở hữu)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403 Forbidden', () => pm.response.to.have.status(403));",
+                  "const j = pm.response.json();",
+                  "pm.test('Thông báo vi phạm quyền sở hữu', () => pm.expect(j.message).to.include('chính mình'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": { "raw": "{{authUrl}}/api/v1/users/{{userIdAdmin}}", "host": ["{{authUrl}}"], "path": ["api", "v1", "users", "{{userIdAdmin}}"] },
+            "description": "Token hợp lệ, role 'user' nhưng truy cập tài nguyên của người khác → 403 (kiểm tra quyền sở hữu tại tầng Service)."
+          }
+        },
+        {
+          "name": "TC13 - Role chusan xem thông tin người khác (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('chusan được xem mọi tài khoản', () => pm.expect(pm.response.json().username).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenChusan}}" }],
+            "url": { "raw": "{{authUrl}}/api/v1/users/{{userIdUser}}", "host": ["{{authUrl}}"], "path": ["api", "v1", "users", "{{userIdUser}}"] }
+          }
+        },
+        {
+          "name": "TC14 - Tra cứu ID không tồn tại (404 Not Found)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 Not Found', () => pm.response.to.have.status(404));",
+                  "const j = pm.response.json();",
+                  "pm.test('Thông báo không tìm thấy', () => pm.expect(j.message).to.include('Không tìm thấy'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenAdmin}}" }],
+            "url": { "raw": "{{authUrl}}/api/v1/users/999999", "host": ["{{authUrl}}"], "path": ["api", "v1", "users", "999999"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Bàn giao liên dịch vụ (Giai đoạn 4)",
+      "description": "Chứng minh token do Auth Service (8081) cấp được Pitch Service (8082) và Booking Service (8083) chấp nhận — tức hợp đồng claim role và jwt.secret đã đồng bộ toàn hệ thống.",
+      "item": [
+        {
+          "name": "TC15 - Token Auth dùng được cho Pitch Service (201)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('handoverPitchName', 'Sân bàn giao ' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('handoverPitchId', j.id);",
+                  "pm.test('Pitch Service giải mã được token của Auth Service', () => pm.expect(j.id).to.be.a('number'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenChusan}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"{{handoverPitchName}}\",\n  \"pitchType\": \"san_7\",\n  \"pricePerHour\": 500000.00,\n  \"address\": \"Sân bàn giao kiểm thử liên dịch vụ\"\n}" },
+            "url": { "raw": "{{pitchUrl}}/api/v1/pitches", "host": ["{{pitchUrl}}"], "path": ["api", "v1", "pitches"] }
+          }
+        },
+        {
+          "name": "TC16 - Token Auth dùng được cho Booking Service (201)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const pad = (x) => String(x).padStart(2, '0');",
+                  "const d = new Date(2027, 5, 1 + Math.floor(Math.random() * 300));",
+                  "const ngay = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());",
+                  "const h = 6 + Math.floor(Math.random() * 12);",
+                  "pm.collectionVariables.set('startTime', ngay + 'T' + pad(h) + ':00:00');",
+                  "pm.collectionVariables.set('endTime', ngay + 'T' + pad(h + 1) + ':00:00');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('Booking Service giải mã được token và lấy đúng userId', () => {",
+                  "  pm.expect(pm.response.json().id).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"pitchId\": {{handoverPitchId}},\n  \"startTime\": \"{{startTime}}\",\n  \"endTime\": \"{{endTime}}\"\n}" },
+            "url": { "raw": "{{bookingUrl}}/api/v1/bookings", "host": ["{{bookingUrl}}"], "path": ["api", "v1", "bookings"] },
+            "description": "Chứng minh claim userId trong token được Booking Service dùng làm principal. Nếu Auth Service bỏ claim userId thì request này sẽ lỗi."
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "authUrl", "value": "http://localhost:8081" },
+    { "key": "pitchUrl", "value": "http://localhost:8082" },
+    { "key": "bookingUrl", "value": "http://localhost:8083" },
+    { "key": "tokenAdmin", "value": "" },
+    { "key": "tokenChusan", "value": "" },
+    { "key": "tokenUser", "value": "" },
+    { "key": "userIdAdmin", "value": "" },
+    { "key": "userIdChusan", "value": "" },
+    { "key": "userIdUser", "value": "" },
+    { "key": "newUsername", "value": "" },
+    { "key": "newEmail", "value": "" },
+    { "key": "demoPitchName", "value": "" },
+    { "key": "handoverPitchName", "value": "" },
+    { "key": "handoverPitchId", "value": "" },
+    { "key": "startTime", "value": "" },
+    { "key": "endTime", "value": "" }
+  ]
+}
