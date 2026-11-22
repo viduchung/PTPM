@@ -15,6 +15,78 @@ services:
       - ./pitchos-database/auth-init.sql:/docker-entrypoint-initdb.d/01_auth.sql
       - ./pitchos-database/pitch-init.sql:/docker-entrypoint-initdb.d/02_pitch.sql
       - ./pitchos-database/booking-init.sql:/docker-entrypoint-initdb.d/03_booking.sql
+    healthcheck:
+      # Them boi Hoang: auth-service dung depends_on condition: service_healthy
+      # nen MySQL buoc phai cong bo trang thai suc khoe cua chinh no.
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_PASSWORD:-123456}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - pitchos-network
+
+  # ==================================================================
+  # SERVICE REGISTRY (EUREKA SERVER) - HOANG PHU TRACH
+  # Khoi dong dau tien: moi service khac deu can dia chi nay de dang ky.
+  # ==================================================================
+  pitchos-service-registry:
+    build:
+      context: ./pitchos-service-registry
+      dockerfile: Dockerfile
+    container_name: pitchos-service-registry
+    restart: unless-stopped
+    ports:
+      - "${REGISTRY_PORT:-8761}:8761"
+    environment:
+      REGISTRY_PORT: 8761
+    healthcheck:
+      # Dung /actuator/health thay vi chi kiem tra port: port mo khong co
+      # nghia ung dung da san sang nhan dang ky (phan biet container status
+      # va application health).
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    networks:
+      - pitchos-network
+
+  # ==================================================================
+  # AUTH & USER SERVICE (Cong 8081) - HOANG PHU TRACH
+  # ==================================================================
+  pitchos-auth-service:
+    build:
+      context: ./pitchos-auth-service
+      dockerfile: Dockerfile
+    container_name: pitchos-auth-service
+    restart: unless-stopped
+    ports:
+      - "${AUTH_SERVICE_PORT:-8081}:8081"
+    environment:
+      AUTH_SERVICE_PORT: 8081
+      # Trong mang Docker, localhost tro ve chinh container nay. Phai goi
+      # MySQL va Eureka bang TEN SERVICE trong compose.
+      MYSQL_HOST: pitchos-mysql
+      MYSQL_PORT: 3306
+      MYSQL_USERNAME: ${MYSQL_USERNAME:-root}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-123456}
+      AUTH_DB_NAME: ${AUTH_DB_NAME:-pitchos_user_db}
+      EUREKA_URL: http://pitchos-service-registry:8761/eureka/
+      # JWT_SECRET duoc nap tu file .env, KHONG ghi cung trong file nay
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+    depends_on:
+      pitchos-mysql:
+        condition: service_healthy
+      pitchos-service-registry:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
     networks:
       - pitchos-network
 

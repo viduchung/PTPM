@@ -72,8 +72,11 @@ public class DataInitializer implements CommandLineRunner {
             );
 
             userRepository.saveAll(initialUsers);
-            log.info("Khởi tạo thành công {} tài khoản mẫu (mật khẩu dùng chung: {})",
-                    initialUsers.size(), DEFAULT_PASSWORD);
+            // KHÔNG in mật khẩu ra log (yêu cầu bảo mật TH8): log của container có thể
+            // được thu thập, lưu trữ và chia sẻ, nên mọi thông tin xác thực phải bị loại
+            // khỏi log. Mật khẩu mặc định của 3 tài khoản mẫu được ghi trong README.md.
+            log.info("Khởi tạo thành công {} tài khoản mẫu cho 3 vai trò (admin, chusan, user).",
+                    initialUsers.size());
         } else {
             log.info("CSDL đã có sẵn {} tài khoản người dùng.", userRepository.count());
             repairDemoPasswords();
@@ -93,8 +96,9 @@ public class DataInitializer implements CommandLineRunner {
 
             User user = found.get();
             if (!passwordEncoder.matches(DEFAULT_PASSWORD, user.getPassword())) {
-                log.warn("Tài khoản '{}' có chuỗi băm BCrypt không khớp mật khẩu mặc định '{}'. "
-                        + "Đang băm lại để phục vụ kiểm thử và demo.", username, DEFAULT_PASSWORD);
+                // Chỉ ghi tên tài khoản, không ghi giá trị mật khẩu ra log.
+                log.warn("Tài khoản '{}' có chuỗi băm BCrypt không khớp mật khẩu mặc định. "
+                        + "Đang băm lại để phục vụ kiểm thử và demo.", username);
                 user.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
                 userRepository.save(user);
             }
