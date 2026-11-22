@@ -1,80 +1,89 @@
-# 👤 BẢNG NHIỆM VỤ CÁ NHÂN: HÙNG
+# 🛡️ BẢNG NHIỆM VỤ CÁ NHÂN: HÙNG — BÀI KIỂM TRA SỐ 2 (TX2)
+## HỌC PHẦN: PHÁT TRIỂN PHẦN MỀM HƯỚNG DỊCH VỤ (SOA / MICROSERVICES 2026)
+### ĐỀ TÀI: HỆ THỐNG ĐẶT SÂN BÓNG TRỰC TUYẾN — PITCHOS
 
 > **HỌ VÀ TÊN:** HÙNG  
-> **VAI TRÒ:** Phụ trách Quản trị CSDL Phân tán, Entity/Repository JPA & Script CSDL  
-> **DỊCH VỤ PHỤ TRÁCH:** Quản trị toàn bộ 3 CSDL MySQL độc lập & Tầng Repository  
-> **CƠ SỞ DỮ LIỆU SỞ HỮU:** `pitchos_user_db`, `pitchos_pitch_db`, `pitchos_booking_db`  
-> **TỔNG ĐIỂM BẢO VỆ:** **2,25 / 10,0 Điểm** (0,75đ Lý thuyết + 1,5đ Thực nghiệm)  
-> **BÁO CÁO PHỤ TRÁCH:** **Chương 3** (Quản lý dữ liệu, lược đồ ERD từng dịch vụ, kiến trúc Entity/Repository)  
-> **THỜI ĐIỂM BẮT ĐẦU:** **GIAI ĐOẠN 1 (LÀM ĐẦU TIÊN CẢ NHÓM)** — Phải hoàn thành CSDL trước thì 3 dịch vụ của Hoàng, Linh, Nhật mới có thể kết nối khi khởi động.
+> **VAI TRÒ:** Kỹ sư Cơ sở Dữ liệu & Quản trị Vận hành Hệ thống  
+> **VÙNG MÃ NGUỒN SỞ HỮU:** `pitchos-database/`, `scripts/`, Khối cấu hình MySQL & Volume trong Docker Compose  
+> **TRỌNG SỐ ĐÁNH GIÁ:** **10,0 / 10,0 Điểm** (60% Điểm nhóm Báo cáo + Mã nguồn, 40% Điểm cá nhân qua Video demo độc lập)  
+> **THỜI HẠN THỰC HIỆN:** 01 tuần (Theo kế hoạch tại `KE_HOACH_KIEM_TRA_2.md`)
 
 ---
 
-## 🎯 1. BAREM ĐIỂM VÀ ĐẦU VIỆC CHI TIẾT CỦA HÙNG (THEO ĐÚNG ĐỀ BÀI)
+## 🎯 1. BAREM ĐIỂM & ĐẦU VIỆC CHI TIẾT CỦA HÙNG
 
-### 📘 A. Phần Lý thuyết (0,75 Điểm — Câu 1 Ý 2b)
-- [ ] **Giải thích nguyên tắc mỗi dịch vụ quản lý dữ liệu thuộc trách nhiệm của mình (Database-per-service):**
-  - Trong kiến trúc Microservices/SOA, mỗi dịch vụ sở hữu độc quyền và chịu trách nhiệm toàn bộ về cơ sở dữ liệu riêng của nó.
-  - Dữ liệu của một dịch vụ chỉ có thể được truy xuất từ bên ngoài thông qua giao diện lập trình (API công khai) của chính dịch vụ đó.
-- [ ] **Vì sao một dịch vụ không nên truy cập trực tiếp cơ sở dữ liệu của dịch vụ khác?**
-  - Vi phạm tính đóng gói (Encapsulation) và ranh giới nghiệp vụ (Service Boundary).
-  - Làm lộ cấu trúc lưu trữ nội bộ (Internal Storage Details) ra bên ngoài, khiến việc sửa đổi schema trở nên cực kỳ nguy hiểm.
-- [ ] **Phân tích các rủi ro nghiêm trọng khi vi phạm nguyên tắc này (dùng chung CSDL):**
-  - **Ghép nối lược đồ dữ liệu (Schema Coupling):** Một thay đổi nhỏ ở bảng của dịch vụ này sẽ làm hỏng hoặc buộc phải refactor hàng loạt dịch vụ khác.
-  - **Khóa dòng chéo / Nghẽn cổ chai (Deadlock & Contention):** Các transaction từ nhiều dịch vụ cạnh tranh tài nguyên trên cùng một bảng vật lý, dẫn đến nghẽn tắc hiệu năng và sập hệ thống.
-  - **Cản trở mở rộng độc lập (Independent Scaling):** Không thể scale riêng DB chịu tải lớn hoặc áp dụng công nghệ lưu trữ linh hoạt (Polyglot Persistence - ví dụ kết hợp Redis/MongoDB khi cần).
-
----
-
-### 💻 B. Phần Thực nghiệm (1,5 Điểm — Câu 2 Ý 3)
-- [ ] **Khởi tạo 3 CSDL MySQL độc lập:**
-  1. `pitchos_user_db` (Dành cho Hoàng - Auth Service)
-  2. `pitchos_pitch_db` (Dành cho Linh - Pitch Service)
-  3. `pitchos_booking_db` (Dành cho Nhật - Booking Service)
-- [ ] **Soạn thảo 3 Script SQL độc lập tương ứng 3 Microservice:**
-  1. `auth-user-service.sql` (Cấp cho Hoàng - `pitchos_user_db`):
-     - Bảng `users`: `id`, `username`, `email` (Gmail), `password` (BCrypt), `full_name`, `phone`, `role` (`admin`, `chusan`, `user`).
-     - Nạp sẵn 3 tài khoản mẫu cho 3 role với mật khẩu mặc định `123456`.
-  2. `pitch-service.sql` (Cấp cho Linh - `pitchos_pitch_db`):
-     - Bảng `pitches`: `id`, `name`, `pitch_type` (`san_5`, `san_7`, `san_10`), `price_per_hour`, `address`, `thumbnail_url`, `google_map_url`, `status` (`hoat_dong`, `bao_tri`).
-     - Nạp sẵn 4 sân bóng mẫu đa dạng cấu hình.
-  3. `booking-service.sql` (Cấp cho Nhật - `pitchos_booking_db`):
-     - Bảng `bookings`: `id`, `user_id`, `pitch_id`, `start_time`, `end_time`, `total_price`, `status` (`cho_duyet`, `da_duyet`, `tu_choi`).
-     - ⚠️ **QUY TẮC CỐT LÕI:** Lưu `user_id` và `pitch_id` dưới dạng số nguyên (Logical ID), **TUYỆT ĐỐI KHÔNG TẠO KHÓA NGOẠI (Foreign Key) VẬT LÝ** sang DB khác.
-- [ ] **Xây dựng cấu trúc mô hình thực thể Entity & Repository JPA:**
-  - Định nghĩa các Entity JPA chuẩn annotations: `@Entity`, `@Table`, `@Id`, `@GeneratedValue(strategy = GenerationType.IDENTITY)`.
-  - Định nghĩa các interfaces kế thừa `JpaRepository`.
-- [ ] **Viết câu truy vấn chống trùng lịch thi đấu trong `BookingRepository`:**
-  - Logic toán học kiểm tra giao thoa giữa 2 khoảng thời gian và loại trừ các đơn bị từ chối:
-    ```sql
-    SELECT COUNT(b) FROM Booking b 
-    WHERE b.pitchId = :pitchId 
-      AND b.status <> 'tu_choi'
-      AND b.startTime < :endTime 
-      AND b.endTime > :startTime
-    ```
-- [ ] **Bảo đảm tính độc lập dữ liệu & Kiểm tra kết quả ghi đĩa:**
-  - Đảm bảo mỗi dịch vụ chỉ cấu hình datasource trỏ vào DB của chính mình.
-  - Phối hợp với Nhật: Sau khi Nhật gọi API tạo đơn thành công, thực thi câu lệnh SQL kiểm tra dữ liệu đã lưu đĩa cứng.
-- [ ] **Bàn giao cấu hình cho cả nhóm:**
-  - Cung cấp JDBC URL, username, password trong file master `.env` và `application.properties` cho Hoàng, Linh, Nhật.
+### 📘 A. Phần Lý thuyết Báo cáo (0,5 Điểm — Câu 1 Ý 1.4)
+*Viết vào file `docs/kt2/CAU1_4_HUNG.md` để sau này gộp vào Báo cáo chính.*
+- [ ] **Phân biệt 3 cấp độ trạng thái theo đúng tiêu chuẩn TH8 của giảng viên:**
+  - *1. Trạng thái hoạt động của Container (Container Status):* Thể hiện tiến trình trong container có đang chạy hay không (`Up` / `Running` / `Exited`). Đây chỉ là trạng thái mức hệ điều hành máy chủ (OS-level process). **Container đang running KHÔNG ĐỒNG NGHĨA với việc ứng dụng hoạt động bình thường** (ví dụ: JVM đang bị crash lặp, đang treo Deadlock hoặc lỗi kết nối DB nhưng tiến trình PID vẫn tồn tại).
+  - *2. Trạng thái sức khỏe của ứng dụng (Application Health):* Thể hiện mức độ sẵn sàng nội tại của ứng dụng Spring Boot thông qua Actuator (`/actuator/health`). Ứng dụng chỉ đạt `UP` khi toàn bộ các thành phần phụ thuộc thiết yếu (kết nối Datasource HikariCP tới MySQL, dung lượng ổ đĩa, kết nối Eureka) đều sẵn sàng phục vụ request.
+  - *3. Khả năng thực hiện nghiệp vụ của hệ thống (Business Availability):* Thể hiện việc luồng nghiệp vụ end-to-end có thực hiện thành công hay không. Đây là mức cao nhất, phụ thuộc vào sự phối hợp của nhiều dịch vụ đồng thời.
+  - *Ví dụ thực tế trong PitchOS:* Container Booking Service đang `Running` và `/actuator/health` báo `UP`, nhưng nếu cả 2 instance của Pitch Service đều bị dừng thì người dùng **hoàn toàn không thể đặt được sân bóng**. Do đó: Container Status ➔ Application Health ➔ Business Availability là 3 cấp độ hoàn toàn khác nhau.
+- [ ] **Trình bày vai trò của Health Check, Log và Docker Volume trong vận hành Microservices:**
+  - *Health Check:* Giúp Docker Engine và bộ điều phối (Orchestrator) tự động phát hiện container bị lỗi nội bộ để khởi động lại (Self-healing), đồng thời giúp Docker Compose (`depends_on: condition: service_healthy`) kiểm soát chính xác thứ tự khởi động (chỉ cho phép service Java bật sau khi MySQL đã thực sự sẵn sàng nhận kết nối).
+  - *Log (Giám sát & Khắc phục sự cố):* Là nhật ký hoạt động của ứng dụng, giúp kỹ sư vận hành truy vết lỗi liên dịch vụ (Distributed Tracing), xác định nguyên nhân gốc rễ (Root Cause Analysis). *🚨 Lưu ý bảo mật bắt buộc của thầy:* Log tuyệt đối không được in dữ liệu nhạy cảm (mật khẩu người dùng, token bí mật).
+  - *Docker Volume (Bảo toàn dữ liệu):* Vùng lưu trữ được Docker quản lý độc lập ngoài vòng đời của container (Lifecycle Independence). Dữ liệu CSDL MySQL được ghi xuống Named Volume sẽ không bị mất khi container bị dừng (`stop`), khởi động lại (`restart`) hoặc thậm chí bị xóa bỏ (`down`). Dữ liệu chỉ bị xóa khi cố tình dùng cờ `-v` (`down -v`).
 
 ---
 
-### 📑 C. Phần Viết Báo cáo (Chương 3)
-- [ ] **Biên soạn toàn bộ Chương 3 (Quản lý dữ liệu):**
-  - Quản trị dữ liệu trong kiến trúc vi dịch vụ (Microservices Data Management).
-  - Sơ đồ dữ liệu và lược đồ ERD độc lập của 3 dịch vụ.
-  - Thiết kế kiến trúc Entity / Repository JPA và giải pháp toàn vẹn dữ liệu phi tập trung không dùng Foreign Key vật lý.
+### 💻 B. Phần Mã nguồn & Kỹ thuật Vận hành (Chấm 60% Nhóm)
+
+#### 1. Quản trị Cơ sở Dữ liệu & Script Tự Động Hóa (Mục 2.4 & 2.5):
+- [ ] **Tách và chuẩn bị 3 file SQL nạp dữ liệu sạch** trong thư mục `pitchos-database/`:
+  1. `auth-init.sql`: Khởi tạo bảng `users`, nạp 3 tài khoản mẫu với mật khẩu băm BCrypt (`admin`, `chusan`, `user`).
+  2. `pitch-init.sql`: Khởi tạo bảng `pitches`, nạp sẵn danh sách sân bóng mẫu và bảng giá theo giờ.
+  3. `booking-init.sql`: Khởi tạo bảng `bookings`, cấu hình các chỉ mục logic (`pitch_id`, `user_id`, thời gian bắt đầu, kết thúc).
+- [ ] Phối hợp với Linh đưa các file SQL này vào thư mục `/docker-entrypoint-initdb.d/` của từng container MySQL tương ứng trong file `docker-compose.yml` để tự động khởi tạo khi container dựng lên lần đầu.
+- [ ] Kiểm tra và đảm bảo các CSDL được gắn vào **Named Volume** bền vững:
+  - `mysql_auth_data` gắn vào `/var/lib/mysql` của `mysql-auth`.
+  - `mysql_pitch_data` gắn vào `/var/lib/mysql` của `mysql-pitch`.
+  - `mysql_booking_data` gắn vào `/var/lib/mysql` của `mysql-booking`.
+
+#### 2. Viết Kịch Bản Script Kiểm Tra Tự Động (Thư mục `scripts/`):
+- [ ] Tạo file script `scripts/check-health.bat` (và `scripts/check-health.sh`): Tự động gửi request kiểm tra endpoint `/actuator/health` của 4 dịch vụ (Registry :8761, Auth :8081, Pitch :8082, Booking :8083) và in ra trạng thái màn hình.
+- [ ] Tạo file script `scripts/test-persistence.bat`: Tự động truy vấn số lượng bản ghi trong bảng `bookings` trước và sau khi thực hiện chuỗi lệnh `docker compose down` rồi `docker compose up -d` để chứng minh dữ liệu còn nguyên vẹn.
+
+#### 3. Thực hiện Bộ Kiểm Thử Vận Hành, Giám Sát & Sự Cố (DEP01–DEP08):
+- [ ] **DEP01:** Chạy `docker compose up -d --build` ➔ Kiểm tra `docker compose ps` (7 container đều `healthy`).
+- [ ] **DEP02:** Kiểm tra sức khỏe `/actuator/health` của từng service ➔ Chụp ảnh minh chứng `{"status":"UP"}`.
+- [ ] **DEP03:** Đọc log liên dịch vụ (`docker compose logs`) của Booking và Pitch ➔ Chỉ rõ dòng log giao tiếp giữa 2 service.
+- [ ] **DEP04:** Dừng container Booking Service ➔ Quan sát Eureka Dashboard loại bỏ Booking sau khoảng thời gian trễ.
+- [ ] **DEP05:** Khởi động lại container Booking ➔ Đăng ký lại thành công vào Eureka và đặt sân bình thường.
+- [ ] **DEP06:** Kiểm tra bảo toàn dữ liệu: Chạy `docker compose down` (không dùng cờ `-v`), sau đó chạy lại `docker compose up -d` ➔ Thực thi câu lệnh SQL chứng minh toàn bộ đơn đặt sân đã tạo trước đó **vẫn còn nguyên vẹn**.
+- [ ] **DEP07 (Sự cố đặc thù 1):** Dừng container `mysql-pitch` ➔ Actuator của Pitch Service lập tức chuyển sang trạng thái `DOWN`, đọc log thấy lỗi ngắt kết nối HikariCP pool.
+- [ ] **DEP08 (Sự cố đặc thù 2 - Chịu lỗi):** Dừng container `pitchos-pitch-service-1` ➔ Gửi request đặt sân qua Booking Service, chứng minh hệ thống vẫn xử lý thành công 100% nhờ có `pitchos-pitch-service-2`.
 
 ---
 
-### 🎤 D. Nhiệm vụ Demo trước Hội đồng (Hùng trực tiếp thao tác)
-- [ ] **Bước 1:** Mở phần mềm quản trị CSDL (**DBeaver / MySQL Workbench / Navicat**).
-- [ ] **Bước 2:** Show 3 schema độc lập `pitchos_user_db`, `pitchos_pitch_db`, `pitchos_booking_db` trên màn hình để chứng minh kiến trúc **Database-per-service** và tính bao đóng.
-- [ ] **Bước 3:** Chứng minh rõ trong bảng `bookings` chỉ lưu ID dạng số nguyên `pitch_id`, `user_id`, không có Foreign Key vật lý ràng buộc chéo.
-- [ ] **Bước 4:** Sau khi Nhật thao tác gọi API tạo đơn đặt sân ở Bước 4 kịch bản, thực thi ngay câu lệnh:
-  ```sql
-  SELECT * FROM pitchos_booking_db.bookings ORDER BY id DESC LIMIT 1;
-  ```
-- [ ] **Bước 5:** Phân tích cho hội đồng thấy đơn hàng đã ghi vững chắc xuống đĩa cứng với trạng thái `cho_duyet`, `total_price` được tính toán chuẩn xác từ đơn giá của Pitch Service.
+### 📝 C. Phần Báo cáo Chuyên đề (Phụ trách: 2,50 / 10,0 Điểm)
+- [ ] **Câu 1.4 (0,5 Điểm):** Lý thuyết 3 mức (Container Status, App Health, Business Availability); vai trò Health Check, Log, Volume (Viết vào `docs/kt2/CAU1_4_HUNG.md`).
+- [ ] **Phần 2.1b: Bảng mô tả dịch vụ và Thiết kế CSDL phân tán (0,5 Điểm)** vào `docs/kt2/PHAN_2_HUNG.md`:
+  - Lập bảng mô tả chi tiết 4 dịch vụ: Tên dịch vụ, chức năng nghiệp vụ, API chính, DB sở hữu, Consumer/Provider, số instance.
+  - Luận giải nguyên tắc Database-per-service và triết lý sử dụng Logical ID (không dùng Foreign Key vật lý ràng buộc chéo giữa các container MySQL).
+- [ ] **Phần 6: Vận hành, Giám sát và Kiểm thử sự cố (1,5 Điểm)** vào `docs/kt2/PHAN_6_HUNG.md`:
+  - Trình bày kết quả gọi endpoint `/actuator/health` của các dịch vụ.
+  - Phân tích log hoạt động của ít nhất 2 dịch vụ (Booking và Pitch) khi có request đặt sân và khi xảy ra lỗi.
+  - Bảng tổng hợp kết quả bộ kiểm thử vận hành **DEP01–DEP08** kèm ảnh chụp minh chứng.
+  - **Phân tích chuyên sâu 1 tình huống sự cố thực tế (Mục bắt buộc có điểm riêng):**
+    - *Tình huống:* Dịch vụ Provider (Pitch Service) bị quá tải hoặc sập tiến trình.
+    - *Nguyên nhân:* Mạng đứt kết nối hoặc container bị kill.
+    - *Ảnh hưởng:* Booking Service không thể lấy được giá sân; nếu không có xử lý lỗi thì Booking sẽ bị treo luồng (Cascading Failure).
+    - *Phương án xử lý:* Cấu hình OpenFeign Timeout (2s/3s), GlobalExceptionHandler bắt FeignException chuyển thành mã **503 Service Unavailable**, thiết lập 2 instance Pitch để cân bằng tải và cấu hình chính sách `restart: unless-stopped` trong Docker Compose.
+- [ ] Viết **Phần 7: Đánh giá và Kết luận** vào `docs/kt2/PHAN_7_HUNG.md`:
+  - Lập bảng tự chấm điểm theo đúng barem 10 điểm của giảng viên.
+  - Nêu rõ các vấn đề kỹ thuật phát sinh trong quá trình triển khai và cách cả nhóm khắc phục.
+  - Đề xuất hướng phát triển mở rộng: Bổ sung API Gateway (Spring Cloud Gateway), áp dụng Circuit Breaker (Resilience4j) và giải pháp khóa phân tán (Distributed Lock với Redis) nếu scale Booking Service.
+- [ ] Xuất tài liệu kiểm thử vận hành `docs/testing/operation-test.md` và phân tích sự cố `docs/operation/failure-analysis.md`.
+
+---
+
+### 🎬 D. Phần Quay Video Demo Cá Nhân (40% Điểm Cá Nhân Của Hùng)
+*Hùng tự thực hiện trên máy tính cá nhân và quay video 10–15 phút đủ 8 bước theo checklist:*
+- [ ] **Bước 1:** Mở sơ đồ kiến trúc hệ thống giới thiệu các microservices, chỉ rõ Consumer (Booking), Provider (Pitch 2 instances) và Service Registry (Eureka).
+- [ ] **Bước 2:** Chạy lệnh `docker compose up -d` ➔ Chạy `docker compose ps` chứng minh toàn bộ 7 container đều `healthy`.
+- [ ] **Bước 3:** Mở Eureka Dashboard `http://localhost:8761` chứng minh các dịch vụ đã đăng ký, Pitch có 2 instances (8082 và 8084).
+- [ ] **Bước 4:** Dùng Postman login lấy Token ➔ Gọi `POST /api/v1/bookings` đặt sân thành công (Status 201).
+- [ ] **Bước 5:** Minh họa lỗi tích hợp: Gửi sân 9999 (Status 404), dừng cả 2 Pitch gửi đặt sân (Status 503).
+- [ ] **Bước 6:** Mở `/actuator/health` = `{"status":"UP"}` và mở log xem luồng trao đổi.
+- [ ] **Bước 7:** Dừng Pitch instance 1 ➔ Đặt sân vẫn thành công (Status 201) nhờ instance 2.
+- [ ] **Bước 8:** Chạy `docker compose down` rồi `up -d` ➔ Mở công cụ quản trị CSDL hoặc thực thi câu lệnh SQL chứng minh dữ liệu đơn đặt sân vẫn còn nguyên vẹn qua Docker Volume.
