@@ -5,7 +5,7 @@
 > **Người thực hiện:** HÙNG  
 > **Trách nhiệm bảo vệ:** **2,25 / 10,0 Điểm** (Câu 1 Ý 2b: 0,75đ Lý thuyết + Câu 2 Ý 3: 1,50đ Thực nghiệm)  
 > **Thời lượng thuyết trình:** **15 Phút** (15 Slides, trung bình ~1 phút / slide)  
-> **Tệp PowerPoint:** `PitchOS-Bao-Cao-Hung-15-Slide.pptx` (trong thư mục `Downloads/` hoặc `docs/`)
+> **Tệp PowerPoint:** `Slide_Hung_PitchOS_ChiTiet.pptx` (trong thư mục `docs/`)
 
 ---
 

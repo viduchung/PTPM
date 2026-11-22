@@ -69,12 +69,10 @@
 
 ---
 
-### 🎤 D. Nhiệm vụ Demo trước Hội đồng (Hùng trực tiếp thao tác)
-- [ ] **Bước 1:** Mở phần mềm quản trị CSDL (**DBeaver / MySQL Workbench / Navicat**).
-- [ ] **Bước 2:** Show 3 schema độc lập `pitchos_user_db`, `pitchos_pitch_db`, `pitchos_booking_db` trên màn hình để chứng minh kiến trúc **Database-per-service** và tính bao đóng.
-- [ ] **Bước 3:** Chứng minh rõ trong bảng `bookings` chỉ lưu ID dạng số nguyên `pitch_id`, `user_id`, không có Foreign Key vật lý ràng buộc chéo.
-- [ ] **Bước 4:** Sau khi Nhật thao tác gọi API tạo đơn đặt sân ở Bước 4 kịch bản, thực thi ngay câu lệnh:
-  ```sql
-  SELECT * FROM pitchos_booking_db.bookings ORDER BY id DESC LIMIT 1;
-  ```
-- [ ] **Bước 5:** Phân tích cho hội đồng thấy đơn hàng đã ghi vững chắc xuống đĩa cứng với trạng thái `cho_duyet`, `total_price` được tính toán chuẩn xác từ đơn giá của Pitch Service.
+### 🎤 D. Nhiệm vụ Demo trước Hội đồng (Hùng trực tiếp thao tác bằng phpMyAdmin & Postman)
+- [ ] **Bước 1:** Mở trình duyệt Web truy cập **phpMyAdmin** (http://localhost/phpmyadmin).
+- [ ] **Bước 2:** Show 3 schema độc lập pitchos_user_db, pitchos_pitch_db, pitchos_booking_db trên thanh danh sách bên trái để chứng minh kiến trúc **Database-per-service** và tính bao đóng dữ liệu.
+- [ ] **Bước 3:** Bấm vào bảng ookings ➔ Tab **Cấu trúc (Structure)**: Chứng minh rõ ràng chỉ lưu ID dạng số nguyên pitch_id, user_id (Logical ID), **không có Foreign Key vật lý** ràng buộc chéo.
+- [ ] **Bước 4:** Mở **Postman**, gửi request POST /api/v1/bookings (kèm Bearer Token user) tạo đơn đặt sân hợp lệ ➔ Nhận mã **201 Created**.
+- [ ] **Bước 5:** Quay lại phpMyAdmin, bấm **Duyệt (Browse)** bảng ookings ➔ Chứng minh bản ghi mới (id = 2, 	otal_price = 600000.00, status = cho_duyet) đã được lưu bền vững xuống đĩa cứng MySQL.
+- [ ] **Bước 6 (Nâng cao):** Gửi tiếp đơn trùng giờ (nhận **400 Bad Request**) và đơn sân không tồn tại (nhận **404 Not Found**) ➔ F5 phpMyAdmin chứng minh không lưu dữ liệu sai lệch.

@@ -7,7 +7,7 @@
 > - **Lý thuyết:** Câu 1 Ý 2b (0,75 Điểm)  
 > - **Thực nghiệm:** Câu 2 Ý 3 (1,50 Điểm)  
 > **Văn bản báo cáo:** Chương 3 — Quản lý Dữ liệu ([BAO_CAO_CHUONG_3_HUNG.md](file:///c:/Users/viduc/Downloads/PTPM/docs/BAO_CAO_CHUONG_3_HUNG.md))  
-> **Slide trình chiếu:** `PitchOS-Bao-Cao-Hung.pptx` ([Xem file](file:///c:/Users/viduc/Downloads/PTPM/docs/PitchOS-Bao-Cao-Hung.pptx))
+> **Slide trình chiếu:** `Slide_Hung_PitchOS_ChiTiet.pptx` ([Xem file](file:///c:/Users/viduc/Downloads/PTPM/docs/Slide_Hung_PitchOS_ChiTiet.pptx))
 
 ---
 
