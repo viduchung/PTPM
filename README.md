@@ -1,114 +1,220 @@
-# PitchOS - Football Pitch Booking System (Kiến trúc SOA / Microservices)
+# ⚽ PitchOS — Hệ Thống Đặt Sân Bóng Trực Tuyến
+## HỌC PHẦN: PHÁT TRIỂN PHẦN MỀM HƯỚNG DỊCH VỤ (SOA / MICROSERVICES 2026)
+### BÀI KIỂM TRA SỐ 2 (TX2) — CHUẨN ĐẦU RA CĐR L2 (TỔNG: 10,0 ĐIỂM)
 
-## 📌 1. Giới thiệu Dự án
-**PitchOS** là hệ thống quản lý và đặt sân bóng đá mini trực tuyến được thiết kế và xây dựng theo mô hình **Kiến trúc hướng dịch vụ (SOA / Microservices)**. Hệ thống phân tách thành các dịch vụ nghiệp vụ độc lập giao tiếp qua giao thức HTTP/REST, áp dụng nguyên tắc quản trị dữ liệu **Database-per-Service** và cơ chế bảo mật phân quyền phi tập trung qua **JWT (JSON Web Token)** với 3 vai trò: `admin`, `chusan`, `user`.
-
----
-
-## 👥 2. BẢNG PHÂN CHIA NHIỆM VỤ CHI TIẾT & BAREM ĐIỂM (TỔNG: 10,0 ĐIỂM)
-
-> **Căn cứ theo đề thi:** Bài kiểm tra số 1 (Học phần Kiến trúc phần mềm) gồm **Câu 1: Lý thuyết (4,0 điểm)** và **Câu 2: Thực nghiệm (6,0 điểm)**.  
-> Nhóm gồm 4 thành viên, phân công độc lập từng ý rõ ràng, **không ai trùng ai**, nhóm trưởng **Hoàng** phụ trách mảng bảo mật cốt lõi với điểm số nhỉnh hơn:
-
-| STT | Thành viên | Vai trò & Dịch vụ phụ trách | Ý phụ trách theo Đề thi | Điểm chi tiết | Tổng điểm | Báo cáo |
-| :---: | :--- | :--- | :--- | :---: | :---: | :---: |
-| **1** | 👑 **HOÀNG** *(Nhóm trưởng)* | **Phụ trách Cơ chế JWT, Phân quyền RBAC & Auth Service**<br>• Dịch vụ: `pitchos-auth-service` (Port 8081)<br>• CSDL: `pitchos_user_db` | • **Câu 1 - Ý 3 (Lý thuyết):** Xác thực & Phân quyền, JWT, HTTP 401 vs 403 (1,0đ)<br>• **Câu 2 - Ý 4 (Thực nghiệm):** Triển khai Auth, JWT, RBAC, kiểm thử bảo mật (2,0đ) | 1,0đ (LT)<br>+ 2,0đ (TN) | **3,0 / 10,0** | **Chương 4 & Chương 5** |
-| **2** | 👤 **LINH** | **Phụ trách Kiến trúc SOA, Chuẩn hóa RESTful API & Pitch Service**<br>• Dịch vụ: `pitchos-pitch-service` (Port 8082)<br>• CSDL: `pitchos_pitch_db` | • **Câu 1 - Ý 1a (Lý thuyết):** Đặc điểm SOA, phân biệt Service - API - Client (0,5đ)<br>• **Câu 1 - Ý 1b (Lý thuyết):** Phân rã dịch vụ PitchOS, 03 API tiêu biểu, SRP (1,0đ)<br>• **Câu 2 - Ý 1 (Thực nghiệm):** Xây dựng RESTful API, Validation 400, Swagger UI (1,0đ) | 1,5đ (LT)<br>+ 1,0đ (TN) | **2,5 / 10,0** | **Chương 1** |
-| **3** | 👤 **HÙNG** | **Phụ trách Quản trị CSDL Phân tán & Tầng Repository**<br>• Dịch vụ: Quản trị 3 DB MySQL độc lập<br>• CSDL: `pitchos_user_db`, `pitchos_pitch_db`, `pitchos_booking_db` | • **Câu 1 - Ý 2b (Lý thuyết):** Nguyên tắc Database-per-service & rủi ro vi phạm (0,75đ)<br>• **Câu 2 - Ý 3 (Thực nghiệm):** CSDL phân tán, Entity, Repository JPA, kiểm chứng ghi đĩa (1,5đ) | 0,75đ (LT)<br>+ 1,5đ (TN) | **2,25 / 10,0** | **Chương 3** |
-| **4** | 👤 **NHẬT** | **Phụ trách Giao tiếp Liên dịch vụ, Sequence Diagram & Booking Service**<br>• Dịch vụ: `pitchos-booking-service` (Port 8083)<br>• CSDL: `pitchos_booking_db` | • **Câu 1 - Ý 2a (Lý thuyết):** Giao tiếp HTTP/REST, Request/Response, Status code (0,75đ)<br>• **Câu 2 - Ý 2 (Thực nghiệm):** Giao tiếp liên dịch vụ qua OpenFeign, bắt lỗi 503, Sequence Diagram (1,5đ) | 0,75đ (LT)<br>+ 1,5đ (TN) | **2,25 / 10,0** | **Chương 2** |
+> 📌 **Định hướng đánh giá KT2:** Khác với Bài kiểm tra số 1 (tập trung vào REST API đơn lẻ và bảo mật), Bài kiểm tra số 2 đánh giá năng lực **tích hợp, container hóa và vận hành** hệ thống Microservices trong thực tế:
+> 1. **Tích hợp & Tiêu thụ dịch vụ (TH6):** Consumer (Booking) gọi Provider (Pitch) qua OpenFeign, kiểm tra tính toàn vẹn dữ liệu và xử lý lỗi phân tán.
+> 2. **Service Registry & Cân bằng tải (TH7):** Eureka Server quản lý danh bạ, gọi dịch vụ qua **Service ID** (bỏ URL cứng), chạy **2 instance Pitch Service** để cân bằng tải và chịu lỗi.
+> 3. **Triển khai & Vận hành Docker (TH8):** Đóng gói Dockerfile multi-stage, điều phối toàn bộ hệ thống bằng `docker-compose.yml`, kiểm tra sức khỏe Spring Boot Actuator, giám sát log và bảo toàn dữ liệu bằng Docker Named Volume.
+> 
+> ⚖️ **Cơ cấu chấm điểm:** **60% Điểm nhóm** (Báo cáo chuyên đề 7 phần + Mã nguồn) và **40% Điểm cá nhân** (Video demo độc lập 8 bước của từng thành viên).
 
 ---
 
-## 🎯 3. CHI TIẾT NHIỆM VỤ TỪNG THÀNH VIÊN
+## 🧭 1. KIẾN TRÚC TỔNG THỂ HỆ THỐNG PITCHOS (KT2)
 
-### 👑 [1. HOÀNG (Nhóm trưởng) — Bảo mật JWT, Phân quyền RBAC & Auth Service (3,0 Điểm)](file:///c:/Users/viduc/Downloads/PTPM/NHIEM_VU_HOANG.md)
-* **File nhiệm vụ chi tiết:** 👉 [NHIEM_VU_HOANG.md](file:///c:/Users/viduc/Downloads/PTPM/NHIEM_VU_HOANG.md) | Thư mục: [`pitchos-auth-service/`](file:///c:/Users/viduc/Downloads/PTPM/pitchos-auth-service/README.md)
-* **Cổng dịch vụ (Port):** `8081` | **Cơ sở dữ liệu:** `pitchos_user_db`
-* **Lý thuyết (1,0đ - Câu 1 Ý 3):** Phân biệt Authentication vs Authorization; cấu trúc 3 phần của JWT (Header, Payload claims, Signature HMAC-SHA256); giải thích sự khác nhau giữa HTTP 401 Unauthorized và HTTP 403 Forbidden; liên hệ vai trò `admin`, `chusan`, `user`.
-* **Thực nghiệm (2,0đ - Câu 2 Ý 4):** Xây dựng Auth & User Service; đăng ký mã hóa BCrypt; đăng nhập cấp phát Bearer JWT Token; cấu hình `JwtAuthenticationFilter`, `AuthenticationEntryPoint` (401), `AccessDeniedHandler` (403); bảo vệ các API; kiểm thử truy cập hợp lệ, không token (401), sai quyền (403); nộp bộ test cases bảo mật.
-* **Báo cáo phụ trách:** **Chương 4 & Chương 5** (Chủ trì tổng hợp kiểm thử toàn hệ thống).
-* **Nhiệm vụ Demo:** Đăng nhập cấp JWT, soi token trên jwt.io, test 3 ca bảo mật: 401 Unauthorized, 403 Forbidden, 200/201 Thành công.
+```
+                                  Client / Postman
+                                         │
+                   ┌─────────────────────┼─────────────────────────┐
+                   │                     │                         │
+                   ▼                     ▼                         ▼
+            ┌──────────────┐      ┌──────────────┐   OpenFeign+LB   ┌────────────────────────┐
+            │ auth-service │      │booking-servic│─────────────────►│ pitch-service-1 (:8082)│
+            │ Cổng: 8081   │      │ Cổng: 8083   │    Service ID:   │ pitch-service-2 (:8084)│
+            │              │      │ (CONSUMER)   │   pitchos-pitch- │ (PROVIDER - 2 INSTANCE)│
+            └──────┬───────┘      └──────┬───────┘      service     └───────────┬────────────┘
+                   │                     │                                      │
+                   │           Heartbeat / Đăng ký danh bạ                      │
+                   └─────────────────────┼──────────────────────────────────────┘
+                                         ▼
+                        ┌──────────────────────────────────┐
+                        │     pitchos-service-registry     │
+                        │        (Eureka Server :8761)     │
+                        └──────────────────────────────────┘
+                   │                     │                                      │
+                   ▼                     ▼                                      ▼
+            ┌──────────────┐      ┌──────────────┐                  ┌────────────────────────┐
+            │  mysql-auth  │      │mysql-booking │                  │      mysql-pitch       │
+            │ volume: auth │      │ vol: booking │                  │ (Dùng chung cho 2 inst)│
+            └──────────────┘      └──────────────┘                  └────────────────────────┘
+            ─────────────────── Mạng nội bộ Docker: pitchos-network ──────────────────────────
+```
 
----
-
-### 👤 [2. LINH — Chuẩn hóa RESTful API, Validation & Pitch Service (2,5 Điểm)](file:///c:/Users/viduc/Downloads/PTPM/NHIEM_VU_LINH.md)
-* **File nhiệm vụ chi tiết:** 👉 [NHIEM_VU_LINH.md](file:///c:/Users/viduc/Downloads/PTPM/NHIEM_VU_LINH.md) | Thư mục: [`pitchos-pitch-service/`](file:///c:/Users/viduc/Downloads/PTPM/pitchos-pitch-service/README.md)
-* **Cổng dịch vụ (Port):** `8082` | **Cơ sở dữ liệu:** `pitchos_pitch_db`
-* **Lý thuyết (1,5đ - Câu 1 Ý 1):**
-  - **Ý 1a (0,5đ):** 4 đặc điểm chính của kiến trúc SOA (Liên kết lỏng, Hợp đồng chuẩn hóa, Tính trừu tượng, Khả năng tái sử dụng); phân biệt Dịch vụ (Service), API và Ứng dụng khách (Client).
-  - **Ý 1b (1,0đ):** Xác định các dịch vụ chính của PitchOS, trách nhiệm từng dịch vụ, 03 API tiêu biểu; luận giải lý do phân chia theo nguyên lý Đơn trách nhiệm (SRP).
-* **Thực nghiệm (1,0đ - Câu 2 Ý 1):** Triển khai 4 API quản lý sân bóng chuẩn RESTful (URL rõ ràng, method phù hợp); cài đặt Jakarta Validation (`@Valid`, `@NotBlank`, `@Positive`); viết `GlobalExceptionHandler` trả về chuẩn mã **400 Bad Request** khi dữ liệu sai quy cách; tích hợp tài liệu OpenAPI / Swagger UI tại `/swagger-ui.html`.
-* **Báo cáo phụ trách:** **Chương 1** (Mô tả bài toán, kiến trúc SOA, phân rã dịch vụ, đặc tả API).
-* **Nhiệm vụ Demo:** Mở Swagger UI thao tác gọi API hợp lệ (200/201); gửi dữ liệu sai quy chuẩn (tên rỗng, giá âm) chứng minh bắt lỗi 400 Bad Request.
-
----
-
-### 👤 [3. HÙNG — Quản trị CSDL Phân tán & Tầng Repository (2,25 Điểm)](file:///c:/Users/viduc/Downloads/PTPM/NHIEM_VU_HUNG.md)
-* **File nhiệm vụ chi tiết:** 👉 [NHIEM_VU_HUNG.md](file:///c:/Users/viduc/Downloads/PTPM/NHIEM_VU_HUNG.md) | Thư mục: [`pitchos-database/`](file:///c:/Users/viduc/Downloads/PTPM/pitchos-database/README.md)
-* **Cơ sở dữ liệu:** 3 Schemas MySQL độc lập (`pitchos_user_db`, `pitchos_pitch_db`, `pitchos_booking_db`)
-* **Lý thuyết (0,75đ - Câu 1 Ý 2b):** Nguyên tắc mỗi dịch vụ tự quản lý dữ liệu (Database-per-service); phân tích rủi ro khi vi phạm (ghép nối lược đồ Schema Coupling, Deadlock khóa dòng chéo, phá vỡ tính bao đóng, cản trở scale).
-* **Thực nghiệm (1,5đ - Câu 2 Ý 3):** Soạn thảo 3 script SQL độc lập; thiết lập cấu trúc thực thể Entity & Repository JPA; câu query chống trùng lịch thi đấu trong `BookingRepository`; kiểm soát chỉ lưu Logical ID dạng số nguyên, **tuyệt đối không tạo Foreign Key vật lý**; kiểm chứng thao tác ghi dữ liệu xuống đĩa cứng.
-* **Báo cáo phụ trách:** **Chương 3** (Quản lý dữ liệu phân tán, ERD từng dịch vụ, kiến trúc Entity / Repository JPA).
-* **Nhiệm vụ Demo:** Mở DBeaver/Workbench show 3 schema DB độc lập không có FK chéo; chạy `SELECT` kiểm chứng đơn lưu đĩa cứng với trạng thái `cho_duyet` sau khi đặt sân.
-
----
-
-### 👤 [4. NHẬT — Giao tiếp Liên dịch vụ, Sequence Diagram & Booking Service (2,25 Điểm)](file:///c:/Users/viduc/Downloads/PTPM/NHIEM_VU_NHAT.md)
-* **File nhiệm vụ chi tiết:** 👉 [NHIEM_VU_NHAT.md](file:///c:/Users/viduc/Downloads/PTPM/NHIEM_VU_NHAT.md) | Thư mục: [`pitchos-booking-service/`](file:///c:/Users/viduc/Downloads/PTPM/pitchos-booking-service/README.md)
-* **Cổng dịch vụ (Port):** `8083` | **Cơ sở dữ liệu:** `pitchos_booking_db`
-* **Lý thuyết (0,75đ - Câu 1 Ý 2a):** Mô tả quy trình giao tiếp giữa 2 dịch vụ (Booking Service $\rightarrow$ Pitch Service); làm rõ vai trò của HTTP/REST, Request (method, header, body), Response (status code, header, body); phân tích các nhóm mã trạng thái `2xx`, `4xx`, `5xx`; nguy cơ sụp đổ dây chuyền (Cascading Failure).
-* **Thực nghiệm (1,5đ - Câu 2 Ý 2):** Xây dựng nghiệp vụ đặt sân có sự tham gia của từ 2 dịch vụ trở lên; tích hợp Spring Cloud OpenFeign gọi sang Pitch Service lấy thông tin giá & trạng thái; xử lý lỗi phân tán (`CustomErrorDecoder` bắt 404, `GlobalExceptionHandler` bắt lỗi mạng khi Pitch Service sập chuyển đổi thành mã chuẩn **503 Service Unavailable**); vẽ sơ đồ tuần tự Sequence Diagram.
-* **Báo cáo phụ trách:** **Chương 2** (Thiết kế API Booking, giao tiếp OpenFeign, Sequence Diagram, cơ chế xử lý lỗi 503).
-* **Nhiệm vụ Demo:** Đặt sân thành công nhận mã `201 Created`; sau đó **tắt Pitch Service (Port 8082)** và gửi lại request đặt sân để chứng minh Booking Service bắt lỗi an toàn và trả về mã **503 Service Unavailable**.
+### Bảng cấu hình các Service trong hệ thống:
+| Tên Container / Module | Eureka Service ID | Port Host | Cơ sở dữ liệu | Số Instance | Vai trò kiến trúc |
+|---|---|:---:|---|:---:|---|
+| **`pitchos-service-registry`** | – | `8761` | – | 1 | Quản lý danh bạ dịch vụ trung tâm (Eureka Server) |
+| **`pitchos-auth-service`** | `pitchos-auth-service` | `8081` | `pitchos_user_db` | 1 | Xác thực & Cấp phát JWT Token, RBAC 3 role |
+| **`pitchos-pitch-service-1`** | `pitchos-pitch-service` | `8082` | `pitchos_pitch_db` | **2** | **Provider** quản lý sân bóng (Instance 1) |
+| **`pitchos-pitch-service-2`** | `pitchos-pitch-service` | `8084` | `pitchos_pitch_db` | ^ | **Provider** quản lý sân bóng (Instance 2, chung DB) |
+| **`pitchos-booking-service`** | `pitchos-booking-service` | `8083` | `pitchos_booking_db` | 1 | **Consumer** gọi Pitch qua Service ID & đặt sân |
+| **`mysql-auth / pitch / booking`**| – | `3306` nội bộ | 3 DB riêng biệt | 3 | Lưu trữ dữ liệu bền vững qua Named Volume |
 
 ---
 
-## 🗂️ 4. Cấu trúc Thư mục Dự án
+## 👥 2. BẢNG PHÂN CHIA NHIỆM VỤ 4 THÀNH VIÊN (KT2)
 
-```text
-pitchos/
-├── README.md                      # [TỔNG QUAN] Bảng điều phối toàn dự án & Barem điểm chuẩn
-├── 🛠️ CONG_NGHE_SU_DUNG.md        # [TECH STACK] Toàn bộ công nghệ Backend, Frontend, CSDL
-├── 🔑 .env                        # [MÔI TRƯỜNG] File cấu hình master dùng chung
-├── 👤 NHIEM_VU_HOANG.md           # [HOÀNG - Nhóm trưởng] File nhiệm vụ chi tiết (3,0đ)
-├── 👤 NHIEM_VU_LINH.md            # [LINH] File nhiệm vụ chi tiết (2,5đ)
-├── 👤 NHIEM_VU_HUNG.md            # [HÙNG] File nhiệm vụ chi tiết (2,25đ)
-├── 👤 NHIEM_VU_NHAT.md            # [NHẬT] File nhiệm vụ chi tiết (2,25đ)
-│
-├── pitchos-database/              # Thư mục CSDL phân tán (HÙNG phụ trách)
-│   ├── auth-user-service.sql      # CSDL User & Auth (Role: admin, chusan, user)
-│   ├── pitch-service.sql          # CSDL Pitch (Trạng thái: hoat_dong, bao_tri)
-│   ├── booking-service.sql        # CSDL Booking (Trạng thái: cho_duyet, da_duyet, tu_choi)
-│   └── README.md                  # Hướng dẫn chi tiết thiết lập CSDL (Hùng)
-│
-├── pitchos-auth-service/          # Thư mục Auth & User Service (HOÀNG phụ trách - Port 8081)
-│   └── README.md                  # Hướng dẫn cấu hình JWT & RBAC Security (Hoàng)
-│
-├── pitchos-pitch-service/         # Thư mục Pitch Service (LINH phụ trách - Port 8082)
-│   └── README.md                  # Hướng dẫn API Sân & Validation (Linh)
-│
-├── pitchos-booking-service/       # Thư mục Booking Service (NHẬT phụ trách - Port 8083)
-│   └── README.md                  # Hướng dẫn OpenFeign & Xử lý lỗi 503 (Nhật)
-│
-└── docs/                          # Tài liệu chung & Kế hoạch diễn tập
-    └── DEMO_VA_KIEM_THU.md        # Kịch bản demo 5 bước và Sequence Diagram
+> 📖 *Kế hoạch tổng thể và ma trận trách nhiệm chi tiết xem tại file:* 👉 [KE_HOACH_KIEM_TRA_2.md](file:///c:/Users/viduc/Downloads/PTPM/KE_HOACH_KIEM_TRA_2.md)
+
+| STT | Thành viên | Vùng mã nguồn sở hữu | Trách nhiệm Code & Vận hành | Trách nhiệm viết Báo cáo & Điểm chi tiết | File checklist cá nhân |
+|:---:|:---|:---|:---|:---|:---:|
+| **1** | 👑 **HOÀNG**<br>*(Nhóm trưởng)* | `pitchos-service-registry/`<br>`pitchos-auth-service/`<br>`README.md`, `.gitignore` | • Dựng Eureka Server (:8761).<br>• Auth: Actuator, Eureka client, **xóa in mật khẩu ra log**.<br>• Gỡ `.env` khỏi Git; viết `README.md`.<br>• Chạy bộ test **TC01–TC06** & 20 request cân bằng tải.<br>• Review & merge toàn bộ PR. | • **Câu 1.2 (0.5đ):** Service Registry & Discovery, Eureka vs Gateway, Service ID.<br>• **Phần 2.1a (0.5đ):** Sơ đồ kiến trúc tích hợp và triển khai (trước & sau).<br>• **Phần 4 (1.5đ):** Service Registry, Eureka & LoadBalancer.<br>➔ **TỔNG: 2,50 / 10,0 ĐIỂM**<br>• Tổng hợp và xuất file `docs/report.pdf`. | 👉 [NHIEM_VU_HOANG.md](file:///c:/Users/viduc/Downloads/PTPM/NHIEM_VU_HOANG.md) |
+| **2** | 🌸 **LINH** | `pitchos-pitch-service/`<br>`docker-compose.yml`<br>`.env.example` | • Pitch: Actuator, Eureka client, endpoint `/api/v1/instance-info`.<br>• Viết `Dockerfile` multi-stage cho Pitch.<br>• Viết file **`docker-compose.yml`** chạy 7 container (2 instance Pitch, network, healthcheck, volume).<br>• Tạo `.env.example`. | • **Câu 1.3 (0.5đ):** Docker Image vs Container, Dockerfile & Compose.<br>• **Phần 1:** Giới thiệu hệ thống PitchOS, công nghệ mới.<br>• **Phần 5 (2.0đ):** Container hóa và Triển khai toàn hệ thống (Compose, Network, Volume).<br>➔ **TỔNG: 2,50 / 10,0 ĐIỂM** | 👉 [NHIEM_VU_LINH.md](file:///c:/Users/viduc/Downloads/PTPM/NHIEM_VU_LINH.md) |
+| **3** | ⚡ **NHẬT** | `pitchos-booking-service/`<br>`postman/collection.json` | • Booking: Đổi Feign sang **Service ID** (bỏ URL cứng).<br>• **Kiểm tra dữ liệu Provider** (giá <= 0 / sân bảo trì trả lỗi **502**).<br>• Thêm endpoint `pitch-instance` test LoadBalancer.<br>• Gộp `postman/collection.json`; chạy test **IT01–IT07**. | • **Câu 1.1 (0.5đ):** Consumer/Provider, quy trình gọi API, xử lý lỗi khi Provider chết/timeout.<br>• **Phần 3 (2.0đ):** Tích hợp và Tiêu thụ dịch vụ (OpenFeign, API contract, xử lý lỗi 404/502/503/timeout).<br>➔ **TỔNG: 2,50 / 10,0 ĐIỂM** | 👉 [NHIEM_VU_NHAT.md](file:///c:/Users/viduc/Downloads/PTPM/NHIEM_VU_NHAT.md) |
+| **4** | 🛡️ **HÙNG** | `pitchos-database/`<br>`scripts/`<br>Khối MySQL Compose | • Tách 3 file SQL init sạch (`pitchos-database/*.sql`).<br>• Cấu hình Named Volume MySQL bền vững.<br>• Viết script `check-health` & `test-persistence`.<br>• Chạy toàn bộ bộ test vận hành **DEP01–DEP08**.<br>• Thu thập và phân tích log 2 service. | • **Câu 1.4 (0.5đ):** 3 mức trạng thái (Container Status, App Health, Business Availability); vai trò Healthcheck, Log, Volume.<br>• **Phần 2.1b (0.5đ):** Bảng mô tả dịch vụ, phân định trách nhiệm CSDL phân tán & Logical ID.<br>• **Phần 6 (1.5đ):** Vận hành hệ thống (Actuator, log, restart service, **phân tích sự cố**).<br>• **Phần 7:** Đánh giá & Kết luận.<br>➔ **TỔNG: 2,50 / 10,0 ĐIỂM** | 👉 [NHIEM_VU_HUNG.md](file:///c:/Users/viduc/Downloads/PTPM/NHIEM_VU_HUNG.md) |
+
+---
+
+## 🚀 3. HƯỚNG DẪN KHỞI CHẠY HỆ THỐNG
+
+### 🔹 Cách 1: Khởi chạy toàn bộ bằng Docker Compose (Khuyên dùng — 1 lệnh duy nhất)
+
+> **Yêu cầu trước khi chạy:**
+> - Đã cài đặt và khởi động **Docker Desktop** trên máy tính.
+> - Đảm bảo cổng `8761`, `8081`, `8082`, `8083`, `8084` không bị chiếm dụng bởi tiến trình khác.
+
+Mở Terminal (PowerShell hoặc CMD) tại thư mục gốc dự án và thực hiện:
+
+```bash
+# 1. Tạo file cấu hình môi trường từ mẫu (nếu chưa có)
+copy .env.example .env
+
+# 2. Xây dựng image và khởi động toàn bộ 7 container chạy ngầm
+docker compose up -d --build
+
+# 3. Kiểm tra trạng thái toàn bộ các container (đợi ~30-45s để đạt healthy)
+docker compose ps
+```
+
+#### 🌐 Các địa chỉ truy cập kiểm tra:
+* **Eureka Dashboard:** [http://localhost:8761](http://localhost:8761) *(Thấy 4 Service IDs, riêng Pitch có 2 instances)*
+* **Auth Service Swagger:** [http://localhost:8081/swagger-ui.html](http://localhost:8081/swagger-ui.html)
+* **Pitch Service 1 Swagger:** [http://localhost:8082/swagger-ui.html](http://localhost:8082/swagger-ui.html)
+* **Pitch Service 2 Swagger:** [http://localhost:8084/swagger-ui.html](http://localhost:8084/swagger-ui.html)
+* **Booking Actuator Health:** [http://localhost:8083/actuator/health](http://localhost:8083/actuator/health) *(Kết quả: `{"status":"UP"}`)*
+
+#### 🛑 Dừng hệ thống:
+```bash
+# Dừng container nhưng BẢO TOÀN DỮ LIỆU CSDL (Named Volume được giữ nguyên)
+docker compose down
+
+# ⚠️ LƯU Ý SỐNG CÒN: Tuyệt đối KHÔNG dùng cờ -v nếu không muốn bị xóa sạch dữ liệu CSDL!
 ```
 
 ---
 
-## 🔄 5. Quy trình Phối hợp 5 Giai đoạn
+### 🔹 Cách 2: Khởi chạy thủ công từng Service (Local Development khi Code/Debug)
 
-1. **Giai đoạn 1 (HÙNG khởi đầu):** Chạy 3 file SQL trong `pitchos-database/`, bàn giao chuỗi kết nối cho Hoàng, Linh và Nhật.
-2. **Giai đoạn 2 (HOÀNG & LINH code song song):**
-   - **Hoàng (Nhóm trưởng):** Code Auth Service (8081), tạo token JWT mẫu với các role `admin`, `chusan`, `user` và gửi Secret Key cho nhóm.
-   - **Linh:** Code Pitch Service (8082), hoàn thiện endpoint `GET /api/v1/pitches/{id}`, Swagger UI và Validation 400.
-3. **Giai đoạn 3 (NHẬT code Booking Service):**
-   - Dùng OpenFeign gọi `GET /api/v1/pitches/{id}` của Linh.
-   - Viết `CustomErrorDecoder` (404) và `GlobalExceptionHandler` (bắt tắt service ra 503).
-   - Tích hợp câu query chống trùng lịch của Hùng (bỏ qua trạng thái `tu_choi`).
-4. **Giai đoạn 4 (HOÀNG hỗ trợ LINH & NHẬT):**
-   - Chia sẻ `JwtAuthenticationFilter` và cấu hình phân quyền vào 2 dịch vụ còn lại.
-   - Thiết lập chặn mã 401 (chưa đăng nhập) và 403 (truy cập sai role).
-5. **Giai đoạn 5 (TỔNG DUYỆT CẢ 4 THÀNH VIÊN):**
-   - Chạy kịch bản kiểm thử 5 bước theo [DEMO_VA_KIEM_THU.md](file:///c:/Users/viduc/Downloads/PTPM/docs/DEMO_VA_KIEM_THU.md).
-   - Xuất file Postman Collection dùng chung và hoàn thiện báo cáo 5 chương theo đúng phân công.
+Nếu bạn muốn chạy từng service riêng biệt bằng Maven trong quá trình lập trình:
+1. Đảm bảo MySQL cục bộ (cổng 3306) đang bật và đã nạp 3 CSDL (`pitchos_user_db`, `pitchos_pitch_db`, `pitchos_booking_db`).
+2. Mở 4 cửa sổ Terminal riêng biệt chạy theo thứ tự:
+   ```bash
+   # Terminal 1: Eureka Server
+   cd pitchos-service-registry && mvn spring-boot:run
+
+   # Terminal 2: Auth Service
+   cd pitchos-auth-service && mvn spring-boot:run
+
+   # Terminal 3: Pitch Service (Instance 1)
+   cd pitchos-pitch-service && mvn spring-boot:run
+
+   # Terminal 4: Booking Service
+   cd pitchos-booking-service && mvn spring-boot:run
+   ```
+
+---
+
+## 🧪 4. DANH MỤC CÁC BỘ KIỂM THỬ (POSTMAN COLLECTION)
+
+Toàn bộ kịch bản kiểm thử được tổ chức tập trung tại file: 👉 **[`postman/collection.json`](file:///c:/Users/viduc/Downloads/PTPM/postman/collection.json)**
+
+### 1. Bộ kiểm thử Tích hợp & Xử lý lỗi (IT01–IT07 — Nhật phụ trách):
+* **IT01:** Khách đặt sân hợp lệ ➔ Trả mã **`201 Created`**, giá tính tự động từ đơn giá Pitch Service.
+* **IT02:** Đặt sân không tồn tại (`pitchId = 9999`) ➔ Nhận mã **`404 Not Found`** từ Provider.
+* **IT03:** Dữ liệu đơn giá Provider không hợp lệ (giá <= 0 / sân bảo trì) ➔ Nhận mã lỗi **`502 Bad Gateway`** / 400.
+* **IT04:** Provider sập hoàn toàn (dừng 2 Pitch) ➔ Nhận mã **`503 Service Unavailable`** sạch sẽ, Booking không sập.
+* **IT05:** Timeout mạng (`docker compose pause` Pitch) ➔ Nhận **`503`** sau 2–3s timeout.
+* **IT06:** Gửi lặp yêu cầu đặt sân cùng khung giờ ➔ Lần 1 `201 Created`, lần 2 `400 Bad Request` ("Trùng giờ").
+* **IT07:** Dữ liệu đầu vào sai (`endTime < startTime`) ➔ Bắt lỗi `400 Bad Request` tại validation.
+
+### 2. Bộ kiểm thử Service Discovery & Cân bằng tải (TC01–TC06 — Hoàng phụ trách):
+* **TC01:** Các service tự động đăng ký vào Eureka sau khi khởi động.
+* **TC02:** Booking gọi Pitch theo Service ID `pitchos-pitch-service` (không dùng URL cứng).
+* **TC03:** Gửi 20 request liên tiếp qua Consumer ➔ LoadBalancer phân phối đều cho cả 2 instance Pitch-1 và Pitch-2.
+* **TC04:** Dừng instance Pitch-1 ➔ Hệ thống tự động chuyển sang Pitch-2, đặt sân vẫn thành công.
+* **TC05:** Dừng cả 2 instance ➔ Consumer trả lỗi 503 sạch sẽ.
+* **TC06:** Khởi động lại ➔ Tự động đăng ký lại vào Eureka và phục hồi sau ~30 giây.
+
+### 3. Bộ kiểm thử Vận hành, Giám sát & Sự cố (DEP01–DEP08 — Hùng phụ trách):
+* **DEP01–DEP02:** Khởi chạy `docker compose up -d` và kiểm tra `/actuator/health` = `UP`.
+* **DEP03:** Đọc log đồng thời 2 service (`docker compose logs`) chứng minh luồng liên kết.
+* **DEP04–DEP05:** Dừng và bật lại Booking Service, quan sát nhịp Heartbeat trên Eureka.
+* **DEP06:** Tắt hệ thống bằng `docker compose down` rồi `up -d` ➔ Dữ liệu đơn đặt sân **vẫn còn nguyên vẹn**.
+* **DEP07–DEP08:** Dừng container `mysql-pitch` ➔ Actuator Pitch chuyển `DOWN`, log ghi rõ ngắt kết nối; bật lại MySQL ➔ tự động phục hồi.
+
+---
+
+## 🎬 5. CHECKLIST VIDEO DEMO CÁ NHÂN (40% ĐIỂM BẮT BUỘC)
+
+*Mỗi thành viên tự quay video màn hình từ 10–15 phút đủ 8 bước theo chuẩn đề bài:*
+1. **Giới thiệu kiến trúc:** Mở sơ đồ kiến trúc, chỉ rõ Consumer (Booking), Provider (Pitch chạy 2 instance).
+2. **Khởi động hệ thống:** Chạy `docker compose up -d` ➔ Chạy `docker compose ps` (cho thấy 7 container đều `healthy`).
+3. **Kiểm tra Eureka:** Mở `http://localhost:8761` ➔ Thấy đủ các service, Pitch Service hiển thị **2 instances** (:8082 và :8084).
+4. **Gọi nghiệp vụ:** Đăng nhập lấy JWT ➔ Gọi `POST /api/v1/bookings` ➔ Nhận mã **`201 Created`**.
+5. **Minh họa lỗi tích hợp:** Gọi sân `9999` (404); dừng cả 2 instance Pitch rồi đặt sân (503).
+6. **Actuator & Log:** Mở `/actuator/health` = `{"status":"UP"}` ➔ Xem `docker compose logs`.
+7. **Khả năng chịu lỗi:** Tắt Pitch instance 1 ➔ Đặt sân vẫn nhận mã **`201 Created`** (nhờ instance 2 phục vụ).
+8. **Bảo toàn dữ liệu:** Chạy `docker compose down` (không dùng `-v`) ➔ `docker compose up -d` ➔ Kiểm tra đơn đặt sân vẫn còn nguyên vẹn trong CSDL.
+
+---
+
+## 🗂️ 6. CẤU TRÚC THƯ MỤC DỰ ÁN
+
+```text
+PTPM-PitchOS/
+├── README.md                      # [TỔNG QUAN] Bảng điều phối KT2 & Hướng dẫn khởi chạy Docker
+├── KE_HOACH_KIEM_TRA_2.md         # [KẾ HOẠCH] Kế hoạch nhóm, barem điểm & checklist 7 ngày
+├── docker-compose.yml             # [DOCKER] File điều phối khởi chạy toàn bộ 7 container
+├── .env.example                   # [ENV] File mẫu các biến môi trường
+├── .gitignore                     # [GIT] Chặn commit .env và thư mục target
+│
+├── NHIEM_VU_HOANG.md              # [HOÀNG] Nhiệm vụ Eureka Server, Auth Service & Báo cáo
+├── NHIEM_VU_LINH.md               # [LINH] Nhiệm vụ Pitch 2 instances, Compose & Dockerfile
+├── NHIEM_VU_NHAT.md               # [NHẬT] Nhiệm vụ Booking Consumer, Feign Service ID & Postman
+├── NHIEM_VU_HUNG.md               # [HÙNG] Nhiệm vụ CSDL MySQL, Scripts, Volume & Vận hành
+│
+├── pitchos-service-registry/      # Module Eureka Server (Cổng 8761 - Hoàng)
+├── pitchos-auth-service/          # Module Auth & User (Cổng 8081 - Hoàng)
+├── pitchos-pitch-service/         # Module Pitch - 2 instances (Cổng 8082 & 8084 - Linh)
+├── pitchos-booking-service/       # Module Booking - Consumer (Cổng 8083 - Nhật)
+│
+├── pitchos-database/              # 3 file SQL nạp dữ liệu sạch cho Docker (Hùng)
+│   ├── auth-init.sql
+│   ├── pitch-init.sql
+│   └── booking-init.sql
+├── scripts/                       # Kịch bản kiểm tra tự động (Hùng)
+│   ├── check-health.bat
+│   └── test-persistence.bat
+├── postman/                       # Bộ kiểm thử chuẩn nộp bài (Nhật)
+│   └── collection.json
+│
+└── docs/                          # Thư mục Báo cáo & Minh chứng
+    ├── report.pdf                 # Bản báo cáo 7 phần chính thức nộp Thầy (Hoàng tổng hợp)
+    ├── tx1/                       # Lưu trữ toàn bộ tài liệu & slide đợt kiểm tra TX1 cũ
+    ├── kt2/                       # Các file báo cáo từng phần do 4 thành viên soạn thảo
+    ├── architecture/              # Sơ đồ kiến trúc trước/sau & bảng mô tả dịch vụ
+    ├── api/                       # API Contract chi tiết
+    ├── testing/                   # Báo cáo kết quả kiểm thử (IT, TC, DEP)
+    └── operation/                 # Phân tích sự cố và hướng dẫn vận hành
+```
+
+---
+
+## ⚠️ 7. CÁC BẪY KỸ THUẬT CẦN TUYỆT ĐỐI TRÁNH (LỜI THẦY DẶN)
+
+1. ❌ **Bẫy `localhost` trong container:** Trong môi trường Docker, `localhost` trỏ về chính container đó. Gọi giữa các container bắt buộc phải dùng tên container (ví dụ `EUREKA_URL=http://pitchos-service-registry:8761/eureka/`, `MYSQL_HOST=mysql-pitch`).
+2. ❌ **Bẫy cờ `docker compose down -v`:** Cờ `-v` sẽ xóa sạch các volume dữ liệu. Tuyệt đối không dùng `-v` khi demo bảo toàn dữ liệu.
+3. ❌ **Bẫy hardcode URL trong Feign:** Trong `@FeignClient` phải dùng `name = "pitchos-pitch-service"`, tuyệt đối không để thuộc tính `url = "..."`.
+4. ❌ **Bẫy lộ mật khẩu trong Log:** Không in mật khẩu hoặc JWT đầy đủ ra console/log (đặc biệt trong `DataInitializer`).
+5. ❌ **Bẫy độ trễ của Eureka (30s latency):** Eureka cập nhật danh bạ có độ trễ tự nhiên (15–30s). Đây là cơ chế chuẩn của Eureka, cần giải thích rõ trong báo cáo, không giấu lỗi.

@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/bookings")
@@ -31,6 +32,17 @@ public class BookingController {
     @GetMapping("/my-bookings")
     public ResponseEntity<List<BookingResponse>> getMyBookings(@AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(bookingService.getMyBookings(userId));
+    }
+
+    /**
+     * KT2 (TC03) - Kiểm tra cân bằng tải qua Consumer: Booking gọi sang Provider theo Service ID
+     * và trả về thông tin instance Pitch mà Spring Cloud LoadBalancer vừa chọn.
+     * Gửi 20 request liên tiếp vào endpoint này để lập bảng phân phối giữa 2 instance (8082 / 8084).
+     * Endpoint công khai (không cần token) để chạy được bằng Postman Collection Runner.
+     */
+    @GetMapping("/pitch-instance")
+    public ResponseEntity<Map<String, Object>> getServingPitchInstance() {
+        return ResponseEntity.ok(bookingService.getServingPitchInstance());
     }
 
     /** Chủ sân duyệt / từ chối đơn → 200 OK. */

@@ -9,6 +9,73 @@
 
 ---
 
+## 🆕 0. CẬP NHẬT CHO BÀI KIỂM TRA SỐ 2 (KT2 / TX2)
+
+Phần dưới (mục 1–6) là nội dung của bài kiểm tra số 1. Mục này ghi lại những thay đổi
+của KT2 theo [`NHIEM_VU_NHAT.md`](../NHIEM_VU_NHAT.md) và [`KE_HOACH_KIEM_TRA_2.md`](../KE_HOACH_KIEM_TRA_2.md).
+
+| Hạng mục | KT1 | KT2 |
+|---|---|---|
+| Gọi Provider | `@FeignClient(name = "pitch-service", url = "${pitch.service.url}")` | `@FeignClient(name = "pitchos-pitch-service")` — chỉ còn Service ID |
+| Định vị dịch vụ | URL cứng trong `.env` | Tra cứu danh bạ Eureka (`EUREKA_URL`) |
+| Cân bằng tải | Không có | Spring Cloud LoadBalancer, Round-Robin trên 2 instance Pitch |
+| Kiểm tra dữ liệu Provider | Chỉ kiểm tra `status` | Thêm kiểm tra `pricePerHour` null / `<= 0` → **502 Bad Gateway** |
+| Giám sát | Không có | Spring Boot Actuator: `/actuator/health`, `/actuator/info` |
+| Triển khai | Chạy bằng `mvn spring-boot:run` | Thêm `Dockerfile` multi-stage, chạy bằng user `appuser` (không root) |
+| Kiểm thử | Postman thủ công | 17 ca test tự động (`mvn test`) + `postman/collection.json` chuẩn cho cả nhóm |
+
+**File đã thêm / sửa trong KT2:**
+
+```text
+pitchos-booking-service/
+├── Dockerfile                                  # MỚI: multi-stage, không chạy root, có HEALTHCHECK
+├── .dockerignore                               # MỚI
+├── application.properties (thư mục gốc)        # ĐÃ XÓA: file cấu hình trùng lặp
+├── pom.xml                                     # + eureka-client, actuator, (test) h2, spring-security-test
+└── src/
+    ├── main/java/com/pitchos/booking/
+    │   ├── client/PitchClient.java             # SỬA: gọi theo Service ID + getInstanceInfo()
+    │   ├── client/PitchGateway.java            # MỚI: hết instance Eureka → 503 (không để lọt 500)
+    │   ├── client/CustomErrorDecoder.java      # SỬA: phân biệt 404 nghiệp vụ và 404 hạ tầng
+    │   ├── controller/BookingController.java   # + GET /api/v1/bookings/pitch-instance
+    │   ├── exception/BadGatewayException.java  # MỚI: 502 khi đơn giá Provider không hợp lệ
+    │   ├── exception/ServiceUnavailableException.java  # MỚI: 503 khi hết instance Provider
+    │   ├── exception/GlobalExceptionHandler.java       # + handler 502 và 503
+    │   ├── security/SecurityConfig.java        # + permitAll cho actuator và pitch-instance
+    │   └── service/BookingService.java         # + validateProviderData(), getServingPitchInstance()
+    ├── main/resources/application.properties   # SỬA: bỏ pitch.service.url, thêm Eureka + Actuator
+    └── test/java/com/pitchos/booking/          # MỚI: IT01-IT07, RBAC, CustomErrorDecoder (17 ca)
+```
+
+**Tài liệu KT2 do Nhật viết:** [`docs/kt2/CAU1_1_NHAT.md`](../docs/kt2/CAU1_1_NHAT.md) ·
+[`docs/kt2/PHAN_3_NHAT.md`](../docs/kt2/PHAN_3_NHAT.md) ·
+[`docs/api/api-contract.md`](../docs/api/api-contract.md) ·
+[`docs/testing/integration-test.md`](../docs/testing/integration-test.md) ·
+[`postman/collection.json`](../postman/collection.json)
+
+**Cách chạy sau KT2:**
+
+```bash
+# Cách 1 - toàn hệ thống bằng Docker (cần docker-compose.yml của Linh)
+docker compose up -d
+
+# Cách 2 - chạy riêng để lập trình (cần Eureka Server :8761 và Pitch Service đang chạy)
+cd pitchos-booking-service
+mvn spring-boot:run
+
+# Chạy 17 ca test tự động (KHÔNG cần MySQL, Eureka hay Pitch Service)
+mvn test
+```
+
+**Mã lỗi bổ sung trong KT2:**
+
+| Mã lỗi | Khi nào |
+| :---: | :--- |
+| `502` | Provider trả `200` nhưng `pricePerHour` null hoặc `<= 0` (dữ liệu dịch vụ phía sau bị sai) |
+| `503` | Provider tắt / quá thời gian chờ / Eureka không còn instance nào của `pitchos-pitch-service` |
+
+---
+
 ## 📚 1. Yêu cầu Lý thuyết (0,75 Điểm — Câu 1 Ý 2a)
 
 - [x] **Quy trình giao tiếp HTTP/REST giữa Booking Service và Pitch Service:**
@@ -41,6 +108,7 @@
 - [x] Kích hoạt `@EnableFeignClients` (trên `PitchosBookingServiceApplication`).
 - [x] Định nghĩa Client interface gọi sang Pitch Service (`client/PitchClient.java`):
   ```java
+  // Bản KT1 - đã được thay thế ở KT2 bằng cách gọi theo Service ID (xem mục 0)
   @FeignClient(name = "pitch-service", url = "${pitch.service.url:http://localhost:8082}")
   public interface PitchClient {
       @GetMapping("/api/v1/pitches/{id}")

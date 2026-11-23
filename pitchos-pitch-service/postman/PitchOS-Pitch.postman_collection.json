@@ -1,0 +1,358 @@
+{
+  "info": {
+    "name": "PitchOS - Pitch Service (Linh)",
+    "description": "Bộ request demo và kiểm thử toàn diện Pitch Service (Port 8082) do Linh phụ trách.\n\nBao gồm:\n- 1. Kịch bản Demo Hội đồng 5 Bước (Thao tác tuần tự theo kịch bản bảo vệ).\n- 2. Bộ kiểm thử chức năng & Validation (200, 201, 400, 404).\n- 3. Bộ kiểm thử bảo mật phân quyền RBAC (401 Unauthorized, 403 Forbidden).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Kịch bản Demo Hội đồng (Linh thao tác trực tiếp)",
+      "description": "Thực hiện lần lượt các bước demo trước giảng viên hội đồng:",
+      "item": [
+        {
+          "name": "Bước 1 - GET danh sách sân (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code là 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Danh sách trả về mảng JSON có dữ liệu', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.at.least(4);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{pitchUrl}}/api/v1/pitches",
+              "host": ["{{pitchUrl}}"],
+              "path": ["api", "v1", "pitches"]
+            }
+          }
+        },
+        {
+          "name": "Bước 2 - GET chi tiết sân 1 cho Booking gọi (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code là 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Thông tin sân chứa đơn giá và trạng thái', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.eql(1);",
+                  "    pm.expect(jsonData.pricePerHour).to.be.a('number');",
+                  "    pm.expect(jsonData.status).to.eql('hoat_dong');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{pitchUrl}}/api/v1/pitches/1",
+              "host": ["{{pitchUrl}}"],
+              "path": ["api", "v1", "pitches", "1"]
+            }
+          }
+        },
+        {
+          "name": "Bước 3 - POST tạo sân KHÔNG gửi token (401 Unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code là 401 Unauthorized', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test('Thông báo lỗi chưa xác thực chuẩn JSON', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(401);",
+                  "    pm.expect(jsonData.error).to.eql('Unauthorized');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sân bóng Test Không Token\",\n  \"pitchType\": \"san_5\",\n  \"pricePerHour\": 300000.00,\n  \"address\": \"Hà Nội\"\n}"
+            },
+            "url": {
+              "raw": "{{pitchUrl}}/api/v1/pitches",
+              "host": ["{{pitchUrl}}"],
+              "path": ["api", "v1", "pitches"]
+            }
+          }
+        },
+        {
+          "name": "Bước 4 - POST tạo sân bằng token USER (403 Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code là 403 Forbidden', function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test('Thông báo lỗi sai quyền truy cập', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(403);",
+                  "    pm.expect(jsonData.error).to.eql('Forbidden');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenUser}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sân bóng Khách Hàng cố tình tạo\",\n  \"pitchType\": \"san_5\",\n  \"pricePerHour\": 300000.00,\n  \"address\": \"Hà Nội\"\n}"
+            },
+            "url": {
+              "raw": "{{pitchUrl}}/api/v1/pitches",
+              "host": ["{{pitchUrl}}"],
+              "path": ["api", "v1", "pitches"]
+            }
+          }
+        },
+        {
+          "name": "Bước 5 - POST tạo sân token CHUSAN dữ liệu SAI (400 Bad Request)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code là 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Phản hồi chi tiết trường vi phạm validation', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(400);",
+                  "    pm.expect(jsonData.errors).to.have.property('name');",
+                  "    pm.expect(jsonData.errors).to.have.property('pricePerHour');",
+                  "    pm.expect(jsonData.errors).to.have.property('address');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenChusan}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"pitchType\": \"san_5\",\n  \"pricePerHour\": -500000.00,\n  \"address\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{pitchUrl}}/api/v1/pitches",
+              "host": ["{{pitchUrl}}"],
+              "path": ["api", "v1", "pitches"]
+            }
+          }
+        },
+        {
+          "name": "Bước 6 - POST tạo sân token CHUSAN dữ liệu ĐÚNG (201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code là 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Có Header Location và ID sân mới', function () {",
+                  "    pm.response.to.have.header('Location');",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.be.a('number');",
+                  "    pm.expect(jsonData.name).to.eql('Sân bóng Hàng Đẫy VIP');",
+                  "    pm.expect(jsonData.status).to.eql('hoat_dong');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenChusan}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sân bóng Hàng Đẫy VIP\",\n  \"pitchType\": \"san_7\",\n  \"pricePerHour\": 600000.00,\n  \"address\": \"Số 9 Trịnh Hoài Đức, Đống Đa, Hà Nội\",\n  \"thumbnailUrl\": \"https://images.unsplash.com/photo-1529900240041-22f1df4d0a11\",\n  \"googleMapUrl\": \"https://maps.google.com/?q=21.0285,105.8342\"\n}"
+            },
+            "url": {
+              "raw": "{{pitchUrl}}/api/v1/pitches",
+              "host": ["{{pitchUrl}}"],
+              "path": ["api", "v1", "pitches"]
+            }
+          }
+        },
+        {
+          "name": "Bước 7 - PATCH chuyển trạng thái sân sang bảo trì (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code là 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Trạng thái chuyển thành bao_tri', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('bao_tri');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenChusan}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"bao_tri\"\n}"
+            },
+            "url": {
+              "raw": "{{pitchUrl}}/api/v1/pitches/1/status",
+              "host": ["{{pitchUrl}}"],
+              "path": ["api", "v1", "pitches", "1", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Bộ Kiểm thử Tra cứu & Lọc (GET)",
+      "item": [
+        {
+          "name": "Lọc sân 5 người (san_5)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{pitchUrl}}/api/v1/pitches?pitchType=san_5",
+              "host": ["{{pitchUrl}}"],
+              "path": ["api", "v1", "pitches"],
+              "query": [{ "key": "pitchType", "value": "san_5" }]
+            }
+          }
+        },
+        {
+          "name": "Lọc sân đang hoạt động (hoat_dong)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{pitchUrl}}/api/v1/pitches?status=hoat_dong",
+              "host": ["{{pitchUrl}}"],
+              "path": ["api", "v1", "pitches"],
+              "query": [{ "key": "status", "value": "hoat_dong" }]
+            }
+          }
+        },
+        {
+          "name": "Tra cứu sân không tồn tại (404 Not Found)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{pitchUrl}}/api/v1/pitches/99999",
+              "host": ["{{pitchUrl}}"],
+              "path": ["api", "v1", "pitches", "99999"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "pitchUrl",
+      "value": "http://localhost:8082",
+      "type": "string"
+    },
+    {
+      "key": "tokenUser",
+      "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwidXNlcklkIjozLCJyb2xlIjoidXNlciIsImlhdCI6MTc5MzExNDM2NywiZXhwIjoxODE0Mzk5OTk5fQ.xkO43nZHrf03Fx5VxXhjROWmaPLD0j6TxTG86ZyGUpo",
+      "type": "string",
+      "description": "Token role: user (hạn 30/06/2027)"
+    },
+    {
+      "key": "tokenChusan",
+      "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjaHVzYW4iLCJ1c2VySWQiOjIsInJvbGUiOiJjaHVzYW4iLCJpYXQiOjE3OTMxMTQzNjcsImV4cCI6MTgxNDM5OTk5OX0.VF8LCUDEroQdN59l9sx2u9hqSLX9knPpnZiAC3aF2ew",
+      "type": "string",
+      "description": "Token role: chusan (hạn 30/06/2027)"
+    },
+    {
+      "key": "tokenAdmin",
+      "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInVzZXJJZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzkzMTE0MzY3LCJleHAiOjE4MTQzOTk5OTl9.bB-qnLb1ZyI1lpVRx_JMjlP9RAwWyeP5XIbPs4SllM8",
+      "type": "string",
+      "description": "Token role: admin (hạn 30/06/2027)"
+    }
+  ]
+}

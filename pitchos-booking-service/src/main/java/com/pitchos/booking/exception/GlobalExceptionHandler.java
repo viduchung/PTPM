@@ -16,14 +16,39 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     /**
-     * Pitch Service bị tắt tiến trình / mất mạng / quá thời gian chờ:
-     * Feign ném RetryableException (là một FeignException). Chuyển thành 503 thay vì để lỗi 500,
-     * Booking Service vẫn hoạt động bình thường (ngăn sụp đổ dây chuyền - Cascading Failure).
+     * Provider không gọi được: tắt tiến trình / mất mạng / quá thời gian chờ (timeout)
+     * → Feign ném RetryableException hoặc FeignException.
+     * Quy về 503 thay vì để lỗi 500, Booking Service vẫn sống bình thường
+     * (ngăn sụp đổ dây chuyền - Cascading Failure). KT2: IT04, IT05.
      */
     @ExceptionHandler({FeignException.class, RetryableException.class})
-    public ResponseEntity<ErrorResponse> handlePitchServiceUnavailable(FeignException ex) {
-        log.warn("Không gọi được Pitch Service: {}", ex.getMessage());
-        return build(HttpStatus.SERVICE_UNAVAILABLE, "Dịch vụ quản lý sân hiện không khả dụng. Vui lòng thử lại sau!");
+    public ResponseEntity<ErrorResponse> handleFeignFailure(FeignException ex) {
+        log.warn("Không gọi được Pitch Service (status Feign = {}): {}", ex.status(), ex.getMessage());
+        return build(HttpStatus.SERVICE_UNAVAILABLE,
+                "Dịch vụ quản lý sân hiện không khả dụng. Vui lòng thử lại sau!");
+    }
+
+    /**
+     * Toàn bộ instance Provider đã rời khỏi danh bạ Eureka: Spring Cloud LoadBalancer
+     * không còn địa chỉ nào để gọi ("No instances available for pitchos-pitch-service").
+     * Đây vẫn là tình huống Provider sập → 503, không phải lỗi lập trình 500. KT2: IT04.
+     */
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleServiceUnavailable(ServiceUnavailableException ex) {
+        log.warn("Không còn instance Provider khả dụng: {}", ex.getMessage());
+        return build(HttpStatus.SERVICE_UNAVAILABLE,
+                "Dịch vụ quản lý sân hiện không khả dụng. Vui lòng thử lại sau!");
+    }
+
+    /**
+     * Provider trả 200 nhưng dữ liệu không dùng được (đơn giá null hoặc <= 0)
+     * → 502 Bad Gateway: lỗi nằm ở dữ liệu dịch vụ phía sau, không phải lỗi của người dùng.
+     * KT2: IT03.
+     */
+    @ExceptionHandler(BadGatewayException.class)
+    public ResponseEntity<ErrorResponse> handleBadGateway(BadGatewayException ex) {
+        log.error("Dữ liệu nhận từ Pitch Service không hợp lệ: {}", ex.getMessage());
+        return build(HttpStatus.BAD_GATEWAY, ex.getMessage());
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
