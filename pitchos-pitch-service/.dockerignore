@@ -1,0 +1,8 @@
+target/
+.mvn/
+*.log
+.idea/
+*.iml
+.git/
+.gitignore
+.env

@@ -180,4 +180,23 @@ public class PitchControllerTest {
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.status", is("bao_tri")));
     }
+
+    @Test
+    @DisplayName("Ca 9 (KT2 - Instance Info): GET /api/v1/instance-info công khai không cần token -> 200 OK và trả về serviceName, instanceId, port")
+    void testGetInstanceInfo_Public_Success() throws Exception {
+        mockMvc.perform(get("/api/v1/instance-info"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.serviceName", is("pitchos-pitch-service")))
+                .andExpect(jsonPath("$.instanceId", notNullValue()))
+                .andExpect(jsonPath("$.port", notNullValue()));
+    }
+
+    @Test
+    @DisplayName("Ca 10 (KT2 - Actuator Health): GET /actuator/health công khai không cần token -> 200 OK")
+    void testActuatorHealth_Public_Success() throws Exception {
+        mockMvc.perform(get("/actuator/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is("UP")));
+    }
 }
