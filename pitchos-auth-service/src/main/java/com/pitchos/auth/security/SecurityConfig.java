@@ -75,10 +75,15 @@ public class SecurityConfig {
                                 "/error"
                         ).permitAll()
 
-                        // 3. Danh sách toàn bộ người dùng: chỉ Quản trị viên
+                        // 3. Endpoint theo dõi sức khỏe: phải công khai để Docker healthcheck
+                        //    và Eureka Server kiểm tra được khi chưa có token. Chỉ mở health và
+                        //    info; các endpoint Actuator khác không được expose trong properties.
+                        .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
+
+                        // 4. Danh sách toàn bộ người dùng: chỉ Quản trị viên
                         .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole("admin")
 
-                        // 4. Các request còn lại yêu cầu đăng nhập
+                        // 5. Các request còn lại yêu cầu đăng nhập
                         .anyRequest().authenticated()
                 )
                 // Cấu hình phản hồi mã lỗi bảo mật 401 Unauthorized và 403 Forbidden chuẩn JSON

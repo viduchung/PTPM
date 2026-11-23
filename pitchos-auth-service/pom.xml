@@ -18,6 +18,11 @@
         <java.version>17</java.version>
         <springdoc.version>2.5.0</springdoc.version>
         <jjwt.version>0.11.5</jjwt.version>
+        <!--
+            Spring Cloud 2023.0.x la dong duy nhat tuong thich voi Spring Boot 3.2.x.
+            Ghep sai phien ban se gay loi khoi dong (yeu cau TH7).
+        -->
+        <spring-cloud.version>2023.0.1</spring-cloud.version>
     </properties>
 
     <dependencies>
@@ -37,6 +42,18 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- Eureka Client: tu dang ky Service ID 'pitchos-auth-service' vao Service Registry -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!-- Actuator: cung cap /actuator/health cho Docker healthcheck va theo doi van hanh -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <!-- MySQL Connector -->
@@ -86,6 +103,18 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>

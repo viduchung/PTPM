@@ -12,7 +12,9 @@ Trong những năm gần đây, phong trào thể thao rèn luyện sức khỏe
 * **Khách hàng (người đi thuê sân):** Phải tìm kiếm số điện thoại của từng cụm sân, gọi điện trực tiếp hoặc nhắn tin qua Zalo/Facebook để hỏi xem sân còn trống vào khung giờ mong muốn hay không. Quá trình này gây mất thời gian, dễ xảy ra tình trạng nhầm lẫn lịch hoặc không nắm rõ được đơn giá, chất lượng mặt sân và vị trí bản đồ.
 * **Chủ sân bóng (người quản lý):** Phải ghi chép lịch đặt sân vào sổ tay hoặc file Excel rời rạc. Khi có nhiều đội bóng cùng hỏi đặt sân trong các khung giờ cao điểm (17h30 – 20h30), nguy cơ ghi trùng lịch (*double booking*) dẫn đến việc tranh chấp sân bóng là rất lớn. Việc theo dõi lịch bảo dưỡng mặt cỏ, điều chỉnh bảng giá theo giờ và thống kê doanh thu cũng gặp nhiều khó khăn.
 
-Hệ thống **PitchOS (Football Pitch Booking System)** ra đời nhằm giải quyết triệt để các tồn tại trên bằng việc ứng dụng nền tảng công nghệ số hóa hiện đại:
+Xuất phát từ thực trạng trên, nhóm lựa chọn thực hiện đề tài **"Xây dựng và phát triển hệ thống quản lý đặt lịch sân bóng đá"**. Hệ thống được nhóm đặt tên là **PitchOS** (viết tắt của *Pitch Operating System*). Trong toàn bộ báo cáo này, tên gọi **PitchOS** được dùng để chỉ chính hệ thống quản lý đặt lịch sân bóng đá nêu trong đề tài.
+
+PitchOS ra đời nhằm giải quyết triệt để các tồn tại trên bằng việc ứng dụng nền tảng công nghệ số hóa hiện đại:
 1. Cho phép khách hàng tra cứu trực quan danh mục sân bóng theo quy mô (sân 5 người, sân 7 người, sân 10 người), xem đơn giá thuê theo giờ, hình ảnh thực tế và địa chỉ bản đồ Google Maps.
 2. Cho phép khách hàng gửi yêu cầu đặt sân trực tuyến với thời gian bắt đầu và kết thúc cụ thể, hệ thống tự động kiểm tra trùng lịch và tính toán tổng tiền minh bạch.
 3. Cung cấp công cụ quản trị dành cho Chủ sân để đăng tải thông tin sân mới, chuyển đổi trạng thái sân linh hoạt giữa hoạt động (*hoat_dong*) và bảo trì (*bao_tri*), cũng như duyệt hoặc từ chối các yêu cầu đặt sân.

@@ -127,45 +127,39 @@ Khác với hệ CSDL tập trung có đường nối Foreign Key vật lý ràn
 
 ```mermaid
 erDiagram
-    subgraph PITCHOS_USER_DB
-        USERS {
-            BIGINT id PK
-            VARCHAR username UK
-            VARCHAR email UK
-            VARCHAR password
-            VARCHAR full_name
-            VARCHAR phone
-            ENUM role
-            TIMESTAMP created_at
-        }
-    end
+    USERS {
+        BIGINT id PK
+        VARCHAR username UK
+        VARCHAR email UK
+        VARCHAR password
+        VARCHAR full_name
+        VARCHAR phone
+        ENUM role
+        TIMESTAMP created_at
+    }
 
-    subgraph PITCHOS_PITCH_DB
-        PITCHES {
-            BIGINT id PK
-            VARCHAR name
-            ENUM pitch_type
-            DECIMAL price_per_hour
-            VARCHAR address
-            VARCHAR thumbnail_url
-            TEXT google_map_url
-            ENUM status
-            TIMESTAMP created_at
-        }
-    end
+    PITCHES {
+        BIGINT id PK
+        VARCHAR name
+        ENUM pitch_type
+        DECIMAL price_per_hour
+        VARCHAR address
+        VARCHAR thumbnail_url
+        TEXT google_map_url
+        ENUM status
+        TIMESTAMP created_at
+    }
 
-    subgraph PITCHOS_BOOKING_DB
-        BOOKINGS {
-            BIGINT id PK
-            BIGINT user_id "Logical ID (No Physical FK)"
-            BIGINT pitch_id "Logical ID (No Physical FK)"
-            DATETIME start_time
-            DATETIME end_time
-            DECIMAL total_price
-            ENUM status
-            TIMESTAMP created_at
-        }
-    end
+    BOOKINGS {
+        BIGINT id PK
+        BIGINT user_id "Logical ID (No Physical FK)"
+        BIGINT pitch_id "Logical ID (No Physical FK)"
+        DATETIME start_time
+        DATETIME end_time
+        DECIMAL total_price
+        ENUM status
+        TIMESTAMP created_at
+    }
 
     USERS ||..o{ BOOKINGS : "Liên kết logic qua user_id"
     PITCHES ||..o{ BOOKINGS : "Liên kết logic qua pitch_id"
