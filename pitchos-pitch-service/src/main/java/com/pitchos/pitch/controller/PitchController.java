@@ -17,7 +17,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -30,7 +32,12 @@ import java.util.List;
 @Tag(name = "1. Quản lý Sân bóng (Pitch Management)", description = "Các API tra cứu, thêm mới và cập nhật trạng thái sân bóng đá mini")
 public class PitchController {
 
+    private static final Logger log = LoggerFactory.getLogger(PitchController.class);
+
     private final PitchService pitchService;
+
+    @Value("${INSTANCE_ID:${pitchos.instance-id:pitch-default}}")
+    private String instanceId;
 
     public PitchController(PitchService pitchService) {
         this.pitchService = pitchService;
@@ -50,6 +57,7 @@ public class PitchController {
             @Parameter(description = "Trạng thái hoạt động: hoat_dong, bao_tri")
             @RequestParam(required = false) PitchStatus status) {
 
+        log.info("[{}] GET /api/v1/pitches - pitchType: {}, status: {}", instanceId, pitchType, status);
         List<PitchResponse> pitches = pitchService.getAllPitches(pitchType, status);
         return ResponseEntity.ok(pitches);
     }
@@ -69,6 +77,7 @@ public class PitchController {
             @Parameter(description = "Mã ID của sân bóng", example = "1")
             @PathVariable Long id) {
 
+        log.info("[{}] GET /api/v1/pitches/{} - Tra cứu chi tiết sân bóng", instanceId, id);
         PitchResponse pitch = pitchService.getPitchById(id);
         return ResponseEntity.ok(pitch);
     }
@@ -94,6 +103,7 @@ public class PitchController {
     public ResponseEntity<PitchResponse> createPitch(
             @Valid @RequestBody CreatePitchRequest request) {
 
+        log.info("[{}] POST /api/v1/pitches - Thêm sân bóng mới: {}", instanceId, request.getName());
         PitchResponse created = pitchService.createPitch(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -129,6 +139,7 @@ public class PitchController {
             @PathVariable Long id,
             @Valid @RequestBody UpdatePitchStatusRequest request) {
 
+        log.info("[{}] PATCH /api/v1/pitches/{}/status - Cập nhật trạng thái sang {}", instanceId, id, request.getStatus());
         PitchResponse updated = pitchService.updatePitchStatus(id, request);
         return ResponseEntity.ok(updated);
     }

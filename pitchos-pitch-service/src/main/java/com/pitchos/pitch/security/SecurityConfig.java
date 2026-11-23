@@ -3,7 +3,6 @@ package com.pitchos.pitch.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pitchos.pitch.dto.ErrorResponse;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -39,10 +38,19 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frame -> frame.disable())) // Cho phép H2-console
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Cho phép truy cập công khai xem danh sách và chi tiết sân bóng
+                        // 1. Cho phép truy cập công khai endpoint kiểm tra instance và actuator health/info (KT2)
+                        .requestMatchers(
+                                "/api/v1/instance-info",
+                                "/api/v1/pitches/instance-info",
+                                "/actuator/health",
+                                "/actuator/info",
+                                "/actuator/**"
+                        ).permitAll()
+
+                        // 2. Cho phép truy cập công khai xem danh sách và chi tiết sân bóng
                         .requestMatchers(HttpMethod.GET, "/api/v1/pitches/**").permitAll()
 
-                        // 2. Cho phép công khai Swagger UI, OpenAPI Docs và H2 Console
+                        // 3. Cho phép công khai Swagger UI, OpenAPI Docs và H2 Console
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -52,11 +60,11 @@ public class SecurityConfig {
                                 "/h2-console/**"
                         ).permitAll()
 
-                        // 3. Phân quyền chặt chẽ các thao tác quản trị sân cho 'chusan' và 'admin'
+                        // 4. Phân quyền chặt chẽ các thao tác quản trị sân cho 'chusan' và 'admin'
                         .requestMatchers(HttpMethod.POST, "/api/v1/pitches").hasAnyRole("chusan", "admin")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/pitches/*/status").hasAnyRole("chusan", "admin")
 
-                        // 4. Các request còn lại yêu cầu xác thực
+                        // 5. Các request còn lại yêu cầu xác thực
                         .anyRequest().authenticated()
                 )
                 // Cấu hình phản hồi mã lỗi bảo mật 401 Unauthorized và 403 Forbidden chuẩn JSON

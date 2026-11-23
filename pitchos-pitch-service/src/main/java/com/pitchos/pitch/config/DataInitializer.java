@@ -6,6 +6,7 @@ import com.pitchos.pitch.entity.PitchType;
 import com.pitchos.pitch.repository.PitchRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,9 @@ public class DataInitializer implements CommandLineRunner {
 
     private final PitchRepository pitchRepository;
 
+    @Value("${INSTANCE_ID:${pitchos.instance-id:pitch-default}}")
+    private String instanceId;
+
     public DataInitializer(PitchRepository pitchRepository) {
         this.pitchRepository = pitchRepository;
     }
@@ -26,7 +30,7 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (pitchRepository.count() == 0) {
-            log.info("CSDL chưa có dữ liệu sân bóng. Đang khởi tạo 4 sân mẫu từ pitch-service.sql...");
+            log.info("[{}] CSDL chưa có dữ liệu sân bóng. Đang khởi tạo 4 sân mẫu từ pitch-service.sql...", instanceId);
 
             List<Pitch> initialPitches = List.of(
                     Pitch.builder()
@@ -68,9 +72,9 @@ public class DataInitializer implements CommandLineRunner {
             );
 
             pitchRepository.saveAll(initialPitches);
-            log.info("Khởi tạo thành công {} sân bóng mẫu sẵn sàng phục vụ kiểm thử và demo!", initialPitches.size());
+            log.info("[{}] Khởi tạo thành công {} sân bóng mẫu sẵn sàng phục vụ kiểm thử và demo!", instanceId, initialPitches.size());
         } else {
-            log.info("CSDL đã có sẵn {} bản ghi sân bóng.", pitchRepository.count());
+            log.info("[{}] CSDL đã có sẵn {} bản ghi sân bóng.", instanceId, pitchRepository.count());
         }
     }
 }

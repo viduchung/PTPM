@@ -10,6 +10,7 @@ import com.pitchos.pitch.exception.ResourceNotFoundException;
 import com.pitchos.pitch.repository.PitchRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,9 @@ public class PitchService {
 
     private final PitchRepository pitchRepository;
 
+    @Value("${INSTANCE_ID:${pitchos.instance-id:pitch-default}}")
+    private String instanceId;
+
     public PitchService(PitchRepository pitchRepository) {
         this.pitchRepository = pitchRepository;
     }
@@ -31,7 +35,7 @@ public class PitchService {
      */
     @Transactional(readOnly = true)
     public List<PitchResponse> getAllPitches(PitchType pitchType, PitchStatus status) {
-        log.info("Lấy danh sách sân bóng - filter pitchType: {}, status: {}", pitchType, status);
+        log.info("[{}] Lấy danh sách sân bóng - filter pitchType: {}, status: {}", instanceId, pitchType, status);
         List<Pitch> pitches;
 
         if (pitchType != null && status != null) {
@@ -54,7 +58,7 @@ public class PitchService {
      */
     @Transactional(readOnly = true)
     public PitchResponse getPitchById(Long id) {
-        log.info("Tra cứu chi tiết sân bóng ID: {}", id);
+        log.info("[{}] Tra cứu chi tiết sân bóng ID: {}", instanceId, id);
         Pitch pitch = pitchRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sân bóng với mã ID: " + id));
         return PitchResponse.fromEntity(pitch);
@@ -65,7 +69,7 @@ public class PitchService {
      */
     @Transactional
     public PitchResponse createPitch(CreatePitchRequest request) {
-        log.info("Thêm mới sân bóng: {}", request.getName());
+        log.info("[{}] Thêm mới sân bóng: {}", instanceId, request.getName());
 
         Pitch pitch = Pitch.builder()
                 .name(request.getName().trim())
@@ -78,7 +82,7 @@ public class PitchService {
                 .build();
 
         Pitch saved = pitchRepository.save(pitch);
-        log.info("Đã tạo thành công sân bóng ID: {}", saved.getId());
+        log.info("[{}] Đã tạo thành công sân bóng ID: {}", instanceId, saved.getId());
         return PitchResponse.fromEntity(saved);
     }
 
@@ -87,13 +91,13 @@ public class PitchService {
      */
     @Transactional
     public PitchResponse updatePitchStatus(Long id, UpdatePitchStatusRequest request) {
-        log.info("Cập nhật trạng thái sân ID: {} sang {}", id, request.getStatus());
+        log.info("[{}] Cập nhật trạng thái sân ID: {} sang {}", instanceId, id, request.getStatus());
         Pitch pitch = pitchRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sân bóng với mã ID: " + id));
 
         pitch.setStatus(request.getStatus());
         Pitch updated = pitchRepository.save(pitch);
-        log.info("Đã cập nhật trạng thái sân ID: {} thành công", updated.getId());
+        log.info("[{}] Đã cập nhật trạng thái sân ID: {} thành công", instanceId, updated.getId());
         return PitchResponse.fromEntity(updated);
     }
 }
