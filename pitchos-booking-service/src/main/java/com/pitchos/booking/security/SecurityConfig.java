@@ -17,6 +17,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  *   POST  /api/v1/bookings              → user
  *   GET   /api/v1/bookings/my-bookings  → user
  *   PATCH /api/v1/bookings/{id}/status  → chusan, admin
+ *   GET   /api/v1/bookings/pitch-instance → công khai (kiểm thử cân bằng tải)
+ *   GET   /actuator/health, /actuator/info → công khai (healthcheck & giám sát)
  * Không có / sai token → 401 Unauthorized; sai vai trò → 403 Forbidden.
  */
 @Configuration
@@ -33,6 +35,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/error").permitAll()
+                        // KT2: healthcheck Docker, giám sát vận hành và kiểm thử cân bằng tải
+                        // phải gọi được khi không có token
+                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/bookings/pitch-instance").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/bookings").hasRole("user")
                         .requestMatchers(HttpMethod.GET, "/api/v1/bookings/my-bookings").hasRole("user")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/bookings/*/status").hasAnyRole("chusan", "admin")
