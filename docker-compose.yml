@@ -32,24 +32,11 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-123456}
       MYSQL_DATABASE: ${AUTH_DB_NAME:-pitchos_user_db}
     ports:
-      - "${MYSQL_AUTH_PORT:-3307}:3306"
-    volumes:
-<<<<<<< Updated upstream
-      - mysql_data:/var/lib/mysql
-      # Tự động nạp 3 file SQL của Hùng khi khởi động container lần đầu:
-      - ./pitchos-database/auth-user-service.sql:/docker-entrypoint-initdb.d/01_auth.sql
-      - ./pitchos-database/pitch-service.sql:/docker-entrypoint-initdb.d/02_pitch.sql
-      - ./pitchos-database/booking-service.sql:/docker-entrypoint-initdb.d/03_booking.sql
-=======
-      - mysql_auth_data:/var/lib/mysql
-      - ./pitchos-database/auth-init.sql:/docker-entrypoint-initdb.d/01_auth.sql:ro
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD}"]
+      - "${MYSQL_AUTH_PORT:-3307}:3306" volumes: - mysql_auth_data:/var/lib/mysql - ./pitchos-database/auth-init.sql:/docker-entrypoint-initdb.d/01_auth.sql:ro healthcheck: test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
->>>>>>> Stashed changes
     networks:
       - pitchos-network
 
@@ -62,12 +49,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-123456}
       MYSQL_DATABASE: ${PITCH_DB_NAME:-pitchos_pitch_db}
     ports:
-      - "${MYSQL_PITCH_PORT:-3308}:3306"
-    volumes:
-      - mysql_pitch_data:/var/lib/mysql
-      - ./pitchos-database/pitch-init.sql:/docker-entrypoint-initdb.d/02_pitch.sql:ro
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD}"]
+      - "${MYSQL_PITCH_PORT:-3308}:3306" volumes: - mysql_pitch_data:/var/lib/mysql - ./pitchos-database/pitch-init.sql:/docker-entrypoint-initdb.d/02_pitch.sql:ro healthcheck: test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -84,12 +66,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-123456}
       MYSQL_DATABASE: ${BOOKING_DB_NAME:-pitchos_booking_db}
     ports:
-      - "${MYSQL_BOOKING_PORT:-3309}:3306"
-    volumes:
-      - mysql_booking_data:/var/lib/mysql
-      - ./pitchos-database/booking-init.sql:/docker-entrypoint-initdb.d/03_booking.sql:ro
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD}"]
+      - "${MYSQL_BOOKING_PORT:-3309}:3306" volumes: - mysql_booking_data:/var/lib/mysql - ./pitchos-database/booking-init.sql:/docker-entrypoint-initdb.d/03_booking.sql:ro healthcheck: test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -150,135 +127,4 @@ services:
       mysql-auth:
         condition: service_healthy
       pitchos-service-registry:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:8081/actuator/health | grep UP || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    networks:
-      - pitchos-network
-
-  # 3.2. Pitch Service - Instance 1 (Provider cổng 8082 - Linh phụ trách)
-  pitchos-pitch-service-1:
-    build:
-      context: ./pitchos-pitch-service
-      dockerfile: Dockerfile
-    container_name: pitchos-pitch-service-1
-    restart: unless-stopped
-    ports:
-      - "${PITCH_SERVICE_PORT:-8082}:8082"
-    environment:
-      SERVER_PORT: 8082
-      PITCH_SERVICE_PORT: 8082
-      INSTANCE_ID: pitch-instance-1
-      MYSQL_HOST: mysql-pitch
-      MYSQL_PORT: 3306
-      MYSQL_USERNAME: ${MYSQL_USERNAME:-root}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-123456}
-      PITCH_DB_NAME: ${PITCH_DB_NAME:-pitchos_pitch_db}
-      EUREKA_URL: http://pitchos-service-registry:8761/eureka/
-      JWT_SECRET: ${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
-    depends_on:
-      mysql-pitch:
-        condition: service_healthy
-      pitchos-service-registry:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:8082/actuator/health | grep UP || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    networks:
-      - pitchos-network
-
-  # 3.3. Pitch Service - Instance 2 (Provider cổng 8084 - Linh phụ trách)
-  # QUAN TRỌNG: depends_on pitchos-pitch-service-1 healthy để chống Race Condition khi DataInitializer nạp dữ liệu mẫu
-  pitchos-pitch-service-2:
-    build:
-      context: ./pitchos-pitch-service
-      dockerfile: Dockerfile
-    container_name: pitchos-pitch-service-2
-    restart: unless-stopped
-    ports:
-      - "${PITCH_SERVICE_2_PORT:-8084}:8084"
-    environment:
-      SERVER_PORT: 8084
-      PITCH_SERVICE_PORT: 8084
-      INSTANCE_ID: pitch-instance-2
-      MYSQL_HOST: mysql-pitch
-      MYSQL_PORT: 3306
-      MYSQL_USERNAME: ${MYSQL_USERNAME:-root}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-123456}
-      PITCH_DB_NAME: ${PITCH_DB_NAME:-pitchos_pitch_db}
-      EUREKA_URL: http://pitchos-service-registry:8761/eureka/
-      JWT_SECRET: ${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
-    depends_on:
-      mysql-pitch:
-        condition: service_healthy
-      pitchos-service-registry:
-        condition: service_healthy
-      pitchos-pitch-service-1:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:8084/actuator/health | grep UP || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    networks:
-      - pitchos-network
-
-  # 3.4. Booking Service (Consumer cổng 8083 - Nhật phụ trách)
-  pitchos-booking-service:
-    build:
-      context: ./pitchos-booking-service
-      dockerfile: Dockerfile
-    container_name: pitchos-booking-service
-    restart: unless-stopped
-    ports:
-      - "${BOOKING_SERVICE_PORT:-8083}:8083"
-    environment:
-      SERVER_PORT: 8083
-      BOOKING_SERVICE_PORT: 8083
-      MYSQL_HOST: mysql-booking
-      MYSQL_PORT: 3306
-      MYSQL_USERNAME: ${MYSQL_USERNAME:-root}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-123456}
-      BOOKING_DB_NAME: ${BOOKING_DB_NAME:-pitchos_booking_db}
-      EUREKA_URL: http://pitchos-service-registry:8761/eureka/
-      JWT_SECRET: ${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
-    depends_on:
-      mysql-booking:
-        condition: service_healthy
-      pitchos-service-registry:
-        condition: service_healthy
-      pitchos-pitch-service-1:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:8083/actuator/health | grep UP || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    networks:
-      - pitchos-network
-
-# ====================================================================
-# ĐỊNH NGHĨA MẠNG NỘI BỘ VÀ NAMED VOLUMES
-# ====================================================================
-
-networks:
-  pitchos-network:
-    name: pitchos-network
-    driver: bridge
-
-volumes:
-  mysql_auth_data:
-    name: mysql_auth_data
-  mysql_pitch_data:
-    name: mysql_pitch_data
-  mysql_booking_data:
-    name: mysql_booking_data
+        condition: service

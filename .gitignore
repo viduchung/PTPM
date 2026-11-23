@@ -7,3 +7,11 @@ target/
 *.log
 .DS_Store
 Thumbs.db
+
+# File cau hinh moi truong that (chua mat khau) - KHONG commit
+# Moi nguoi tu copy .env.example thanh .env tren may minh
+.env
+!.env.example
+
+# Ban xuat lai cua bo suu tap Postman (trung noi dung voi ban chinh)
+*-CLEAN.postman_collection.json
