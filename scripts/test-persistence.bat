@@ -6,14 +6,13 @@ echo ========================================================
 echo.
 
 echo [BƯỚC 1] Đếm số lượng đơn đặt sân hiện có trong MySQL...
-docker exec -i $(docker ps -q -f name=booking.*mysql) mysql -u root -e "SELECT count(*) AS total_bookings FROM pitchos_booking_db.bookings;" 2>nul
+docker exec -i mysql-booking mysql -uroot -p123456 -e "SELECT count(*) AS total_bookings FROM pitchos_booking_db.bookings;" 2>nul
 if %errorlevel% neq 0 (
-    echo Không tìm thấy container mysql riêng lẻ, đang thử kiểm tra container mysql chung...
-    docker exec -i $(docker ps -q -f name=mysql) mysql -u root -e "SELECT count(*) AS total_bookings FROM pitchos_booking_db.bookings;" 2>nul
+    docker exec -i pitchos-mysql mysql -uroot -p123456 -e "SELECT count(*) AS total_bookings FROM pitchos_booking_db.bookings;" 2>nul
 )
 
 echo.
-echo [BƯỚC 2] Dừng toàn bộ hệ thống bằng Docker Compose (KHÔNG DÙNG -v)...
+echo [BƯỚC 2] Dừng toàn bộ hệ thống bằng Docker Compose (KHÔNG DÙNG cờ -v)...
 echo Lệnh: docker compose down
 docker compose down
 
@@ -27,10 +26,10 @@ echo Đang chờ MySQL khởi động lại (15 giây)...
 timeout /t 15 /nobreak >nul
 
 echo.
-echo [BƯỚC 4] Kiểm tra lại số lượng đơn đặt sân sau khi restart...
-docker exec -i $(docker ps -q -f name=booking.*mysql) mysql -u root -e "SELECT id, user_id, pitch_id, total_price, status, created_at FROM pitchos_booking_db.bookings ORDER BY id DESC LIMIT 5;" 2>nul
+echo [BƯỚC 4] Kiểm tra lại dữ liệu đơn đặt sân sau khi restart...
+docker exec -i mysql-booking mysql -uroot -p123456 -e "SELECT id, user_id, pitch_id, total_price, status, created_at FROM pitchos_booking_db.bookings ORDER BY id DESC LIMIT 5;" 2>nul
 if %errorlevel% neq 0 (
-    docker exec -i $(docker ps -q -f name=mysql) mysql -u root -e "SELECT id, user_id, pitch_id, total_price, status, created_at FROM pitchos_booking_db.bookings ORDER BY id DESC LIMIT 5;" 2>nul
+    docker exec -i pitchos-mysql mysql -uroot -p123456 -e "SELECT id, user_id, pitch_id, total_price, status, created_at FROM pitchos_booking_db.bookings ORDER BY id DESC LIMIT 5;" 2>nul
 )
 
 echo.
