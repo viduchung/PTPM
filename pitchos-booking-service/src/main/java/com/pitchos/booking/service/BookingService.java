@@ -1,11 +1,12 @@
 package com.pitchos.booking.service;
 
-import com.pitchos.booking.client.PitchClient;
+import com.pitchos.booking.client.PitchGateway;
 import com.pitchos.booking.dto.BookingRequest;
 import com.pitchos.booking.dto.BookingResponse;
 import com.pitchos.booking.dto.PitchResponseDTO;
 import com.pitchos.booking.entity.Booking;
 import com.pitchos.booking.entity.BookingStatus;
+import com.pitchos.booking.exception.BadGatewayException;
 import com.pitchos.booking.exception.BadRequestException;
 import com.pitchos.booking.exception.ResourceNotFoundException;
 import com.pitchos.booking.repository.BookingRepository;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -24,37 +26,42 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class BookingService {
 
+    /** Trạng thái sân cho phép đặt, do Provider pitchos-pitch-service công bố. */
+    private static final String PITCH_STATUS_ACTIVE = "hoat_dong";
+
+    /** Số phút trong một giờ, dùng khi quy đổi đơn giá/giờ sang tiền của khoảng thời gian đặt. */
+    private static final int MINUTES_PER_HOUR = 60;
+
     private final BookingRepository bookingRepository;
-    private final PitchClient pitchClient;
+    private final PitchGateway pitchGateway;
 
     /** Mỗi sân một khóa: các request đặt cùng sân phải lần lượt "kiểm tra trùng lịch → lưu đơn". */
     private final ConcurrentHashMap<Long, Object> pitchLocks = new ConcurrentHashMap<>();
 
     /**
-     * Đặt sân: gọi Pitch Service lấy giá → tính tổng tiền → kiểm tra trùng lịch → lưu đơn cho_duyet.
-     * Pitch Service bị tắt thì pitchClient ném FeignException → GlobalExceptionHandler trả 503.
+     * Đặt sân: gọi Provider lấy giá → kiểm tra dữ liệu nhận về → tính tổng tiền
+     * → kiểm tra trùng lịch → lưu đơn cho_duyet.
+     *
+     * Các mã lỗi tích hợp: 404 (sân không tồn tại), 502 (đơn giá Provider không hợp lệ),
+     * 400 (sân bảo trì / trùng lịch / sai giờ), 503 (Provider sập hoặc quá thời gian chờ).
      */
     public BookingResponse createBooking(Long userId, BookingRequest request) {
         if (!request.getEndTime().isAfter(request.getStartTime())) {
             throw new BadRequestException("endTime phải sau startTime");
         }
 
-        // 1. Gọi Pitch Service qua OpenFeign
-        PitchResponseDTO pitch = pitchClient.getPitchById(request.getPitchId());
+        // 1. Gọi Provider qua OpenFeign + Service ID (Eureka tra cứu, LoadBalancer chọn instance)
+        PitchResponseDTO pitch = pitchGateway.getPitchById(request.getPitchId());
         log.info("Pitch Service trả về sân {}: giá {} /giờ, trạng thái {}",
                 pitch.getId(), pitch.getPricePerHour(), pitch.getStatus());
 
-        if (!"hoat_dong".equals(pitch.getStatus())) {
-            throw new BadRequestException("Sân đang bảo trì, không thể đặt");
-        }
+        // 2. KT2 - Kiểm tra tính hợp lệ của dữ liệu nhận về từ Provider trước khi dùng
+        validateProviderData(pitch);
 
-        // 2. totalPrice = số giờ * pricePerHour
-        long minutes = Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
-        BigDecimal totalPrice = pitch.getPricePerHour()
-                .multiply(BigDecimal.valueOf(minutes))
-                .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+        // 3. totalPrice = số giờ * pricePerHour
+        BigDecimal totalPrice = calculateTotalPrice(pitch.getPricePerHour(), request);
 
-        // 3-4. Kiểm tra trùng lịch và lưu đơn phải liền một khối cho từng sân: nếu 2 request gửi đồng thời
+        // 4-5. Kiểm tra trùng lịch và lưu đơn phải liền một khối cho từng sân: nếu 2 request gửi đồng thời
         // cùng kiểm tra xong rồi mới lưu thì cả 2 đều qua → 1 khung giờ bị đặt 2 lần.
         // Khóa nằm trong bộ nhớ nên chỉ đúng khi chạy 1 instance Booking Service.
         synchronized (pitchLocks.computeIfAbsent(request.getPitchId(), id -> new Object())) {
@@ -77,6 +84,38 @@ public class BookingService {
 
             return BookingResponse.from(bookingRepository.save(booking));
         }
+    }
+
+    /**
+     * KT2 (IT03) - Không tin tưởng mù quáng dữ liệu của Provider:
+     *  - Đơn giá null hoặc <= 0: dữ liệu dịch vụ phía sau bị sai → 502 Bad Gateway.
+     *  - Sân không ở trạng thái hoat_dong: lỗi nghiệp vụ của yêu cầu → 400 Bad Request.
+     */
+    private void validateProviderData(PitchResponseDTO pitch) {
+        if (pitch.getPricePerHour() == null
+                || pitch.getPricePerHour().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BadGatewayException("Dữ liệu đơn giá từ Pitch Service không hợp lệ");
+        }
+        if (!PITCH_STATUS_ACTIVE.equalsIgnoreCase(pitch.getStatus())) {
+            throw new BadRequestException("Sân bóng hiện không hoạt động hoặc đang bảo trì");
+        }
+    }
+
+    private BigDecimal calculateTotalPrice(BigDecimal pricePerHour, BookingRequest request) {
+        long minutes = Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
+        return pricePerHour
+                .multiply(BigDecimal.valueOf(minutes))
+                .divide(BigDecimal.valueOf(MINUTES_PER_HOUR), 2, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * KT2 (TC03) - Trả về thông tin instance Provider mà LoadBalancer vừa phân phối,
+     * dùng để gửi 20 request liên tiếp và lập bảng phân phối tải giữa 2 instance Pitch.
+     */
+    public Map<String, Object> getServingPitchInstance() {
+        Map<String, Object> instanceInfo = pitchGateway.getInstanceInfo();
+        log.info("LoadBalancer phân phối request sang instance Pitch: {}", instanceInfo);
+        return instanceInfo;
     }
 
     public List<BookingResponse> getMyBookings(Long userId) {

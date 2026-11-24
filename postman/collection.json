@@ -1,0 +1,1301 @@
+{
+  "info": {
+    "name": "PitchOS - KT2 (TX2) - Bo kiem thu toan he thong",
+    "description": "BO KIEM THU CHUAN NOP BAI - BAI KIEM TRA SO 2 (TX2) - HE THONG PITCHOS\nVung so huu: Nhat (pitchos-booking-service + postman/collection.json)\n\nTHU TU CHAY:\n  1. Thu muc '1. Authentication & RBAC'  -> sinh 3 Bearer Token luu vao bien collection.\n  2. Thu muc '2. Integration & Error Handling (IT01-IT07)' -> bo test tich hop Consumer/Provider.\n     Rieng IT03b, IT04, IT05 can thao tac Docker ghi trong phan Description cua tung request.\n  3. Thu muc '3. Service Discovery & Load Balancing (TC01-TC06)' -> danh ba Eureka va can bang tai.\n     TC03 chay bang Collection Runner voi Iterations = 20.\n\nYEU CAU TRUOC KHI CHAY: docker compose up -d va toan bo container o trang thai healthy.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "authUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "pitchUrl",
+      "value": "http://localhost:8082",
+      "type": "string"
+    },
+    {
+      "key": "pitchUrl2",
+      "value": "http://localhost:8084",
+      "type": "string"
+    },
+    {
+      "key": "bookingUrl",
+      "value": "http://localhost:8083",
+      "type": "string"
+    },
+    {
+      "key": "eurekaUrl",
+      "value": "http://localhost:8761",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "chusanToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pitchId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "brokenPitchId",
+      "value": "3",
+      "type": "string"
+    },
+    {
+      "key": "bookingId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "slotStart",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "slotEnd",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lbStats",
+      "value": "{}",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication & RBAC",
+      "description": "Dang ky, dang nhap 3 vai tro va sinh Bearer Token luu vao bien collection. Chay thu muc nay truoc moi bo test khac.",
+      "item": [
+        {
+          "name": "1.1 Dang ky khach hang moi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authUrl}}/api/v1/auth/register",
+            "description": "Tai khoan tao qua API luon co vai tro 'user' (khong cho client tu khai role).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"khachhang01\",\n  \"email\": \"khachhang01@gmail.com\",\n  \"password\": \"123456\",\n  \"fullName\": \"Nguyen Van Khach Hang\",\n  \"phone\": \"0912345678\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created hoac 400 neu tai khoan da ton tai', function () {",
+                  "    pm.expect([201, 400]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.2 Dang nhap vai tro user -> luu {{userToken}}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authUrl}}/api/v1/auth/login",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user\",\n  \"password\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Tra ve accessToken', () => pm.expect(body.accessToken).to.be.a('string'));",
+                  "pm.test('Vai tro user', () => pm.expect(body.role).to.eql('user'));",
+                  "pm.collectionVariables.set('userToken', body.accessToken);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.3 Dang nhap vai tro chusan -> luu {{chusanToken}}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authUrl}}/api/v1/auth/login",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"chusan\",\n  \"password\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('chusanToken', pm.response.json().accessToken);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.4 Dang nhap vai tro admin -> luu {{adminToken}}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authUrl}}/api/v1/auth/login",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('adminToken', pm.response.json().accessToken);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.5 Sai mat khau -> 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authUrl}}/api/v1/auth/login",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user\",\n  \"password\": \"sai-mat-khau\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 Unauthorized', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.6 RBAC - Dat san khi khong gui token -> 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": \"{{pitchId}}\",\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Sinh khung gio 90 phut ngau nhien trong nam 2027 de chay lai nhieu lan khong bi trung lich",
+                  "const day = 1 + Math.floor(Math.random() * 28);",
+                  "const month = 1 + Math.floor(Math.random() * 12);",
+                  "const hour = 6 + Math.floor(Math.random() * 12);",
+                  "const pad = (n) => String(n).padStart(2, '0');",
+                  "const start = `2027-${pad(month)}-${pad(day)}T${pad(hour)}:00:00`;",
+                  "const end = `2027-${pad(month)}-${pad(day)}T${pad(hour + 1)}:30:00`;",
+                  "pm.collectionVariables.set('slotStart', start);",
+                  "pm.collectionVariables.set('slotEnd', end);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 Unauthorized', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.7 RBAC - Token chusan dat san -> 403",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{chusanToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "Chi vai tro 'user' duoc dat san. Chusan/admin chi duyet hoac tu choi don.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": \"{{pitchId}}\",\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Sinh khung gio 90 phut ngau nhien trong nam 2027 de chay lai nhieu lan khong bi trung lich",
+                  "const day = 1 + Math.floor(Math.random() * 28);",
+                  "const month = 1 + Math.floor(Math.random() * 12);",
+                  "const hour = 6 + Math.floor(Math.random() * 12);",
+                  "const pad = (n) => String(n).padStart(2, '0');",
+                  "const start = `2027-${pad(month)}-${pad(day)}T${pad(hour)}:00:00`;",
+                  "const end = `2027-${pad(month)}-${pad(day)}T${pad(hour + 1)}:30:00`;",
+                  "pm.collectionVariables.set('slotStart', start);",
+                  "pm.collectionVariables.set('slotEnd', end);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Integration & Error Handling (IT01-IT07)",
+      "description": "Bo kiem thu Consumer (booking) goi Provider (pitch) qua Service ID va xu ly loi tich hop. Yeu cau: da chay thu muc 1 de co token.",
+      "item": [
+        {
+          "name": "IT01 - Dat san thanh cong (201, totalPrice = so gio x don gia)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "San 1 gia 300.000d/gio, dat 1,5 gio -> totalPrice = 450.000. Log Booking Service in dong 'Pitch Service tra ve san 1: gia ... trang thai hoat_dong'.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": \"{{pitchId}}\",\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Sinh khung gio 90 phut ngau nhien trong nam 2027 de chay lai nhieu lan khong bi trung lich",
+                  "const day = 1 + Math.floor(Math.random() * 28);",
+                  "const month = 1 + Math.floor(Math.random() * 12);",
+                  "const hour = 6 + Math.floor(Math.random() * 12);",
+                  "const pad = (n) => String(n).padStart(2, '0');",
+                  "const start = `2027-${pad(month)}-${pad(day)}T${pad(hour)}:00:00`;",
+                  "const end = `2027-${pad(month)}-${pad(day)}T${pad(hour + 1)}:30:00`;",
+                  "pm.collectionVariables.set('slotStart', start);",
+                  "pm.collectionVariables.set('slotEnd', end);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('bookingId', body.id);",
+                  "pm.test('Trang thai don la cho_duyet', () => pm.expect(body.status).to.eql('cho_duyet'));",
+                  "pm.test('totalPrice = 1,5 gio x don gia Provider', function () {",
+                  "    const start = new Date(pm.collectionVariables.get('slotStart'));",
+                  "    const end = new Date(pm.collectionVariables.get('slotEnd'));",
+                  "    const hours = (end - start) / 3600000;",
+                  "    pm.expect(Number(body.totalPrice)).to.be.above(0);",
+                  "    pm.expect(Number(body.totalPrice)).to.eql(hours * 300000);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IT02 - San khong ton tai pitchId=9999 -> 404",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "Provider tra 404 -> CustomErrorDecoder -> ResourceNotFoundException -> 404 kem thong bao ro rang.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": 9999,\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Sinh khung gio 90 phut ngau nhien trong nam 2027 de chay lai nhieu lan khong bi trung lich",
+                  "const day = 1 + Math.floor(Math.random() * 28);",
+                  "const month = 1 + Math.floor(Math.random() * 12);",
+                  "const hour = 6 + Math.floor(Math.random() * 12);",
+                  "const pad = (n) => String(n).padStart(2, '0');",
+                  "const start = `2027-${pad(month)}-${pad(day)}T${pad(hour)}:00:00`;",
+                  "const end = `2027-${pad(month)}-${pad(day)}T${pad(hour + 1)}:30:00`;",
+                  "pm.collectionVariables.set('slotStart', start);",
+                  "pm.collectionVariables.set('slotEnd', end);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 Not Found', () => pm.response.to.have.status(404));",
+                  "pm.test('Thong bao ro rang ve san khong ton tai', function () {",
+                  "    pm.expect(pm.response.json().message).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IT03a - San dang bao tri (pitchId=4) -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "San 4 trong du lieu mau co status = bao_tri. Consumer kiem tra du lieu Provider truoc khi dung -> tra 400 (loi nghiep vu cua yeu cau).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": 4,\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Sinh khung gio 90 phut ngau nhien trong nam 2027 de chay lai nhieu lan khong bi trung lich",
+                  "const day = 1 + Math.floor(Math.random() * 28);",
+                  "const month = 1 + Math.floor(Math.random() * 12);",
+                  "const hour = 6 + Math.floor(Math.random() * 12);",
+                  "const pad = (n) => String(n).padStart(2, '0');",
+                  "const start = `2027-${pad(month)}-${pad(day)}T${pad(hour)}:00:00`;",
+                  "const end = `2027-${pad(month)}-${pad(day)}T${pad(hour + 1)}:30:00`;",
+                  "pm.collectionVariables.set('slotStart', start);",
+                  "pm.collectionVariables.set('slotEnd', end);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('Noi ro san khong hoat dong / dang bao tri', function () {",
+                  "    pm.expect(pm.response.json().message).to.include('hoạt động');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IT03b - Don gia Provider <= 0 hoac null -> 502 Bad Gateway",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "CHUAN BI: tao du lieu loi ben Provider roi dat bien brokenPitchId = id san do.\n  docker compose exec mysql-pitch mysql -uroot -p123456 pitchos_pitch_db \\\n    -e \"UPDATE pitches SET price_per_hour = 0 WHERE id = 3;\"\nSau khi chup minh chung, tra lai gia cu (800000).\nDu lieu dich vu phia sau sai -> 502, KHONG phai loi cua nguoi dung (400) va cung khong phai 500 mo ho.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": \"{{brokenPitchId}}\",\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Sinh khung gio 90 phut ngau nhien trong nam 2027 de chay lai nhieu lan khong bi trung lich",
+                  "const day = 1 + Math.floor(Math.random() * 28);",
+                  "const month = 1 + Math.floor(Math.random() * 12);",
+                  "const hour = 6 + Math.floor(Math.random() * 12);",
+                  "const pad = (n) => String(n).padStart(2, '0');",
+                  "const start = `2027-${pad(month)}-${pad(day)}T${pad(hour)}:00:00`;",
+                  "const end = `2027-${pad(month)}-${pad(day)}T${pad(hour + 1)}:30:00`;",
+                  "pm.collectionVariables.set('slotStart', start);",
+                  "pm.collectionVariables.set('slotEnd', end);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('502 Bad Gateway', () => pm.response.to.have.status(502));",
+                  "pm.test('Noi ro don gia tu Provider khong hop le', function () {",
+                  "    pm.expect(pm.response.json().message).to.include('đơn giá');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IT04 - Provider sap hoan toan -> 503",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "CHUAN BI: docker compose stop pitchos-pitch-service-1 pitchos-pitch-service-2\nCho 15-30s de Eureka loai 2 instance khoi danh ba, sau do gui request nay.\nKy vong 503 sach se, Booking Service KHONG sap (xem request ke tiep).\nKHOI PHUC: docker compose start pitchos-pitch-service-1 pitchos-pitch-service-2",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": \"{{pitchId}}\",\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Sinh khung gio 90 phut ngau nhien trong nam 2027 de chay lai nhieu lan khong bi trung lich",
+                  "const day = 1 + Math.floor(Math.random() * 28);",
+                  "const month = 1 + Math.floor(Math.random() * 12);",
+                  "const hour = 6 + Math.floor(Math.random() * 12);",
+                  "const pad = (n) => String(n).padStart(2, '0');",
+                  "const start = `2027-${pad(month)}-${pad(day)}T${pad(hour)}:00:00`;",
+                  "const end = `2027-${pad(month)}-${pad(day)}T${pad(hour + 1)}:30:00`;",
+                  "pm.collectionVariables.set('slotStart', start);",
+                  "pm.collectionVariables.set('slotEnd', end);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('503 Service Unavailable', () => pm.response.to.have.status(503));",
+                  "pm.test('Thong bao than thien, khong lo stack trace', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.status).to.eql(503);",
+                  "    pm.expect(JSON.stringify(body)).to.not.include('Exception');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IT04b - Booking Service van song khi Provider sap -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings/my-bookings",
+            "description": "Chung minh khong sup do day chuyen (Cascading Failure): endpoint khong phu thuoc Provider van tra 200 ngay khi ca 2 instance Pitch dang dung."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IT05 - Timeout mang (pause Provider) -> 503 sau 2-3s",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "CHUAN BI: docker compose pause pitchos-pitch-service-1 pitchos-pitch-service-2\nContainer con song nhung khong tra loi -> Feign cho het read-timeout 3s roi nem RetryableException -> 503.\nKHOI PHUC: docker compose unpause pitchos-pitch-service-1 pitchos-pitch-service-2",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": \"{{pitchId}}\",\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Sinh khung gio 90 phut ngau nhien trong nam 2027 de chay lai nhieu lan khong bi trung lich",
+                  "const day = 1 + Math.floor(Math.random() * 28);",
+                  "const month = 1 + Math.floor(Math.random() * 12);",
+                  "const hour = 6 + Math.floor(Math.random() * 12);",
+                  "const pad = (n) => String(n).padStart(2, '0');",
+                  "const start = `2027-${pad(month)}-${pad(day)}T${pad(hour)}:00:00`;",
+                  "const end = `2027-${pad(month)}-${pad(day)}T${pad(hour + 1)}:30:00`;",
+                  "pm.collectionVariables.set('slotStart', start);",
+                  "pm.collectionVariables.set('slotEnd', end);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('503 Service Unavailable', () => pm.response.to.have.status(503));",
+                  "pm.test('Tra loi trong khoang timeout da cau hinh (< 10s)', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(10000);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IT06a - Gui lap lan 1 -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "Giu nguyen slotStart/slotEnd de request IT06b gui lai dung khung gio nay.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": \"{{pitchId}}\",\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Sinh khung gio 90 phut ngau nhien trong nam 2027 de chay lai nhieu lan khong bi trung lich",
+                  "const day = 1 + Math.floor(Math.random() * 28);",
+                  "const month = 1 + Math.floor(Math.random() * 12);",
+                  "const hour = 6 + Math.floor(Math.random() * 12);",
+                  "const pad = (n) => String(n).padStart(2, '0');",
+                  "const start = `2027-${pad(month)}-${pad(day)}T${pad(hour)}:00:00`;",
+                  "const end = `2027-${pad(month)}-${pad(day)}T${pad(hour + 1)}:30:00`;",
+                  "pm.collectionVariables.set('slotStart', start);",
+                  "pm.collectionVariables.set('slotEnd', end);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IT06b - Gui lap lan 2 cung khung gio -> 400 trung lich",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "Khong sinh khung gio moi: dung lai dung slot cua IT06a.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": \"{{pitchId}}\",\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('Bao trung khung gio', function () {",
+                  "    pm.expect(pm.response.json().message).to.include('đã có người đặt');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IT07 - endTime truoc startTime -> 400 tai validation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "Chan ngay tai Consumer, khong goi sang Provider (tiet kiem mot vong HTTP).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": \"{{pitchId}}\",\n  \"startTime\": \"2027-07-01T20:00:00\",\n  \"endTime\": \"2027-07-01T18:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('Noi ro endTime phai sau startTime', function () {",
+                  "    pm.expect(pm.response.json().message).to.include('endTime');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IT08 - Chu san duyet don (PATCH, role chusan) -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{chusanToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings/{{bookingId}}/status",
+            "description": "Dung bookingId do IT01 luu lai. Hoan tat luong nghiep vu dat san.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"da_duyet\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Trang thai chuyen sang da_duyet', function () {",
+                  "    pm.expect(pm.response.json().status).to.eql('da_duyet');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Service Discovery & Load Balancing (TC01-TC06)",
+      "description": "Kiem thu danh ba Eureka va can bang tai 2 instance Provider. TC03 chay bang Collection Runner voi 20 vong lap (Iterations = 20).",
+      "item": [
+        {
+          "name": "TC01 - Eureka co du Service ID, Pitch co 2 instance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{eurekaUrl}}/eureka/apps",
+            "description": "Doc truc tiep danh ba Eureka duoi dang JSON (tuong duong Dashboard 8761)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const apps = pm.response.json().applications.application || [];",
+                  "const list = Array.isArray(apps) ? apps : [apps];",
+                  "const names = list.map(a => String(a.name).toUpperCase());",
+                  "pm.test('Da dang ky PITCHOS-BOOKING-SERVICE', function () {",
+                  "    pm.expect(names).to.include('PITCHOS-BOOKING-SERVICE');",
+                  "});",
+                  "pm.test('PITCHOS-PITCH-SERVICE co dung 2 instance', function () {",
+                  "    const pitch = list.find(a => String(a.name).toUpperCase() === 'PITCHOS-PITCH-SERVICE');",
+                  "    pm.expect(pitch, 'khong tim thay pitch service trong danh ba').to.not.be.undefined;",
+                  "    const instances = Array.isArray(pitch.instance) ? pitch.instance : [pitch.instance];",
+                  "    pm.expect(instances.length).to.eql(2);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC02 - Dat san qua Service ID (khong con URL cung)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "Consumer khai bao @FeignClient(name = \"pitchos-pitch-service\") - khong co thuoc tinh url. Dat san thanh cong chung minh Eureka + LoadBalancer da dinh tuyen dung.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": \"{{pitchId}}\",\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Sinh khung gio 90 phut ngau nhien trong nam 2027 de chay lai nhieu lan khong bi trung lich",
+                  "const day = 1 + Math.floor(Math.random() * 28);",
+                  "const month = 1 + Math.floor(Math.random() * 12);",
+                  "const hour = 6 + Math.floor(Math.random() * 12);",
+                  "const pad = (n) => String(n).padStart(2, '0');",
+                  "const start = `2027-${pad(month)}-${pad(day)}T${pad(hour)}:00:00`;",
+                  "const end = `2027-${pad(month)}-${pad(day)}T${pad(hour + 1)}:30:00`;",
+                  "pm.collectionVariables.set('slotStart', start);",
+                  "pm.collectionVariables.set('slotEnd', end);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC03 - Can bang tai: chay Runner 20 vong lap",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{bookingUrl}}/api/v1/bookings/pitch-instance",
+            "description": "Chon rieng request nay trong Collection Runner, dat Iterations = 20. Console in bang phan phoi giua 2 instance Pitch (8082 / 8084) sau moi vong. Phu thuoc endpoint GET /api/v1/instance-info cua Provider (Linh phu trach)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "// Provider tra ve thong tin instance dang phuc vu (instanceId / port / host)",
+                  "const key = String(body.instanceId || body.port || body.host || JSON.stringify(body));",
+                  "const stats = JSON.parse(pm.collectionVariables.get('lbStats') || '{}');",
+                  "stats[key] = (stats[key] || 0) + 1;",
+                  "pm.collectionVariables.set('lbStats', JSON.stringify(stats));",
+                  "console.log('Phan phoi tai sau ' + Object.values(stats).reduce((a, b) => a + b, 0) + ' request: ' + JSON.stringify(stats));",
+                  "pm.test('Instance phuc vu duoc ghi nhan', () => pm.expect(key).to.not.be.empty);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC03b - Xoa bo dem phan phoi tai truoc khi chay Runner",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{bookingUrl}}/actuator/health",
+            "description": "Chay request nay mot lan de reset bien lbStats truoc khi chay TC03 20 vong."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('lbStats', '{}');",
+                  "pm.test('Booking Service UP', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().status).to.eql('UP');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC04 - Dung 1 instance Provider, dat san van thanh cong",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "CHUAN BI: docker compose stop pitchos-pitch-service-1 (cho 15-30s).\nLoadBalancer tu chuyen toan bo request sang instance 2 (cong 8084) -> van 201.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": \"{{pitchId}}\",\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Sinh khung gio 90 phut ngau nhien trong nam 2027 de chay lai nhieu lan khong bi trung lich",
+                  "const day = 1 + Math.floor(Math.random() * 28);",
+                  "const month = 1 + Math.floor(Math.random() * 12);",
+                  "const hour = 6 + Math.floor(Math.random() * 12);",
+                  "const pad = (n) => String(n).padStart(2, '0');",
+                  "const start = `2027-${pad(month)}-${pad(day)}T${pad(hour)}:00:00`;",
+                  "const end = `2027-${pad(month)}-${pad(day)}T${pad(hour + 1)}:30:00`;",
+                  "pm.collectionVariables.set('slotStart', start);",
+                  "pm.collectionVariables.set('slotEnd', end);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created nho instance con lai', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC05 - Dung ca 2 instance Provider -> 503 sach se",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "CHUAN BI: docker compose stop pitchos-pitch-service-1 pitchos-pitch-service-2",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": \"{{pitchId}}\",\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Sinh khung gio 90 phut ngau nhien trong nam 2027 de chay lai nhieu lan khong bi trung lich",
+                  "const day = 1 + Math.floor(Math.random() * 28);",
+                  "const month = 1 + Math.floor(Math.random() * 12);",
+                  "const hour = 6 + Math.floor(Math.random() * 12);",
+                  "const pad = (n) => String(n).padStart(2, '0');",
+                  "const start = `2027-${pad(month)}-${pad(day)}T${pad(hour)}:00:00`;",
+                  "const end = `2027-${pad(month)}-${pad(day)}T${pad(hour + 1)}:30:00`;",
+                  "pm.collectionVariables.set('slotStart', start);",
+                  "pm.collectionVariables.set('slotEnd', end);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('503 Service Unavailable', () => pm.response.to.have.status(503));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC06 - Bat lai Provider, sau ~30s hoat dong binh thuong",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{bookingUrl}}/api/v1/bookings",
+            "description": "CHUAN BI: docker compose start pitchos-pitch-service-1 pitchos-pitch-service-2, cho khoang 30s de 2 instance dang ky lai vao Eureka (heartbeat 10s, eviction 30s).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pitchId\": \"{{pitchId}}\",\n  \"startTime\": \"{{slotStart}}\",\n  \"endTime\": \"{{slotEnd}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Sinh khung gio 90 phut ngau nhien trong nam 2027 de chay lai nhieu lan khong bi trung lich",
+                  "const day = 1 + Math.floor(Math.random() * 28);",
+                  "const month = 1 + Math.floor(Math.random() * 12);",
+                  "const hour = 6 + Math.floor(Math.random() * 12);",
+                  "const pad = (n) => String(n).padStart(2, '0');",
+                  "const start = `2027-${pad(month)}-${pad(day)}T${pad(hour)}:00:00`;",
+                  "const end = `2027-${pad(month)}-${pad(day)}T${pad(hour + 1)}:30:00`;",
+                  "pm.collectionVariables.set('slotStart', start);",
+                  "pm.collectionVariables.set('slotEnd', end);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DEP02 - Actuator health cua Booking Service",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{bookingUrl}}/actuator/health",
+            "description": "Giam sat App Health (khac voi Container Status cua Docker). show-details=never nen chi tra ve {\"status\":\"UP\"}."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK va status UP', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().status).to.eql('UP');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
