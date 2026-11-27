@@ -81,3 +81,49 @@ Trong quá trình hiện thực hóa hệ thống từ KT1 lên KT2, nhóm đã 
 ### 4. Triển khai Giám sát tập trung (Prometheus & Grafana) và Distributed Tracing (Micrometer Tracing / Zipkin)
 * Thu thập toàn bộ số liệu đo lường (Metrics) từ endpoint `/actuator/prometheus` của các container để vẽ biểu đồ trực quan hóa tài nguyên CPU, RAM, thời gian phản hồi (Response Time) và số lượng đơn đặt theo giờ trên Grafana Dashboard.
 * Gắn mã định danh tương quan (Correlation ID / Trace ID) xuyên suốt từ Client $\rightarrow$ Gateway $\rightarrow$ Booking $\rightarrow$ Pitch để theo dõi trọn vẹn vòng đời của một request qua các container phân tán.
+
+## VẤN ĐỀ PHÁT SINH TRONG QUÁ TRÌNH TÍCH HỢP, TRIỂN KHAI VÀ VẬN HÀNH
+
+Đề bài yêu cầu báo cáo có nhận xét về các vấn đề phát sinh. Mục này ghi lại những sự cố nhóm thực sự gặp phải khi thực hiện bài kiểm tra số 2, nguyên nhân gốc và cách khắc phục. Đây đều là lỗi đã xảy ra trên máy thật, không phải tình huống giả định.
+
+### Giai đoạn tích hợp dịch vụ
+
+**Feign Client vẫn giữ URL cố định sau khi đã dựng xong Eureka.** Ở bước đầu, Service Registry đã chạy và Eureka Dashboard hiển thị đủ danh sách dịch vụ, nhưng Booking Service vẫn khai báo `@FeignClient(name = "pitch-service", url = "${pitch.service.url}")`. Hệ thống chạy đúng nên rất dễ tưởng đã hoàn thành, trong khi thực chất cơ chế Service Discovery hoàn toàn không được sử dụng. Nhóm khắc phục bằng cách xóa thuộc tính `url`, chỉ giữ `@FeignClient(name = "pitchos-pitch-service")`, và đặt ra phép thử nghiệm thu: *xóa URL khỏi cấu hình mà hệ thống vẫn gọi được Provider*.
+
+**Sai định dạng dữ liệu đầu vào khi kiểm thử.** Lần gửi yêu cầu đặt sân đầu tiên trả về `400 Bad Request`. Nguyên nhân là `BookingRequest` yêu cầu `startTime` và `endTime` kiểu `LocalDateTime` dạng `2026-12-20T18:00:00`, trong khi người kiểm thử gửi kèm trường `bookingDate` riêng theo thói quen cũ. Bài học là hợp đồng API phải tra cứu từ lớp DTO thực tế chứ không dựa vào trí nhớ.
+
+### Giai đoạn triển khai container
+
+**Bẫy `localhost` bên trong container.** Cấu hình `http://localhost:8082` chạy hoàn hảo khi bốn dịch vụ cùng nằm trên một máy, nhưng khi đóng gói vào Docker thì `localhost` trỏ về chính container đang chạy mã đó, nơi không có cổng nào lắng nghe. Lỗi `Connection refused` chỉ bùng ra ở bước triển khai chứ không xuất hiện trong lúc phát triển. Khắc phục bằng cách gọi nhau qua tên service trong mạng nội bộ: `MYSQL_HOST=mysql-auth`, `EUREKA_URL=http://pitchos-service-registry:8761/eureka/`.
+
+**Mật khẩu cơ sở dữ liệu rỗng khiến dịch vụ không khởi động được.** File `docker-compose.yml` dùng cú pháp `${MYSQL_PASSWORD:-123456}` còn `application.properties` dùng `${MYSQL_PASSWORD:}`. Hai cú pháp này xử lý giá trị rỗng khác nhau: Docker coi chuỗi rỗng là chưa đặt nên dùng giá trị mặc định, còn Spring coi chuỗi rỗng là một giá trị hợp lệ. Hậu quả là container MySQL được tạo với mật khẩu `123456` trong khi ứng dụng kết nối bằng mật khẩu rỗng. Khắc phục bằng cách điền giá trị thật vào file `.env`.
+
+**Hai nguồn cấu hình xung đột.** Mỗi service tồn tại một file `application.properties` thừa ở thư mục gốc bên cạnh file trong `src/main/resources`. Spring Boot đọc cả hai và file ở thư mục làm việc ghi đè file trong classpath, gây ra tình trạng sửa cấu hình mà không thấy tác dụng. Nhóm đã xóa các file thừa này.
+
+### Giai đoạn vận hành
+
+**Trùng Instance ID làm mất khả năng cân bằng tải.** Khi chạy hai instance Pitch Service, nếu không cấu hình `eureka.instance.instance-id`, cả hai cùng đăng ký một định danh. Eureka coi đó là một instance duy nhất, bản ghi sau ghi đè bản ghi trước, Dashboard chỉ hiện một dòng và LoadBalancer không có gì để luân phiên. Khắc phục bằng `eureka.instance.instance-id=${spring.application.name}:${server.port}`.
+
+**Chế độ Self-Preservation giữ lại instance đã chết.** Khi kiểm thử dừng một instance, Eureka không loại nó khỏi danh bạ. Nguyên nhân là cơ chế tự bảo vệ: hệ thống chỉ có bốn instance nên việc dừng một cái đã làm tỉ lệ Heartbeat tụt quá ngưỡng, Eureka kết luận mạng bị lỗi và giữ nguyên toàn bộ bản ghi cũ. Nhóm tắt chế độ này ở môi trường kiểm thử bằng `eureka.server.enable-self-preservation=false`, kèm ghi chú rõ đây không phải cấu hình khuyến nghị cho môi trường sản xuất.
+
+**Khoảng thời gian có request lỗi sau khi dừng một instance.** Đo thực tế cho thấy ngay sau khi dừng Pitch instance 1, trong mười request thử nghiệm có năm request trả lỗi; sau 35 giây thì toàn bộ mười request đều thành công. Chiều ngược lại cũng vậy: ngay sau khi hai instance khởi động lại, hai mươi request dồn hết vào cổng 8082, sau 35 giây mới trở lại tỉ lệ 10/10.
+
+Đây **không phải lỗi lập trình**. Consumer không hỏi Eureka Server ở từng lời gọi mà dùng bản sao danh bạ trong bộ nhớ của chính nó, làm mới theo chu kỳ 30 giây. Hiện tượng này là đặc tính cố hữu của mô hình **AP** mà Eureka theo đuổi: chấp nhận dữ liệu có thể hơi cũ để luôn trả lời được, thay vì khóa hệ thống chờ đồng thuận. Hệ thống sản xuất xử lý khoảng trễ này bằng cơ chế thử lại (Retry) và ngắt mạch (Circuit Breaker) ở phía Consumer — nằm ngoài phạm vi bài kiểm tra số 2 nhưng là hướng phát triển tiếp theo.
+
+### Quản lý mã nguồn và thông tin bí mật
+
+**File `.env` chứa mật khẩu và khóa JWT bị commit lên Git.** Nhóm đã gỡ khỏi Git bằng `git rm --cached .env`, bổ sung quy tắc vào `.gitignore` và chỉ commit `.env.example`. Cần lưu ý rằng các giá trị này vẫn tồn tại trong lịch sử Git; với một dự án học tập thì chấp nhận được, nhưng trong môi trường thật bắt buộc phải thu hồi và cấp lại khóa mới.
+
+### Tổng hợp mức độ ảnh hưởng
+
+| Vấn đề | Giai đoạn | Mức ảnh hưởng | Trạng thái |
+|---|---|---|---|
+| Feign Client còn URL cố định | Tích hợp | Mất hoàn toàn yêu cầu Service Discovery | Đã khắc phục |
+| Sai định dạng dữ liệu đầu vào | Tích hợp | Nhầm là lỗi hệ thống | Đã làm rõ |
+| Bẫy `localhost` trong container | Triển khai | Hệ thống không chạy được sau khi đóng gói | Đã khắc phục |
+| Mật khẩu CSDL rỗng | Triển khai | Dịch vụ khởi động rồi thoát ngay | Đã khắc phục |
+| Hai nguồn cấu hình xung đột | Triển khai | Sửa cấu hình không có tác dụng | Đã khắc phục |
+| Trùng Instance ID | Vận hành | Mất khả năng cân bằng tải | Đã khắc phục |
+| Self-Preservation giữ instance chết | Vận hành | Kiểm thử dừng dịch vụ không phản ánh đúng | Đã tắt ở môi trường kiểm thử |
+| Độ trễ cache danh bạ 30 giây | Vận hành | Một số request lỗi trong giai đoạn chuyển tiếp | Đặc tính kiến trúc, đã phân tích |
+| `.env` bị commit lên Git | Mã nguồn | Lộ mật khẩu và khóa JWT | Đã gỡ, lịch sử Git vẫn còn |

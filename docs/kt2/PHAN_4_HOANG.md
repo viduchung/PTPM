@@ -126,10 +126,6 @@ Lần kiểm tra đầu chạy trực tiếp bằng JVM trên máy cá nhân (`j
 | Eureka Dashboard | `curl -o /dev/null -w "%{http_code}" http://localhost:8761/` | `200` |
 | Danh bạ khi chưa có client | `curl http://localhost:8761/eureka/apps` | `<applications>` rỗng — đúng kỳ vọng, vì `register-with-eureka=false` nên Server không tự đăng ký chính nó |
 
-**📷 Vị trí chèn ảnh 1:** Ảnh chụp Eureka Dashboard tại `http://localhost:8761` ngay sau khi khởi động, cho thấy mục *Instances currently registered with Eureka* đang trống và khối *General Info* hiển thị thông tin node.
-
-*Chú thích ảnh cần viết kèm:* Dashboard trống ở thời điểm này là kết quả đúng chứ không phải lỗi, vì chưa có dịch vụ nào khởi động và bản thân Eureka Server không tự đăng ký. Ảnh này làm mốc so sánh với Ảnh 2 ở Mục 3.4.
-
 ---
 
 ## 3. CƠ CHẾ ĐĂNG KÝ CỦA EUREKA CLIENT
@@ -209,10 +205,6 @@ eureka.instance.lease-expiration-duration-in-seconds=30
 Sự khác biệt giữa **dừng êm** và **dừng đột ngột** là điểm cần nhấn mạnh khi trình bày: `docker compose stop` gửi `SIGTERM`, Spring Boot bắt được tín hiệu và kịp gọi hủy đăng ký nên bản ghi mất ngay; còn `docker kill` hoặc máy mất điện thì không kịp, và hệ thống phải chờ hết thời hạn lease. Chính khoảng chờ này tạo ra **độ trễ cập nhật bảng định tuyến** phân tích ở Mục 6.
 
 ### 3.4. Minh chứng các dịch vụ đã đăng ký
-
-**📷 Vị trí chèn ảnh 2:** Ảnh chụp Eureka Dashboard sau khi `docker compose up -d` hoàn tất, cho thấy bảng *Instances currently registered with Eureka* có đủ ba Service ID, trong đó `PITCHOS-PITCH-SERVICE` hiển thị **2 instance** (cổng 8082 và 8084).
-
-*Chú thích ảnh cần viết kèm:* Cần chỉ rõ cột `Availability Zones` của dòng `PITCHOS-PITCH-SERVICE` hiện số `2`, và cột `Status` hiện hai liên kết `UP (2)` tương ứng hai Instance ID khác nhau. Đây là điều kiện tiên quyết để có cân bằng tải: nếu Instance ID bị trùng, Dashboard chỉ hiện 1 instance và LoadBalancer không có gì để luân phiên.
 
 **Kết quả đo thực tế ngày 27/11/2026** (TC01, danh bạ trả về `HTTP 200`):
 
@@ -451,10 +443,6 @@ Hai phép đo này chỉ ra cùng một nguyên nhân: Booking Service **không 
 | **TC06** khởi động lại | Cả 2 instance đăng ký lại sau 57,5 giây, đặt sân `201 Created` ngay sau đó, **không phải restart Booking Service** |
 
 Kết quả TC05 đáng chú ý: Booking Service trả `503` cho nghiệp vụ nhưng `/actuator/health` vẫn `UP`. Đây không phải mâu thuẫn mà là minh chứng thực nghiệm cho sự phân biệt **sức khỏe ứng dụng** (Booking vẫn khỏe) và **khả năng nghiệp vụ** (không đặt sân được vì phụ thuộc bên ngoài đã chết) — nội dung lý thuyết ở Câu 1.4.
-
-**📷 Vị trí chèn ảnh 3:** Dashboard sau khi dừng instance 1, `PITCHOS-PITCH-SERVICE` còn `UP (1)`.
-
-**📷 Vị trí chèn ảnh 4:** Postman đặt sân `201 Created` khi chỉ còn 1 instance.
 
 ---
 
