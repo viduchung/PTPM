@@ -235,9 +235,9 @@ environment:
 
 ---
 
-## 4. HƯỚNG DẪN XUẤT HAI FILE ẢNH PNG
+## 4. MÃ NGUỒN HAI SƠ ĐỒ KIẾN TRÚC
 
-Hai sơ đồ dưới đây được viết bằng Mermaid để xuất ra ảnh PNG đặt vào `docs/architecture/`. Cách xuất: dán mã vào <https://mermaid.live>, chọn **Actions → PNG**, lưu đúng tên file.
+Hai sơ đồ dưới đây được đặc tả bằng ngôn ngữ Mermaid và được xuất thành hai file ảnh `docs/architecture/integration-architecture.png` và `docs/architecture/deployment-architecture.png`. Việc đặc tả bằng mã nguồn thay vì vẽ tay giúp sơ đồ luôn đồng bộ với kiến trúc thực tế và có thể sinh lại khi hệ thống thay đổi.
 
 ### 4.1. `integration-architecture.png`
 
@@ -321,16 +321,3 @@ graph TB
 
 ---
 
-## 5. BẢNG TỔNG HỢP: PHẦN THỪA HƯỞNG TỪ KT1 VÀ PHẦN BỔ SUNG Ở KT2
-
-| Thành phần | Trạng thái ở KT1 | Bổ sung ở KT2 | Người thực hiện |
-|---|---|---|---|
-| Auth Service | Đã có: JWT, RBAC 3 vai trò | Eureka Client, Actuator, Dockerfile, gỡ log in mật khẩu | Hoàng |
-| Pitch Service | Đã có: CRUD sân bóng | Eureka Client, Actuator, endpoint `/instance-info`, chạy 2 instance | Linh |
-| Booking Service | Đã có: đặt sân, gọi Pitch bằng URL cứng | Eureka Client, **chuyển Feign sang Service ID**, Actuator | Nhật |
-| Service Registry | **Chưa có** | Module `pitchos-service-registry` xây mới hoàn toàn | Hoàng |
-| Cơ sở dữ liệu | 3 schema trong MySQL cài trên máy | Chạy trong container, dữ liệu trên Named Volume, tự nạp script khởi tạo | Hùng |
-| Triển khai | 3 lệnh `java -jar` thủ công | `docker compose up -d` một lệnh duy nhất | Linh |
-| Quản lý bí mật | `.env` bị commit lên Git | Gỡ `.env` khỏi Git, chỉ commit `.env.example` | Hoàng |
-
-Bảng này đáp ứng yêu cầu của đề bài về việc trình bày rõ phần nào đã thực hiện từ các bài thực hành trước và phần nào được bổ sung để hoàn thành bài kiểm tra số 2.

@@ -107,7 +107,7 @@ Bộ kiểm thử triển khai và vận hành hệ thống được thực hi�
 
 ---
 
-## 6.4. PHÂN TÍCH CHUYÊN SÂU TÌNH HUỐNG SỰ CỐ VẬN HÀNH THỰC TẾ (1.5 ĐIỂM)
+## 6.4. PHÂN TÍCH CHUYÊN SÂU MỘT TÌNH HUỐNG SỰ CỐ VẬN HÀNH THỰC TẾ
 
 > 📌 **Yêu cầu barem điểm:** Trình bày chi tiết một tình huống sự cố thực tế xảy ra trong quá trình tích hợp/vận hành, phân tích nguyên nhân gốc rễ và giải pháp khắc phục triệt để.
 

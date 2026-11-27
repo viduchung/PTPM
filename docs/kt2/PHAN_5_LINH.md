@@ -255,7 +255,7 @@ if (pitchRepository.count() == 0) {
 Tuân thủ nguyên tắc số III của phương pháp luận *The Twelve-Factor App* (Configuration in Environment):
 * Toàn bộ cấu hình hệ thống được định nghĩa tập trung trong file `.env.example` mẫu:
   * Thông tin tài khoản CSDL (`MYSQL_USERNAME=root`, `MYSQL_PASSWORD=123456`).
-  * Khóa bảo mật ký số JWT (`JWT_SECRET=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970`).
+  * Khóa bảo mật ký số JWT (`JWT_SECRET=<chuỗi bí mật HMAC-SHA256, 64 ký tự hex — xem `.env.example`>`).
   * Cổng ánh xạ ra máy chủ và URL Eureka Server.
 * **Nguyên tắc bảo mật:** File `.env` chứa mật khẩu thực tế được thêm vào `.gitignore` để tránh rò rỉ mã bí mật lên kho lưu trữ GitHub công khai. Khi người dùng hoặc giám khảo tải dự án về, chỉ cần copy file `.env.example` thành `.env` là có thể khởi chạy ngay lập tức mà không cần sửa mã nguồn.
 
@@ -277,7 +277,7 @@ volumes:
 
 ---
 
-## 5.5. HƯỚNG DẪN CHÈN VÀ CHÚ THÍCH ẢNH MINH CHỨNG KẾT QUẢ `docker compose ps`
+## 5.5. KẾT QUẢ KIỂM TRA TRẠNG THÁI TOÀN BỘ CONTAINER
 
 Sau khi khởi chạy toàn bộ hệ thống bằng câu lệnh:
 ```bash
@@ -303,22 +303,3 @@ docker compose ps
 | **`pitchos-pitch-service-2`** | `ptpm-pitchos-pitch-service-2` | `Up` | **`healthy`** | `0.0.0.0:8084->8084/tcp` |
 | **`pitchos-booking-service`** | `ptpm-pitchos-booking-service` | `Up` | **`healthy`** | `0.0.0.0:8083->8083/tcp` |
 
-### 5.5.2. Khung vị trí chèn ảnh minh chứng trong Báo cáo Word
-
-> 📸 **HƯỚNG DẪN DÀNH CHO LINH KHI DÁN VÀO BÁO CÁO WORD:**  
-> 1. Mở cửa sổ Terminal (PowerShell hoặc Command Prompt), đứng tại thư mục gốc dự án và gõ lệnh:  
->    `docker compose ps`  
-> 2. Dùng công cụ *Snipping Tool (Windows + Shift + S)* chụp lại toàn bộ màn hình kết quả dòng lệnh.  
-> 3. Chèn ảnh chụp vào vị trí bên dưới:  
->  
-> ```
-> ┌─────────────────────────────────────────────────────────────────────────────┐
-> │ [CHÈN HÌNH 5.1 TẠI ĐÂY]                                                     │
-> │ Ảnh chụp terminal hiển thị kết quả lệnh `docker compose ps`                 │
-> │ Chứng minh toàn bộ 8 containers đều đạt trạng thái "Up (healthy)"           │
-> └─────────────────────────────────────────────────────────────────────────────┘
-> *Hình 5.1: Minh chứng trạng thái 8 containers của hệ thống PitchOS đều đạt chuẩn Up (healthy)*
-> ```
->  
-> 4. **Lời bình giải thích dưới ảnh:**  
->    *"Quan sát Hình 5.1, toàn bộ 8/8 containers thuộc hệ thống PitchOS đều hiển thị trạng thái `Up (healthy)`. Điều này chứng minh rằng: (1) Các cơ sở dữ liệu MySQL đã khởi động hoàn tất và vượt qua bài kiểm tra `mysqladmin ping`; (2) Eureka Service Registry sẵn sàng tiếp nhận đăng ký danh bạ; (3) Cả 4 microservices Java đều kết nối thành công tới CSDL sở hữu và endpoint `/actuator/health` trả về kết quả UP; (4) Instance 2 của Pitch Service đã khởi động tuần tự sau Instance 1, loại bỏ hoàn toàn nguy cơ Race Condition trong việc nạp dữ liệu."*

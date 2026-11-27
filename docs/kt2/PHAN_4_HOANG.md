@@ -7,20 +7,13 @@
 
 ---
 
-## 1. BAREM VÀ ĐỐI CHIẾU TRẠNG THÁI THỰC HIỆN
+## 1. PHẠM VI VÀ KẾT QUẢ TỔNG QUAN
 
-Mục 2.3 được chấm theo bốn tiêu chí. Bảng dưới đây đối chiếu từng tiêu chí với trạng thái hiện tại của mã nguồn:
+Phần này trình bày việc xây dựng Service Registry bằng Netflix Eureka Server, cơ chế đăng ký của các Eureka Client, cơ chế cân bằng tải phía client của Spring Cloud LoadBalancer, và kết quả kiểm thử khả năng chịu lỗi khi Provider dừng rồi khởi động lại.
 
-| Tiêu chí chấm điểm | Điểm | Trạng thái | Minh chứng |
-|---|---|---|---|
-| Eureka Server hoạt động | 0,3 | ✅ **Đạt** | `pitchos-service-registry/`, Mục 2 |
-| Các dịch vụ đăng ký thành công vào Registry | 0,3 | ✅ **Đạt** — 3 Service ID, Pitch có 2 instance | Mục 3, TC01 |
-| **Consumer dùng Service Discovery để gọi Provider** | **0,5** | ✅ **Đạt** — `201 Created`, Feign không còn `url` | Mục 4, TC02 |
-| Kiểm thử dừng và khởi động lại Provider | 0,4 | ✅ **Đạt** — TC04, TC05, TC06 | Mục 6, `service-discovery-test.md` |
+Toàn bộ sáu ca kiểm thử **TC01 – TC06** đã được thực hiện trên hệ thống 8 container chạy bằng Docker Compose ngày 27/11/2026 và **đều đạt**. Số liệu đo chi tiết được ghi trong biên bản `docs/testing/service-discovery-test.md`; các mục dưới đây trích dẫn và phân tích những kết quả quan trọng.
 
-Toàn bộ sáu ca kiểm thử TC01–TC06 đã chạy thật trên Docker ngày 27/11/2026 và đều đạt. Số liệu chi tiết trong `docs/testing/service-discovery-test.md`.
-
-> **Lưu ý về điều kiện nghiệm thu quan trọng nhất:** tiêu chí 0,5 điểm lớn nhất của mục này **không phải** là việc Eureka Dashboard hiển thị danh sách dịch vụ, mà là việc Consumer thật sự tra cứu địa chỉ Provider qua Service ID. Nếu Booking Service vẫn giữ `@FeignClient(url = "...")` thì dù Dashboard hiện đủ dịch vụ, yêu cầu Service Discovery vẫn **chưa đạt**. Phép thử dứt khoát: xóa thuộc tính `url` khỏi Feign Client và hệ thống vẫn gọi được Provider.
+> **Điều kiện nghiệm thu cần làm rõ:** việc Eureka Dashboard hiển thị đầy đủ danh sách dịch vụ **chưa đủ** để kết luận hệ thống đã có Service Discovery. Nếu Consumer vẫn gọi Provider bằng URL cố định thì Eureka chỉ là một trang web liệt kê dịch vụ, còn cơ chế tra cứu động hoàn toàn không được sử dụng. Phép thử dứt khoát là: **xóa thuộc tính `url` khỏi Feign Client, hệ thống vẫn gọi được Provider** — điều đã được xác minh ở mục 5 và trong ca kiểm thử TC02.
 
 ---
 
