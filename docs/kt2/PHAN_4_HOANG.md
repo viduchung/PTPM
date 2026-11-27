@@ -13,10 +13,12 @@ Mục 2.3 được chấm theo bốn tiêu chí. Bảng dưới đây đối chi
 
 | Tiêu chí chấm điểm | Điểm | Trạng thái | Minh chứng |
 |---|---|---|---|
-| Eureka Server hoạt động | 0,3 | ✅ **Hoàn thành** | `pitchos-service-registry/`, Mục 2 |
-| Các dịch vụ đăng ký thành công vào Registry | 0,3 | ⏳ Auth Service đã xong; chờ Pitch và Booking | Mục 3 |
-| **Consumer dùng Service Discovery để gọi Provider** | **0,5** | ⏳ Phụ thuộc Booking Service (Nhật) | Mục 4 |
-| Kiểm thử dừng và khởi động lại Provider | 0,4 | ⏳ Chờ đủ dịch vụ để chạy | Mục 6, `service-discovery-test.md` |
+| Eureka Server hoạt động | 0,3 | ✅ **Đạt** | `pitchos-service-registry/`, Mục 2 |
+| Các dịch vụ đăng ký thành công vào Registry | 0,3 | ✅ **Đạt** — 3 Service ID, Pitch có 2 instance | Mục 3, TC01 |
+| **Consumer dùng Service Discovery để gọi Provider** | **0,5** | ✅ **Đạt** — `201 Created`, Feign không còn `url` | Mục 4, TC02 |
+| Kiểm thử dừng và khởi động lại Provider | 0,4 | ✅ **Đạt** — TC04, TC05, TC06 | Mục 6, `service-discovery-test.md` |
+
+Toàn bộ sáu ca kiểm thử TC01–TC06 đã chạy thật trên Docker ngày 27/11/2026 và đều đạt. Số liệu chi tiết trong `docs/testing/service-discovery-test.md`.
 
 > **Lưu ý về điều kiện nghiệm thu quan trọng nhất:** tiêu chí 0,5 điểm lớn nhất của mục này **không phải** là việc Eureka Dashboard hiển thị danh sách dịch vụ, mà là việc Consumer thật sự tra cứu địa chỉ Provider qua Service ID. Nếu Booking Service vẫn giữ `@FeignClient(url = "...")` thì dù Dashboard hiện đủ dịch vụ, yêu cầu Service Discovery vẫn **chưa đạt**. Phép thử dứt khoát: xóa thuộc tính `url` khỏi Feign Client và hệ thống vẫn gọi được Provider.
 
@@ -122,7 +124,7 @@ Vì vậy nhóm tắt chế độ này ở môi trường học tập, kèm ghi 
 
 ### 2.5. Kết quả kiểm tra Eureka Server (đã xác minh)
 
-Chạy trực tiếp bằng JVM trên máy cá nhân (`java -jar target/pitchos-service-registry-0.0.1-SNAPSHOT.jar`):
+Lần kiểm tra đầu chạy trực tiếp bằng JVM trên máy cá nhân (`java -jar target/pitchos-service-registry-0.0.1-SNAPSHOT.jar`). Lần kiểm thử chính thức chạy trong Docker cùng toàn hệ thống 8 container:
 
 | Kiểm tra | Lệnh | Kết quả thực tế |
 |---|---|---|
@@ -219,14 +221,16 @@ Sự khác biệt giữa **dừng êm** và **dừng đột ngột** là điểm
 
 *Chú thích ảnh cần viết kèm:* Cần chỉ rõ cột `Availability Zones` của dòng `PITCHOS-PITCH-SERVICE` hiện số `2`, và cột `Status` hiện hai liên kết `UP (2)` tương ứng hai Instance ID khác nhau. Đây là điều kiện tiên quyết để có cân bằng tải: nếu Instance ID bị trùng, Dashboard chỉ hiện 1 instance và LoadBalancer không có gì để luân phiên.
 
-**Bảng kết quả cần điền sau khi chạy** *(hiện chưa chạy được vì Pitch Service và Booking Service đang chờ Linh và Nhật bổ sung Eureka Client)*:
+**Kết quả đo thực tế ngày 27/11/2026** (TC01, danh bạ trả về `HTTP 200`):
 
 | Service ID trên Dashboard | Instance ID | Trạng thái | Cổng |
 |---|---|---|---|
 | `PITCHOS-AUTH-SERVICE` | `pitchos-auth-service:8081` | `UP` | 8081 |
-| `PITCHOS-PITCH-SERVICE` | `pitchos-pitch-service:8082` | `UP` | 8082 |
-| `PITCHOS-PITCH-SERVICE` | `pitchos-pitch-service:8084` | `UP` | 8084 |
 | `PITCHOS-BOOKING-SERVICE` | `pitchos-booking-service:8083` | `UP` | 8083 |
+| `PITCHOS-PITCH-SERVICE` | `pitchos-pitch-service:pitch-instance-1` | `UP` | 8082 |
+| `PITCHOS-PITCH-SERVICE` | `pitchos-pitch-service:pitch-instance-2` | `UP` | 8084 |
+
+Hai instance Pitch Service mang cùng Service ID nhưng hai Instance ID phân biệt — đúng điều kiện cần của cân bằng tải.
 
 Có thể kiểm tra bằng dòng lệnh thay cho Dashboard để đưa vào báo cáo dạng văn bản:
 
@@ -279,30 +283,32 @@ Cách thu số liệu: Booking Service cung cấp endpoint `GET /api/v1/bookings
 1..20 | ForEach-Object { (Invoke-RestMethod -Uri "http://localhost:8083/api/v1/bookings/pitch-instance" -Headers @{Authorization="Bearer $env:TOKEN"}).port }
 ```
 
-**Bảng cần điền sau khi chạy** *(chưa chạy được: phụ thuộc endpoint `/instance-info` của Linh và việc Nhật chuyển Feign sang Service ID)*:
+**Kết quả đo thực tế ngày 27/11/2026** (TC03, 20 request tuần tự):
 
-| Lần | Instance phục vụ | Lần | Instance phục vụ |
+| Lần | Instance | Cổng | Lần | Instance | Cổng |
+|---|---|---|---|---|---|
+| 1 | `pitch-instance-2` | 8084 | 11 | `pitch-instance-2` | 8084 |
+| 2 | `pitch-instance-1` | 8082 | 12 | `pitch-instance-1` | 8082 |
+| 3 | `pitch-instance-2` | 8084 | 13 | `pitch-instance-2` | 8084 |
+| 4 | `pitch-instance-1` | 8082 | 14 | `pitch-instance-1` | 8082 |
+| 5 | `pitch-instance-2` | 8084 | 15 | `pitch-instance-2` | 8084 |
+| 6 | `pitch-instance-1` | 8082 | 16 | `pitch-instance-1` | 8082 |
+| 7 | `pitch-instance-2` | 8084 | 17 | `pitch-instance-2` | 8084 |
+| 8 | `pitch-instance-1` | 8082 | 18 | `pitch-instance-1` | 8082 |
+| 9 | `pitch-instance-2` | 8084 | 19 | `pitch-instance-2` | 8084 |
+| 10 | `pitch-instance-1` | 8082 | 20 | `pitch-instance-1` | 8082 |
+
+**Tổng hợp:**
+
+| Instance | Cổng | Số request | Tỉ lệ |
 |---|---|---|---|
-| 1 | | 11 | |
-| 2 | | 12 | |
-| 3 | | 13 | |
-| 4 | | 14 | |
-| 5 | | 15 | |
-| 6 | | 16 | |
-| 7 | | 17 | |
-| 8 | | 18 | |
-| 9 | | 19 | |
-| 10 | | 20 | |
+| `pitch-instance-1` | 8082 | **10** | 50% |
+| `pitch-instance-2` | 8084 | **10** | 50% |
+| **Tổng** | | **20** | **100%** |
 
-**Bảng tổng hợp:**
+**Nhận xét:** cả hai instance đều nhận được request, kết luận Spring Cloud LoadBalancer hoạt động đúng. Đáng chú ý hơn con số 50/50 là **thứ tự luân phiên hoàn hảo** `8084 → 8082 → 8084 → 8082…`, đúng hành vi của thuật toán Round Robin: biến đếm nguyên tử tăng 1 sau mỗi lời gọi rồi chia lấy dư cho số instance đang `UP`. Lần đo này ra tỉ lệ tuyệt đối vì 20 request được gửi tuần tự từ một luồng duy nhất, không có request đồng thời làm xáo trộn biến đếm.
 
-| Instance | Số request nhận được | Tỉ lệ |
-|---|---|---|
-| `pitch-service-1` (cổng 8082) | | |
-| `pitch-service-2` (cổng 8084) | | |
-| **Tổng** | **20** | **100%** |
-
-**Nhận xét cần viết sau khi có số liệu:** nêu rõ cả hai instance đều nhận được request (kết luận LoadBalancer hoạt động), giải thích độ lệch so với 50/50 bằng ba lý do ở Mục 4.3, và nếu một instance nhận 0 request thì phải kiểm tra lại Instance ID có bị trùng không.
+Tuy vậy, một lần đo khác ngay sau khi hai instance vừa khởi động lại (TC06) cho kết quả **20/0 — toàn bộ dồn vào cổng 8082**, rồi trở lại 10/10 sau 35 giây. Kết quả đó cũng đúng, và được phân tích ở Mục 6.3. Nó cho thấy vì sao tiêu chí nghiệm thu phải là *cả hai instance đều nhận được request* chứ không phải *tỉ lệ đúng 50/50*.
 
 ---
 
@@ -417,19 +423,45 @@ Phần này chiếm 0,4 điểm trong barem mục 2.3. Kết quả chi tiết c�
 | (c) Consumer làm mới bản sao danh bạ | 30 giây | 30 giây |
 | **Tổng xấu nhất** | **~180 giây** | **~65 giây** |
 
-Khoảng thời gian cần đo và điền vào báo cáo:
+**Số liệu đo thực tế ngày 27/11/2026:**
 
-| Phép đo | Giá trị đo được | Cách đo |
-|---|---|---|
-| Thời gian từ lúc `docker compose stop` đến lúc instance biến mất khỏi Dashboard | *(cần đo)* | Bấm thời gian, F5 Dashboard mỗi 5 giây |
-| Thời gian từ lúc dừng đến lúc Consumer không còn gọi vào instance đã chết | *(cần đo)* | Gửi request liên tục, ghi thời điểm request lỗi cuối cùng |
-| Thời gian từ lúc `docker compose start` đến lúc instance xuất hiện lại trên Dashboard | *(cần đo)* | Bấm thời gian, F5 Dashboard |
+| Phép đo | Giá trị đo được |
+|---|---|
+| Từ lúc `docker compose stop` một instance đến khi Eureka còn 1 instance | **18,2 giây** |
+| Từ lúc dừng cả hai instance đến khi Eureka còn 0 instance | **12,1 giây** |
+| Từ lúc `docker compose start` đến khi cả 2 instance đăng ký lại | **57,5 giây** |
+| Từ lúc Eureka có đủ 2 instance đến khi Consumer dùng lại cả hai | **khoảng 35 giây** |
+| Thời gian Consumer trả lỗi `503` khi không còn Provider | **2,0 giây** (không treo) |
 
-**Nhận xét cần viết:** trong khoảng độ trễ này, Consumer vẫn có thể chọn instance đã chết và nhận `Connection refused`. Hiện tượng đó **không phải lỗi lập trình** mà là hệ quả trực tiếp của mô hình **AP** mà Eureka theo đuổi: Eureka chấp nhận trả về dữ liệu có thể hơi cũ để luôn luôn trả lời được, thay vì khóa hệ thống chờ đồng thuận. Hệ thống sản xuất khắc phục bằng cách bổ sung cơ chế thử lại (Retry) và ngắt mạch (Circuit Breaker) ở phía Consumer — ngoài phạm vi bài kiểm tra này nhưng cần nêu như hướng phát triển.
+### 6.3. Quan sát quan trọng nhất: cache của Consumer, không phải danh bạ của Server
 
-**📷 Vị trí chèn ảnh 3:** Dashboard sau khi dừng instance 1, cho thấy `PITCHOS-PITCH-SERVICE` chỉ còn `UP (1)`.
+Ngay sau khi dừng một instance, 10 request thử nghiệm cho kết quả **5 thành công trên cổng 8084 và 5 lỗi `503`** — đúng tỉ lệ 50%. Sau 35 giây, cùng phép đo cho **10/10 thành công**.
 
-**📷 Vị trí chèn ảnh 4:** Kết quả Postman đặt sân thành công `201 Created` ở thời điểm chỉ còn 1 instance — minh chứng hệ thống vẫn phục vụ được.
+Chiều ngược lại cũng vậy. Sau khi hai instance khởi động lại, phép đo phân phối được lặp ba lần cách nhau 35 giây:
+
+| Thời điểm đo | Phân phối 20 request |
+|---|---|
+| Ngay sau khi Provider phục hồi | `8082: 20` / `8084: 0` |
+| Sau +35 giây | `8082: 10` / `8084: 10` |
+| Sau +70 giây | `8082: 10` / `8084: 10` |
+
+Hai phép đo này chỉ ra cùng một nguyên nhân: Booking Service **không đọc trực tiếp từ Eureka Server mỗi lần gọi**. Nó dùng bản sao danh bạ trong bộ nhớ của chính nó, làm mới theo chu kỳ 30 giây. Eureka Server đã biết sự thật mới từ giây thứ 12 hoặc 57, nhưng Consumer chỉ biết ở lần làm mới cache kế tiếp.
+
+**Kết luận:** hiện tượng gọi vào instance đã chết và nhận lỗi **không phải lỗi lập trình**, mà là hệ quả trực tiếp của mô hình **AP** (Availability + Partition tolerance) mà Eureka theo đuổi: chấp nhận dữ liệu có thể hơi cũ để luôn trả lời được, thay vì khóa hệ thống chờ đồng thuận như mô hình CP. Hệ thống phải được thiết kế để **chịu được** điều này. Môi trường sản xuất bổ sung cơ chế **thử lại (Retry)** và **ngắt mạch (Circuit Breaker)** ở phía Consumer — ngoài phạm vi bài kiểm tra số 2 nhưng là hướng phát triển tiếp theo.
+
+**Kết quả ba ca kiểm thử:**
+
+| Ca | Kết quả thực tế |
+|---|---|
+| **TC04** dừng 1 instance | Đặt sân vẫn `201 Created` (`id=3`, `totalPrice=600000`) |
+| **TC05** dừng cả 2 instance | `503 Service Unavailable` — *"Dịch vụ quản lý sân hiện không khả dụng. Vui lòng thử lại sau!"*; container Booking vẫn `healthy`, `/actuator/health` vẫn trả `{"status":"UP"}` |
+| **TC06** khởi động lại | Cả 2 instance đăng ký lại sau 57,5 giây, đặt sân `201 Created` ngay sau đó, **không phải restart Booking Service** |
+
+Kết quả TC05 đáng chú ý: Booking Service trả `503` cho nghiệp vụ nhưng `/actuator/health` vẫn `UP`. Đây không phải mâu thuẫn mà là minh chứng thực nghiệm cho sự phân biệt **sức khỏe ứng dụng** (Booking vẫn khỏe) và **khả năng nghiệp vụ** (không đặt sân được vì phụ thuộc bên ngoài đã chết) — nội dung lý thuyết ở Câu 1.4.
+
+**📷 Vị trí chèn ảnh 3:** Dashboard sau khi dừng instance 1, `PITCHOS-PITCH-SERVICE` còn `UP (1)`.
+
+**📷 Vị trí chèn ảnh 4:** Postman đặt sân `201 Created` khi chỉ còn 1 instance.
 
 ---
 
